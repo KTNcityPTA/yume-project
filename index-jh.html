@@ -241,6 +241,13 @@ footer{
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
+/* ── 流れ星 ── */
+.meteor{position:fixed;width:1.5px;height:60px;background:linear-gradient(to bottom,rgba(212,165,116,0),rgba(212,165,116,.7));border-radius:2px;animation:meteor linear infinite;pointer-events:none;z-index:0;}
+.meteor:nth-child(1){left:20%;top:-60px;animation-duration:4s;animation-delay:1s;}
+.meteor:nth-child(2){left:60%;top:-60px;animation-duration:5s;animation-delay:2.5s;}
+.meteor:nth-child(3){left:80%;top:-60px;animation-duration:4.5s;animation-delay:4s;}
+@keyframes meteor{from{transform:translateY(0) rotate(15deg);opacity:1;}to{transform:translateY(120vh) rotate(15deg);opacity:0;}}
+
 @media(max-width:480px){
   .container{padding:3.5rem 1.4rem 3rem;}
   .org-name{margin-bottom:3.5rem;}
@@ -251,6 +258,7 @@ footer{
 <body>
 <div class="bg-gradient"></div>
 <div class="bg-lines"></div>
+<div class="meteor"></div><div class="meteor"></div><div class="meteor"></div>
 
 <div class="container">
   <div class="badge-wrap">
