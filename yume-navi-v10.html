@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夢ナビ｜交野市PTA協議会 夢プロジェクト</title>
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--sun:#FFD93D;--coral:#FF6B6B;--mint:#10b981;--ocean:#3b82f6;--lav:#8b5cf6;--peach:#f97316;--white:#FFFEF7;--ink:#1a1a2e;--soft:#5a6480;--pta:#1a4a8a;--shadow:0 6px 24px rgba(0,0,0,.10);--gold:#fbbf24;}
+body{font-family:'Zen Maru Gothic',sans-serif;background:var(--white);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+header{background:linear-gradient(135deg,var(--pta),#2563EB);color:#fff;padding:.75rem 1rem;text-align:center;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18);}
+.header-inner{display:flex;align-items:center;justify-content:center;gap:.5rem;}
+#testToggleBtn{font-size:1.1rem;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:50%;width:2rem;height:2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;color:#fff;}
+#testToggleBtn:hover{background:rgba(255,255,255,.22);transform:rotate(20deg);}
+#testToggleBtn.active{background:rgba(255,220,0,.35);border-color:gold;filter:drop-shadow(0 0 5px gold);}
+header h1{font-family:'Kaisei Decol',serif;font-size:1.3rem;letter-spacing:.05em;}
+header .sub{font-size:.68rem;opacity:.8;margin-top:.1rem;}
+#testBanner{display:none;background:rgba(255,200,0,.25);border:1.5px dashed gold;color:#fff;font-size:.75rem;font-weight:700;text-align:center;padding:.3rem;letter-spacing:.1em;}
+#testBanner.show{display:block;}
+main{flex:1;max-width:680px;margin:0 auto;padding:1.2rem 1rem 4rem;width:100%;}
+.screen{display:none;}
+.screen.active{display:block;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+#scInit{display:none;text-align:center;padding:4rem 1rem;}
+#scInit.show{display:flex;flex-direction:column;align-items:center;gap:1.2rem;}
+.init-spinner{font-size:3rem;animation:spin 1.5s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.init-text{font-size:.95rem;color:var(--soft);line-height:1.8;}
+.init-err{font-size:.85rem;color:var(--coral);background:#fee;border-radius:12px;padding:1rem;max-width:400px;margin:1rem auto;}
+.section-lead{font-size:1.08rem;font-weight:700;margin-bottom:1rem;color:var(--pta);line-height:1.7;}
+.q-label{font-size:.9rem;font-weight:700;margin:.9rem 0 .4rem;color:var(--ink);line-height:1.5;}
+.q-hint{font-size:.77rem;color:var(--soft);margin-bottom:.55rem;line-height:1.5;}
+.grade-steps{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-bottom:1rem;}
+.gs-btn{padding:.45rem .85rem;border-radius:30px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s;color:var(--ink);position:relative;}
+.gs-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+.gs-btn.active{color:#fff;font-weight:700;}
+.gs-btn.recommended{border-color:var(--gold);background:#fffbeb;font-weight:700;}
+.gs-btn.recommended::after{content:'おすすめ';position:absolute;top:-8px;right:-4px;background:var(--gold);color:#fff;font-size:.55rem;padding:.1rem .35rem;border-radius:8px;font-weight:700;letter-spacing:.05em;}
+.gs-btn.recommended.active::after{background:rgba(255,255,255,.3);}
+.grade-separator{width:100%;text-align:center;font-size:.72rem;color:var(--soft);margin:.5rem 0 .3rem;letter-spacing:.1em;font-weight:700;}
+#testModeLabel{display:none;background:rgba(255,180,0,.18);border:1.5px dashed var(--gold);border-radius:14px;padding:.5rem 1rem;font-size:.8rem;font-weight:700;color:#b45309;text-align:center;margin-bottom:.7rem;}
+#testModeLabel.show{display:block;}
+.grade-card-single{background:#fff;border-radius:22px;padding:1.2rem;box-shadow:var(--shadow);text-align:center;margin-bottom:.8rem;border:3px solid transparent;display:none;}
+.gc-icon{font-size:2rem;display:block;margin-bottom:.3rem;}
+.gc-name{font-size:1rem;font-weight:700;color:var(--pta);}
+.gc-desc{font-size:.8rem;color:var(--soft);margin-top:.25rem;line-height:1.6;}
+.btn-confirm{display:none;width:100%;max-width:300px;margin:.8rem auto 0;padding:.8rem 1rem;border:none;border-radius:50px;color:#fff;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.btn-back{background:none;border:1px solid #ccc;border-radius:20px;padding:.3rem .75rem;font-family:inherit;font-size:.76rem;color:var(--soft);cursor:pointer;margin-bottom:.8rem;transition:all .2s;display:inline-flex;align-items:center;gap:.3rem;}
+.btn-back:hover{background:#f5f5f5;color:var(--ink);}
+.route-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.8rem;}
+.route-card{background:#fff;border-radius:22px;padding:1.4rem 1rem;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:var(--shadow);text-align:center;border:3px solid transparent;}
+.route-card:hover{transform:translateY(-5px);box-shadow:0 14px 32px rgba(0,0,0,.13);}
+.route-icon{font-size:2.2rem;display:block;margin-bottom:.4rem;}
+.route-title{font-weight:700;font-size:.93rem;margin-bottom:.3rem;}
+.route-desc{font-size:.73rem;color:var(--soft);line-height:1.6;}
+.input-field{width:100%;padding:.7rem 1rem;border:2px solid #e0e0e0;border-radius:14px;font-family:inherit;font-size:.92rem;color:var(--ink);transition:border-color .2s;background:#fff;}
+.input-field:focus{outline:none;border-color:var(--ocean);}
+select.input-field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .7rem center;background-size:1.1rem;padding-right:2rem;}
+textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
+.profile-card{background:#fff;border-radius:20px;padding:1.4rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
+.profile-card h2{font-family:'Kaisei Decol',serif;font-size:1.05rem;margin-bottom:1rem;color:var(--pta);}
+.form-label{font-size:.82rem;font-weight:700;margin-bottom:.35rem;display:block;color:var(--soft);}
+.form-row{margin-bottom:.8rem;}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem;}
+.chip{padding:.35rem .78rem;border:1.5px solid #d0d0d0;border-radius:20px;background:#fff;font-family:inherit;font-size:.77rem;cursor:pointer;animation:chipIn .3s ease both;transition:all .15s;color:var(--ink);}
+@keyframes chipIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
+.chip:hover{background:#f0f4ff;border-color:var(--ocean);}
+.chip.on-a{background:var(--ocean);color:#fff;border-color:var(--ocean);}
+.chip.on-b{background:var(--lav);color:#fff;border-color:var(--lav);}
+.chip.on-c{background:var(--mint);color:#fff;border-color:var(--mint);}
+.chip.career{padding:.45rem .9rem;font-size:.83rem;}
+.chip.career.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;border-color:#f59e0b;font-weight:700;}
+.chip.career.rank-2{background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff;border-color:#6b7280;font-weight:700;}
+.chip.career.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border-color:#b45309;font-weight:700;}
+.more-btn{display:none;margin-top:.4rem;padding:.3rem .85rem;border:1.5px solid var(--ocean);border-radius:20px;background:#fff;font-family:inherit;font-size:.73rem;color:var(--ocean);cursor:pointer;align-items:center;gap:.25rem;transition:all .2s;}
+.more-btn:hover{background:var(--ocean);color:#fff;}
+.more-btn.show{display:inline-flex;}
+.err-msg{color:var(--coral);font-size:.77rem;font-weight:700;display:none;margin-top:.35rem;}
+.err-msg.show{display:block;}
+.btn-go{display:block;width:100%;max-width:300px;margin:1.1rem auto 0;padding:.8rem 1rem;background:linear-gradient(135deg,var(--ocean),var(--lav));border:none;border-radius:50px;color:#fff;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.15);}
+.btn-go:hover{transform:translateY(-2px);}
+.uranai-card{background:#fff;border-radius:20px;padding:1.4rem;box-shadow:var(--shadow);}
+.uranai-card h2{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:var(--pta);margin-bottom:.5rem;}
+.uranai-card>p{font-size:.82rem;color:var(--soft);margin-bottom:1.1rem;line-height:1.7;}
+.birth-row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+.birth-row select{flex:1;min-width:80px;}
+.birth-label-sm{font-size:.78rem;color:var(--soft);white-space:nowrap;}
+.radio-group{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.5rem;}
+.radio-label{display:flex;align-items:center;gap:.28rem;padding:.28rem .7rem;border:1.5px solid #d0d0d0;border-radius:20px;cursor:pointer;font-size:.8rem;transition:all .15s;}
+.radio-label:hover{background:#f0f4ff;border-color:var(--ocean);}
+.radio-label:has(input:checked){background:var(--ocean);color:#fff;border-color:var(--ocean);}
+.radio-label input{display:none;}
+
+/* ── 結果画面 ── */
+#scResult{display:none;}
+#scResult.show{display:block;animation:fadeUp .5s ease;}
+.res-header{border-radius:22px;padding:1.5rem;margin-bottom:1rem;color:#fff;text-align:center;position:relative;}
+#resTitle{font-family:'Kaisei Decol',serif;font-size:1.35rem;margin-bottom:.3rem;}
+#resSub{font-size:.76rem;opacity:.85;}
+.res-back-btn{position:absolute;top:.8rem;left:.8rem;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:16px;padding:.28rem .7rem;font-family:inherit;font-size:.72rem;cursor:pointer;transition:all .2s;}
+.res-back-btn:hover{background:rgba(255,255,255,.38);}
+
+/* ── 夢の正体 導入ゾーン ── */
+/* コンセプトカード */
+.dream-concept-card{background:linear-gradient(135deg,#0c4a6e,#1a4a8a,#312e81);border-radius:22px;padding:1.5rem;margin-bottom:.8rem;color:#fff;text-align:center;overflow:hidden;position:relative;}
+.concept-emoji-row{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:1.6rem;margin-bottom:.9rem;}
+.concept-arrow{font-size:.9rem;opacity:.6;}
+.concept-title{font-family:'Kaisei Decol',serif;font-size:1.15rem;margin-bottom:.55rem;}
+.concept-body{font-size:.86rem;line-height:2;opacity:.95;}
+.concept-highlight{display:inline-block;background:rgba(251,191,36,.25);border:1px solid rgba(251,191,36,.55);border-radius:6px;padding:.05rem .4rem;color:#fbbf24;font-weight:700;}
+
+/* 変換カード */
+.dream-transform-card{background:#fff;border-radius:18px;padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.8rem;border:2px solid var(--gold);}
+.transform-label{font-size:.7rem;color:#92400e;font-weight:700;text-align:center;margin-bottom:.65rem;}
+.transform-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;justify-content:center;}
+.transform-box{background:#f0f7ff;border-radius:12px;padding:.65rem 1rem;text-align:center;flex:1;min-width:115px;}
+.transform-box.dream{background:linear-gradient(135deg,#fef3c7,#fde68a);}
+.transform-box-label{font-size:.65rem;color:var(--soft);margin-bottom:.2rem;}
+.transform-box-value{font-size:.9rem;font-weight:700;color:var(--pta);}
+.transform-box.dream .transform-box-value{color:#92400e;}
+.transform-arrow-big{font-size:1.5rem;color:var(--gold);}
+
+/* ガイドカード */
+.guide-card{background:linear-gradient(135deg,#fff7ed,#fef3c7);border-radius:18px;padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.8rem;border:2px solid var(--gold);}
+.guide-label{font-size:.75rem;color:#b45309;font-weight:700;margin-bottom:.5rem;}
+.guide-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
+.guide-body{font-size:.88rem;line-height:2.1;color:var(--ink);}
+
+/* キャラクター */
+.animal-section{background:linear-gradient(135deg,#f8f0ff,#f0f8ff);border-radius:18px;padding:1.2rem;margin-bottom:.8rem;border:2px solid var(--lav);}
+.animal-label{font-size:.72rem;color:var(--lav);font-weight:700;margin-bottom:.5rem;}
+.animal-name{font-size:1.1rem;font-weight:700;color:var(--pta);margin-bottom:.3rem;}
+.animal-desc{font-size:.83rem;color:var(--ink);line-height:1.8;}
+
+/* 夢候補カード（ルートC）*/
+.dream-candidates{margin-bottom:.9rem;}
+.dc-title{font-family:'Kaisei Decol',serif;font-size:.95rem;color:var(--pta);margin-bottom:.6rem;}
+.dc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
+.dc-card{background:#fff;border-radius:14px;padding:.8rem .65rem;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;}
+.dc-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12);}
+.dc-card.selected{border-color:var(--mint);background:#f0fdf4;}
+.dc-emoji{font-size:1.6rem;display:block;margin-bottom:.25rem;}
+.dc-name{font-size:.78rem;font-weight:700;color:var(--pta);}
+
+/* アコーディオンヒント */
+.hint-intro{font-size:.78rem;color:var(--soft);margin-bottom:.5rem;line-height:1.6;}
+.hint-accordion{background:#fff;border-radius:16px;margin-bottom:.6rem;box-shadow:var(--shadow);overflow:hidden;}
+.hint-acc-header{display:flex;align-items:center;gap:.5rem;padding:.85rem 1rem;cursor:pointer;user-select:none;transition:background .2s;}
+.hint-acc-header:hover{background:#f8f9ff;}
+.hint-acc-icon{font-size:1.1rem;}
+.hint-acc-label{font-size:.85rem;font-weight:700;flex:1;}
+.hint-acc-toggle{font-size:.75rem;color:var(--soft);transition:transform .3s;flex-shrink:0;}
+.hint-acc-toggle.open{transform:rotate(180deg);}
+.hint-acc-body{display:none;padding:0 1rem .9rem;}
+.hint-acc-body.open{display:block;animation:fadeUp .2s ease;}
+.hint-acc-sublabel{font-size:.7rem;color:var(--soft);margin-bottom:.45rem;}
+.hint-item{padding:.55rem .85rem;font-size:.84rem;line-height:1.7;color:var(--ink);border-radius:10px;margin-bottom:.35rem;border-left:3px solid var(--ocean);background:#f0f7ff;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:flex-start;gap:.4rem;}
+.hint-item:hover{background:#dbeafe;transform:translateX(2px);}
+.hint-item:last-child{margin-bottom:0;}
+.hint-item.q2{background:#f5f0ff;border-left-color:var(--lav);}
+.hint-item.q2:hover{background:#ede8ff;}
+.hint-item.q3{background:#fff7ed;border-left-color:var(--peach);}
+.hint-item.q3:hover{background:#fef0dc;}
+.hint-use-badge{font-size:.63rem;color:#fff;background:var(--mint);border-radius:8px;padding:.1rem .4rem;white-space:nowrap;flex-shrink:0;margin-top:.2rem;}
+
+/* 偉人 */
+.hero-section{margin-bottom:.9rem;}
+.hero-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
+.hero-grid{display:grid;gap:.65rem;}
+.hero-card{background:#fff;border-radius:18px;padding:1rem;box-shadow:var(--shadow);}
+.hero-name{font-weight:700;font-size:.92rem;margin-bottom:.18rem;display:flex;align-items:center;gap:.38rem;}
+.hero-emoji{font-size:1.35rem;}
+.hero-job{font-size:.76rem;color:var(--ocean);font-weight:700;margin-bottom:.28rem;}
+.hero-msg{font-size:.8rem;color:var(--ink);line-height:1.85;}
+
+/* 自分で書く */
+.writing-card{background:linear-gradient(135deg,#ecfeff,#f0fdf4);border:2px solid var(--mint);border-radius:22px;padding:1.4rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
+.writing-title{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:var(--pta);margin-bottom:.35rem;}
+.writing-sub{font-size:.8rem;color:var(--soft);margin-bottom:.9rem;line-height:1.8;}
+.mode-tabs{display:flex;gap:.4rem;margin-bottom:.9rem;}
+.mode-tab{flex:1;padding:.55rem;border:1.5px solid #d0d0d0;border-radius:10px;background:#fff;font-family:inherit;font-size:.8rem;cursor:pointer;color:var(--ink);transition:all .15s;}
+.mode-tab.active{background:var(--mint);color:#fff;border-color:var(--mint);font-weight:700;}
+.template-area{display:none;}
+.template-area.show{display:block;}
+.template-select-wrap{margin-bottom:.7rem;}
+.template-edit-zone{background:#fff;border-radius:14px;border:2px dashed var(--mint);padding:.9rem;margin-bottom:.6rem;}
+.template-edit-label{font-size:.72rem;color:var(--mint);font-weight:700;margin-bottom:.55rem;display:flex;align-items:center;gap:.3rem;}
+.template-blanks{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.7rem;}
+.blank-row{display:flex;align-items:center;gap:.5rem;}
+.blank-num{font-size:.72rem;color:var(--soft);white-space:nowrap;min-width:20px;}
+.blank-input-field{flex:1;padding:.48rem .75rem;border:2px solid var(--gold);border-radius:10px;font-family:inherit;font-size:.86rem;background:#fef9ec;color:var(--ink);}
+.blank-input-field:focus{outline:none;border-color:#f59e0b;}
+.template-preview-wrap{background:#fefce8;border-radius:10px;padding:.7rem .9rem;border-left:4px solid var(--gold);margin-bottom:.5rem;}
+.template-preview-label{font-size:.68rem;color:#92400e;margin-bottom:.3rem;font-weight:700;}
+.template-preview{font-size:.87rem;line-height:2;color:var(--ink);}
+.full-edit-wrap{margin-top:.6rem;}
+.full-edit-label{font-size:.72rem;color:var(--pta);font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.25rem;}
+.full-edit-area{width:100%;padding:.75rem 1rem;border:2px solid var(--ocean);border-radius:12px;font-family:inherit;font-size:.9rem;line-height:1.85;min-height:100px;color:var(--ink);background:#fff;resize:vertical;transition:border-color .2s;}
+.full-edit-area:focus{outline:none;border-color:#1d4ed8;}
+.hint-flash{border-color:var(--mint)!important;transition:border-color .6s;}
+
+/* 感想 */
+.kansou-card{background:#fff;border-radius:18px;padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
+.kansou-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.4rem;}
+
+/* アクション */
+.result-actions{display:flex;flex-direction:column;gap:.65rem;margin-top:1rem;}
+#submitBtn{display:block;width:100%;max-width:280px;margin:0 auto;padding:.8rem;background:linear-gradient(135deg,var(--mint),#059669);border:none;border-radius:50px;color:#fff;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,0,0,.15);}
+#submitBtn:hover{transform:translateY(-2px);}
+.save-status{display:none;font-size:.78rem;text-align:center;padding:.6rem;border-radius:10px;margin-top:.35rem;}
+.save-status.ok{background:#e8f5e9;color:#2e7d32;font-weight:700;}
+.save-status.err{background:#ffebee;color:#c62828;}
+.btn-outline{display:block;width:100%;max-width:280px;margin:0 auto;padding:.65rem;background:#fff;border:2px solid var(--pta);border-radius:50px;color:var(--pta);font-family:inherit;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
+.btn-outline:hover{background:var(--pta);color:#fff;}
+
+/* ── ドキュメントビュー ── */
+#docView{display:none;position:fixed;inset:0;z-index:9999;background:#e8e8e0;overflow-y:auto;padding:1.5rem 1rem 5rem;}
+#docView.show{display:block;}
+.doc-close-bar{position:sticky;top:0;z-index:100;display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;padding:.7rem;background:rgba(232,232,224,.92);backdrop-filter:blur(8px);margin:-1.5rem -1rem 1.5rem;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.doc-bar-btn{padding:.5rem 1.1rem;border-radius:20px;border:none;font-family:inherit;font-size:.8rem;cursor:pointer;font-weight:700;transition:all .2s;}
+.doc-bar-btn.primary{background:var(--pta);color:#fff;}
+.doc-bar-btn.primary:hover{background:#1e40af;}
+.doc-bar-btn.secondary{background:#fff;color:var(--pta);border:2px solid var(--pta);}
+.doc-bar-btn.secondary:hover{background:var(--pta);color:#fff;}
+.doc-paper{background:#fff;max-width:620px;margin:0 auto;padding:2.5rem 2.2rem;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.15);}
+.doc-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:3px double var(--pta);}
+.doc-title{font-family:'Kaisei Decol',serif;font-size:1.7rem;color:var(--pta);margin-bottom:.4rem;}
+.doc-sub{font-size:.78rem;color:var(--soft);margin-bottom:.4rem;}
+.doc-badge{display:inline-block;background:var(--pta);color:#fff;padding:.2rem .9rem;border-radius:20px;font-size:.7rem;}
+.doc-section{margin-bottom:1.4rem;}
+.doc-section-title{font-size:.68rem;font-weight:700;color:var(--soft);letter-spacing:.12em;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid #e0e0e0;text-transform:uppercase;}
+.doc-career-name{font-family:'Kaisei Decol',serif;font-size:1.35rem;color:var(--pta);}
+.doc-guide-box{background:#fffbeb;border-left:4px solid var(--gold);padding:.8rem 1rem;border-radius:0 10px 10px 0;font-size:.84rem;line-height:2;}
+.doc-dream-box{background:linear-gradient(135deg,#f0fdf4,#ecfeff);border:2px solid var(--mint);border-radius:12px;padding:1rem 1.2rem;font-size:.95rem;line-height:2.1;min-height:70px;white-space:pre-wrap;}
+.doc-kansou-box{background:#f8f9ff;border-radius:12px;padding:1rem 1.2rem;font-size:.87rem;line-height:2;min-height:60px;color:var(--soft);white-space:pre-wrap;}
+.doc-hero-list{display:flex;flex-direction:column;gap:.5rem;}
+.doc-hero-item{background:#f8f9ff;border-radius:10px;padding:.65rem .9rem;font-size:.8rem;line-height:1.8;}
+.doc-footer{text-align:center;margin-top:2rem;padding-top:1rem;border-top:1px solid #e0e0e0;font-size:.68rem;color:var(--soft);}
+@media print{
+  body>*:not(#docView){display:none!important;}
+  #docView{position:static;background:#fff;padding:0;}
+  .doc-close-bar{display:none!important;}
+  .doc-paper{box-shadow:none;max-width:100%;padding:1.5rem;}
+}
+
+/* お問い合わせ */
+.contact-card{background:var(--white);border-radius:22px;padding:1.6rem;box-shadow:var(--shadow);}
+.contact-card h2{font-family:'Kaisei Decol',serif;font-size:1.2rem;margin-bottom:.35rem;}
+.contact-card>p{font-size:.82rem;color:var(--soft);margin-bottom:1.2rem;line-height:1.7;}
+.confirm-row{display:flex;gap:.45rem;font-size:.82rem;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid #f0f0f0;}
+.confirm-label{font-weight:700;min-width:75px;color:var(--soft);}
+.confirm-val{color:var(--ink);}
+footer{background:var(--pta);color:#fff;text-align:center;padding:1.1rem 1rem;font-size:.72rem;line-height:1.8;}
+footer a{color:#93c5fd;text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+.footer-privacy{font-size:.66rem;opacity:.75;margin-top:.35rem;}
+@media(max-width:480px){.route-grid{grid-template-columns:1fr;}.birth-row{gap:.35rem;}.dc-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<header>
+  <div id="testBanner">🔧 テストモード</div>
+  <div class="header-inner">
+    <button id="testToggleBtn" onclick="toggleTestMode()" title="テストモード切替">✦</button>
+    <div><h1>夢ナビ</h1><p class="sub">交野市PTA協議会　夢プロジェクト</p></div>
+  </div>
+</header>
+
+<!-- ドキュメントビュー（印刷・保存用） -->
+<div id="docView">
+  <div class="doc-close-bar">
+    <button class="doc-bar-btn primary" onclick="printDoc()">🖨️ 印刷・PDFで保存</button>
+    <button class="doc-bar-btn secondary" onclick="saveDocAsImage()">📸 画像として保存</button>
+    <button class="doc-bar-btn secondary" onclick="closeDocView()">← アプリにもどる</button>
+  </div>
+  <div class="doc-paper" id="docPaper">
+    <div class="doc-header">
+      <div class="doc-title">わたしの　夢の正体</div>
+      <div class="doc-sub" id="docMeta"></div>
+      <div class="doc-badge">交野市PTA協議会 夢プロジェクト 2026</div>
+    </div>
+    <div class="doc-section">
+      <div class="doc-section-title">選んだ仕事</div>
+      <div class="doc-career-name" id="docCareerName"></div>
+    </div>
+    <div class="doc-section">
+      <div class="doc-section-title">夢の正体とは</div>
+      <div class="doc-guide-box" id="docGuideText"></div>
+    </div>
+    <div class="doc-section">
+      <div class="doc-section-title">わたしが見つけた「夢の正体」</div>
+      <div class="doc-dream-box" id="docDreamText">（まだ書いていません）</div>
+    </div>
+    <div class="doc-section">
+      <div class="doc-section-title">感想・気づき</div>
+      <div class="doc-kansou-box" id="docKansouText">（まだ書いていません）</div>
+    </div>
+    <div class="doc-section">
+      <div class="doc-section-title">参考にした偉人の言葉</div>
+      <div class="doc-hero-list" id="docHeroList"></div>
+    </div>
+    <div class="doc-footer">交野市PTA協議会　夢プロジェクト　2026年 夏休みの宿題</div>
+  </div>
+</div>
+
+<main>
+  <div id="scInit" class="show">
+    <div class="init-spinner">✨</div>
+    <div class="init-text">準備中です...<br>少しお待ちください</div>
+  </div>
+
+  <!-- ① 学年選択 -->
+  <div class="screen" id="scGrade">
+    <p class="section-lead" id="gradeLead">こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span></p>
+    <div id="testModeLabel">🔧 テストモード ON — 送信データに「テスト」フラグが付きます</div>
+    <div class="grade-steps" id="gradeSteps"></div>
+    <div class="grade-card-single" id="gradePreview"></div>
+    <button class="btn-confirm" id="gradeConfirmBtn" onclick="goProfile()">この学年で進む →</button>
+  </div>
+
+  <!-- ② プロフィール -->
+  <div class="screen" id="scProfile">
+    <button class="btn-back" onclick="show('scGrade')">← 学年選択にもどる</button>
+    <div class="profile-card">
+      <h2>あなたのことを教えてください</h2>
+      <div class="form-row">
+        <label class="form-label" for="pSchool">🏫 学校名（必須）</label>
+        <select class="input-field" id="pSchool"><option value="">── 選んでください ──</option></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="pName">👤 お名前</label>
+        <input class="input-field" id="pName" type="text" placeholder="名前を入力してください">
+      </div>
+      <p class="err-msg" id="profileErr">学校名を選んでください！</p>
+      <button class="btn-go" onclick="goRoute()">ルートを選ぶ →</button>
+    </div>
+  </div>
+
+  <!-- ③ ルート選択 -->
+  <div class="screen" id="scRoute">
+    <button class="btn-back" onclick="show('scProfile')">← もどる</button>
+    <p class="section-lead">どのルートで夢を探しますか？</p>
+    <div class="route-grid">
+      <div class="route-card" style="border-color:var(--ocean)" onclick="pickRoute('A')">
+        <span class="route-icon">💼</span>
+        <div class="route-title">なりたい仕事から</div>
+        <div class="route-desc">気になっている仕事から夢の正体を探そう！</div>
+      </div>
+      <div class="route-card" style="border-color:var(--lav)" onclick="pickRoute('B')">
+        <span class="route-icon">💜</span>
+        <div class="route-title">したいことから</div>
+        <div class="route-desc">気持ちや価値観から自分に合う仕事を見つけよう！</div>
+      </div>
+      <div class="route-card" style="border-color:var(--peach)" onclick="pickRoute('C')">
+        <span class="route-icon">🌈</span>
+        <div class="route-title">夢を一緒に考えよう</div>
+        <div class="route-desc">生年月日・好きなことから向いている仕事を見つけよう！</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ ルートA -->
+  <div class="screen" id="scA1">
+    <button class="btn-back" onclick="show('scRoute')">← もどる</button>
+    <p class="q-label">気になる仕事を選んでね</p>
+    <p class="q-hint">🏆 人気の仕事ランキング（タップして選択）</p>
+    <div class="chips-wrap" id="rankingChips"></div>
+    <button class="more-btn" id="rankingMoreBtn" onclick="loadMoreRanking()">＋ もっと見る（+10件）</button>
+    <p class="q-hint" style="margin-top:1rem">📂 カテゴリーから探す（複数選択可）</p>
+    <div class="chips-wrap" id="catChips"></div>
+    <div id="catResultBox" style="display:none;margin-top:.8rem">
+      <p class="q-hint">✨ 選んだカテゴリーに合う仕事</p>
+      <div class="chips-wrap" id="catResultChips"></div>
+      <button class="more-btn" id="catMoreBtn" onclick="loadMoreCatResult()">＋ もっと見る（+10件）</button>
+    </div>
+    <p class="err-msg" id="a1Err">気になる仕事を選んでね！</p>
+    <button class="btn-go" onclick="goResult('A')">この仕事で進む →</button>
+  </div>
+
+  <!-- ⑤ ルートB -->
+  <div class="screen" id="scB1">
+    <button class="btn-back" onclick="show('scRoute')">← もどる</button>
+    <p class="q-label">あなたの気持ちに近いものを選んでね（複数選択可）</p>
+    <div class="chips-wrap" id="valueChips"></div>
+    <button class="more-btn" id="valueMoreBtn" onclick="loadMoreValues()">＋ もっと見る</button>
+    <div id="b2ResultBox" style="display:none;margin-top:1rem">
+      <p class="q-label">✨ あなたの気持ちに合う仕事</p>
+      <p class="q-hint">仕事を一つ選んでね</p>
+      <div class="chips-wrap" id="b2CareerChips"></div>
+      <button class="more-btn" id="b2MoreBtn" onclick="loadMoreB2()">＋ もっと見る</button>
+    </div>
+    <p class="err-msg" id="b1Err">気持ちと仕事をそれぞれ選んでね！</p>
+    <button class="btn-go" onclick="goResult('B')">この仕事で進む →</button>
+  </div>
+
+  <!-- ⑥ ルートC -->
+  <div class="screen" id="scC1">
+    <button class="btn-back" onclick="show('scRoute')">← もどる</button>
+    <div class="uranai-card">
+      <h2>🌈 あなたの夢を一緒に考えよう！</h2>
+      <p>生年月日・好きなこと・得意なことを教えてね。向いているかもしれない仕事と夢の候補を紹介するよ！</p>
+      <div class="form-row">
+        <label class="form-label">🎂 生まれた日（月→日→年の順で）</label>
+        <div class="birth-row">
+          <select class="input-field" id="cMonth" onchange="updateDayYear()"><option value="">月</option></select>
+          <span class="birth-label-sm">月</span>
+          <select class="input-field" id="cDay" onchange="updateYear()"><option value="">日</option></select>
+          <span class="birth-label-sm">日</span>
+          <select class="input-field" id="cYear"><option value="">年</option></select>
+          <span class="birth-label-sm">年</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">性別</label>
+        <div class="radio-group" id="cGenderGroup"></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">好きなこと・得意なこと（いくつでも選んでOK）</label>
+        <div class="chips-wrap" id="cLikeChips"></div>
+        <button class="more-btn" id="likeMoreBtn" onclick="loadMoreLikes()">＋ もっと見る</button>
+      </div>
+      <p class="err-msg" id="cErr">生まれた月・日・年と性別を選んでね！</p>
+      <button class="btn-go" onclick="generateRouteC()">🔮 結果を見る！</button>
+    </div>
+  </div>
+
+  <!-- ── 結果画面 ── -->
+  <div id="scResult">
+    <div class="res-header" id="resHeader">
+      <button class="res-back-btn" onclick="goBackFromResult()">← もどる</button>
+      <div id="resTitle">✨ 結果</div>
+      <div id="resSub"></div>
+    </div>
+
+    <!-- ゾーン1：夢の正体の概念（導入） -->
+    <div class="dream-concept-card">
+      <div class="concept-emoji-row">
+        <span>💼</span><span class="concept-arrow">→</span>
+        <span>❓</span><span class="concept-arrow">→</span>
+        <span>✨</span><span class="concept-arrow">→</span>
+        <span>🌍</span>
+      </div>
+      <div class="concept-title">夢の「正体」って何だろう？</div>
+      <div class="concept-body" id="conceptBodyText"></div>
+    </div>
+
+    <!-- ゾーン2：職業→夢の正体 変換イメージ -->
+    <div class="dream-transform-card">
+      <div class="transform-label">💡 あなたが選んだ仕事で考えてみよう</div>
+      <div class="transform-row">
+        <div class="transform-box">
+          <div class="transform-box-label">仕事の名前</div>
+          <div class="transform-box-value" id="transformCareer">—</div>
+        </div>
+        <div class="transform-arrow-big">→</div>
+        <div class="transform-box dream">
+          <div class="transform-box-label">夢の正体（あなたが探すもの）</div>
+          <div class="transform-box-value">？？？</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ゾーン3：ガイドテキスト（学年別） -->
+    <div class="guide-card">
+      <div class="guide-label">💡 夢の正体とは？</div>
+      <div class="guide-title" id="guideTitle"></div>
+      <div class="guide-body" id="guideBody"></div>
+    </div>
+
+    <!-- ルートC：キャラクター -->
+    <div class="animal-section" id="resAnimalSection" style="display:none">
+      <div class="animal-label">🌈 あなたのキャラクター診断</div>
+      <div class="animal-name" id="resAnimalName"></div>
+      <div class="animal-desc" id="resAnimalDesc"></div>
+    </div>
+
+    <!-- ルートC：夢候補カード -->
+    <div class="dream-candidates" id="resDreamCandidates" style="display:none">
+      <div class="dc-title">✨ あなたに向いているかもしれない仕事（タップすると詳しく見られるよ）</div>
+      <div class="dc-grid" id="dcGrid"></div>
+    </div>
+
+    <!-- ゾーン4：ヒント（アコーディオン） -->
+    <div id="hintSection" style="margin-top:.9rem">
+      <p class="hint-intro">👇 ヒントを開いて「夢の正体」を書くときの参考にしよう。<br>気に入ったヒントをタップすると書くエリアに追加できるよ！</p>
+      <div class="hint-accordion" id="acc1">
+        <div class="hint-acc-header" onclick="toggleAcc('acc1')">
+          <span class="hint-acc-icon">🌱</span>
+          <span class="hint-acc-label">ヒント1：この仕事で「誰を笑顔にできる」？</span>
+          <span class="hint-acc-toggle" id="acc1-toggle">▼</span>
+        </div>
+        <div class="hint-acc-body" id="acc1-body">
+          <div class="hint-acc-sublabel">タップすると書くエリアに追加されるよ 👇</div>
+          <div id="hint1List"></div>
+        </div>
+      </div>
+      <div class="hint-accordion" id="acc2">
+        <div class="hint-acc-header" onclick="toggleAcc('acc2')">
+          <span class="hint-acc-icon">💬</span>
+          <span class="hint-acc-label" style="color:var(--lav)">ヒント2：どんな「ありがとう」が届く？</span>
+          <span class="hint-acc-toggle" id="acc2-toggle">▼</span>
+        </div>
+        <div class="hint-acc-body" id="acc2-body">
+          <div class="hint-acc-sublabel">タップすると書くエリアに追加されるよ 👇</div>
+          <div id="hint2List"></div>
+        </div>
+      </div>
+      <div class="hint-accordion" id="acc3">
+        <div class="hint-acc-header" onclick="toggleAcc('acc3')">
+          <span class="hint-acc-icon">🌍</span>
+          <span class="hint-acc-label" style="color:var(--peach)">ヒント3：世の中にどんな影響を残せる？</span>
+          <span class="hint-acc-toggle" id="acc3-toggle">▼</span>
+        </div>
+        <div class="hint-acc-body" id="acc3-body">
+          <div class="hint-acc-sublabel">タップすると書くエリアに追加されるよ 👇</div>
+          <div id="hint3List"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ゾーン5：偉人 -->
+    <div class="hero-section" style="margin-top:.9rem">
+      <div class="hero-title">📚 偉人たちの「夢の正体」</div>
+      <div class="hero-grid" id="heroCards"></div>
+    </div>
+
+    <!-- ゾーン6：自分で書く（核心） -->
+    <div class="writing-card">
+      <div class="writing-title">✍️ あなたの「夢の正体」を書こう</div>
+      <div class="writing-sub">ヒントや偉人の言葉を参考に、あなただけの言葉で書こう。<br>上手に書かなくていい。素直な気持ちが一番大切！</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tabTemplate" onclick="switchMode('template')">📝 穴埋めで書く</button>
+        <button class="mode-tab" id="tabFree" onclick="switchMode('free')">✏️ 自由に書く</button>
+      </div>
+      <!-- 穴埋め -->
+      <div class="template-area show" id="templateArea">
+        <div class="template-select-wrap">
+          <label class="form-label">テンプレートを選ぶ</label>
+          <select class="input-field" id="templateSelect" onchange="renderTemplate()"></select>
+        </div>
+        <div class="template-edit-zone">
+          <div class="template-edit-label">✏️ 黄色の欄に言葉を入れよう</div>
+          <div class="template-blanks" id="templateBlanks"></div>
+          <div class="template-preview-wrap">
+            <div class="template-preview-label">📄 完成イメージ</div>
+            <div class="template-preview" id="templatePreview"></div>
+          </div>
+        </div>
+        <p style="font-size:.72rem;color:var(--soft);margin-bottom:.4rem">↓ 完成した文章を自由に書き直してもOKだよ！</p>
+        <div class="full-edit-wrap">
+          <div class="full-edit-label">🖊️ 完成した夢の正体（自由に書き直せるよ）</div>
+          <textarea class="full-edit-area" id="templateOutput" placeholder="ここに書こう！"></textarea>
+        </div>
+      </div>
+      <!-- 自由 -->
+      <div class="template-area" id="freeArea">
+        <div class="full-edit-wrap">
+          <div class="full-edit-label">🖊️ あなたの言葉で書こう</div>
+          <textarea class="full-edit-area" id="freeInput" placeholder="あなたの「夢の正体」を自由に書いてね！" style="min-height:120px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 感想 -->
+    <div class="kansou-card">
+      <div class="kansou-title">💬 感想・気づき</div>
+      <div style="background:#f8f9ff;border-radius:10px;padding:.7rem;margin-bottom:.6rem">
+        <div style="font-size:.7rem;color:var(--ocean);font-weight:700;margin-bottom:.4rem">📖 例文</div>
+        <div style="font-size:.76rem;color:var(--soft);line-height:1.8;padding-left:.5rem;border-left:3px solid var(--ocean);margin-bottom:.3rem">「夢は仕事だと思っていたけど、なった後に人に与える感動のことだと知った。」</div>
+        <div style="font-size:.76rem;color:var(--soft);line-height:1.8;padding-left:.5rem;border-left:3px solid var(--ocean)">「夢はお医者さんだけだと思っていたけど、人の健康を守りたかったのだと気づいた！」</div>
+      </div>
+      <textarea class="input-field" id="kansouInput" placeholder="今日の気づき・感想を書こう"></textarea>
+    </div>
+
+    <div class="result-actions">
+      <button id="submitBtn" onclick="saveResult()">📤 宿題を提出する</button>
+      <div class="save-status" id="saveStatus"></div>
+      <button class="btn-outline" onclick="openDocView()">📄 ドキュメントとして保存・印刷</button>
+      <button class="btn-outline" onclick="fullReset()">🔁 再チャレンジする</button>
+    </div>
+  </div>
+
+  <!-- お問い合わせ -->
+  <div class="screen" id="scContact">
+    <button class="btn-back" onclick="show('scGrade')">← トップにもどる</button>
+    <div class="contact-card" id="contactForm">
+      <h2>📬 お問い合わせ</h2>
+      <p>夢ナビに関するご質問・ご意見をお送りください。</p>
+      <div class="form-row"><label class="form-label" for="cName">お名前</label><input class="input-field" id="cName" type="text" placeholder="田中　太郎"></div>
+      <div class="form-row"><label class="form-label" for="cEmail">メールアドレス</label><input class="input-field" id="cEmail" type="email" placeholder="example@email.com"></div>
+      <div class="form-row"><label class="form-label" for="cCategory">種別</label>
+        <select class="input-field" id="cCategory">
+          <option value="">── 選んでください ──</option>
+          <option>アプリの使い方について</option><option>不具合・エラーの報告</option>
+          <option>内容に関するご意見・ご要望</option><option>学校展開・活用についてのご相談</option><option>その他</option>
+        </select></div>
+      <div class="form-row"><label class="form-label">返信希望</label>
+        <div class="radio-group">
+          <label class="radio-label"><input type="radio" name="cReply" value="希望する" checked> 希望する</label>
+          <label class="radio-label"><input type="radio" name="cReply" value="不要"> 不要</label>
+        </div></div>
+      <div class="form-row"><label class="form-label" for="cBody">内容</label><textarea class="input-field" id="cBody" placeholder="詳細をご記入ください"></textarea></div>
+      <p class="err-msg" id="contactErr">すべての項目を入力してください。</p>
+      <button class="btn-go" onclick="showContactConfirm()">確認画面へ →</button>
+    </div>
+    <div class="contact-card" id="contactConfirm" style="display:none">
+      <h2>✅ 送信内容の確認</h2>
+      <div class="confirm-row"><span class="confirm-label">お名前</span><span class="confirm-val" id="cfName"></span></div>
+      <div class="confirm-row"><span class="confirm-label">メール</span><span class="confirm-val" id="cfEmail"></span></div>
+      <div class="confirm-row"><span class="confirm-label">種別</span><span class="confirm-val" id="cfCat"></span></div>
+      <div class="confirm-row"><span class="confirm-label">返信</span><span class="confirm-val" id="cfReply"></span></div>
+      <div class="confirm-row" style="border:none"><span class="confirm-label">内容</span><span class="confirm-val" id="cfBody" style="white-space:pre-wrap"></span></div>
+      <button class="btn-outline" onclick="backContactForm()" style="margin-bottom:.6rem">← 修正する</button>
+      <button class="btn-go" onclick="sendContact()">送信する →</button>
+    </div>
+    <div class="contact-card" id="contactSent" style="display:none">
+      <h2>✅ 送信完了！</h2><p>お問い合わせありがとうございます。</p>
+      <button class="btn-outline" style="max-width:240px;margin:1rem auto 0" onclick="show('scGrade')">トップにもどる</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <a href="#" onclick="showContact();return false;">📬 お問い合わせ</a>
+  <div class="footer-privacy">個人情報は夢ナビの運営・改善・集計目的のみに使用します。<br>交野市PTA協議会　夢プロジェクト</div>
+</footer>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbyGe-GLAYQvgLp24RhajYoOKk2laNhmfOM15au3ODfM1c2hYzaYQZj5beWQTUWqC8Lgmg/exec';
+const STORAGE_KEY='yumeNavi_master_v1';
+const STORAGE_VERSION_KEY='yumeNavi_master_version';
+const SCHOOLS=['交野みらい学園','倉治小学校','郡津小学校','旭小学校','星田小学校','妙見坂小学校','岩船小学校','私市小学校','藤が尾小学校','第２中学校','第３中学校','第４中学校'];
+const GRADES=[
+  {id:'s1',label:'１ねんせい',icon:'🐣',color:'#FFD93D',grad:'linear-gradient(135deg,#FFD93D,#FFB347)',desc:'えとひらがなでたのしくさがそう！',col:'小1',popKey:'人気度（小1）',group:'es'},
+  {id:'s2',label:'小学２年生',icon:'🌼',color:'#FFCA28',grad:'linear-gradient(135deg,#FFCA28,#FFB347)',desc:'すきなものからゆめをさがそう！',col:'小2',popKey:'人気度（小2）',group:'es'},
+  {id:'s3',label:'小学３年生',icon:'🌸',color:'#FF9A9E',grad:'linear-gradient(135deg,#FFB347,#FF9A9E)',desc:'いろんなお仕事を知って夢を探そう！',col:'小3',popKey:'人気度（小3）',group:'es'},
+  {id:'s4',label:'小学４年生',icon:'🌱',color:'#6BCB77',grad:'linear-gradient(135deg,#6BCB77,#4D96FF)',desc:'仕事の中身を知って夢を見つけよう！',col:'小4',popKey:'人気度（小4）',group:'es'},
+  {id:'s5',label:'小学５年生',icon:'🌿',color:'#4CAF50',grad:'linear-gradient(135deg,#4CAF50,#26C6DA)',desc:'得意なことから夢を考えてみよう！',col:'小5',popKey:'人気度（小5）',group:'es'},
+  {id:'s6',label:'小学６年生',icon:'🚀',color:'#4D96FF',grad:'linear-gradient(135deg,#4D96FF,#C77DFF)',desc:'夢の正体を深く考えてみよう！',col:'小6',popKey:'人気度（小6）',group:'es'},
+  {id:'m1',label:'中学１年生',icon:'⭐',color:'#5E60CE',grad:'linear-gradient(135deg,#5E60CE,#C77DFF)',desc:'将来の第一歩を踏み出そう。',col:'中1',popKey:'人気度（中1）',group:'jh'},
+  {id:'m2',label:'中学２年生',icon:'🔭',color:'#C77DFF',grad:'linear-gradient(135deg,#C77DFF,#FF6B6B)',desc:'これからの自分をリアルに描こう。',col:'中2',popKey:'人気度（中2）',group:'jh'},
+  {id:'m3',label:'中学３年生',icon:'🎯',color:'#E040FB',grad:'linear-gradient(135deg,#E040FB,#FF4081)',desc:'進路と自分の軸を見つめよう。',col:'中3',popKey:'人気度（中3）',group:'jh'},
+  {id:'g',label:'大人',icon:'✨',color:'#1a4a8a',grad:'linear-gradient(135deg,#1a4a8a,#4D96FF)',desc:'大人自身の「目指している自分」を確認しよう。',col:'大人',popKey:'人気度（大人）',group:'jh'},
+];
+function getGradeGroup(id){
+  if(['s1','s2','s3'].includes(id))return '小1-3';
+  if(['s4','s5','s6'].includes(id))return '小4-6';
+  if(['m1','m2','m3'].includes(id))return '中1-3';
+  return '大人';
+}
+
+let MASTER=null,isTestMode=false,grade=null,route=null;
+let selectedCareerId=null,selectedCareerName=null;
+let selectedValueIds=[],selectedLikeChips=[],animalCharResult=null;
+let rankingAllList=[],rankingShown=10,catSelected=[],catResultList=[],catResultShown=10;
+let valueShown=10,b2List=[],b2Shown=10,likeShown=10;
+let writingMode='template',currentTemplateParts=[];
+let heroDataForDoc=[];
+
+// 入口判定：?from=es（小学生）/ ?from=jh（中学生・大人）/ 無指定（全表示）
+function getEntryGroup(){
+  const params=new URLSearchParams(window.location.search);
+  return params.get('from'); // 'es' / 'jh' / null
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  try{await loadMaster();buildGradeButtons();document.getElementById('scInit').classList.remove('show');document.getElementById('scGrade').classList.add('active');}
+  catch(err){document.getElementById('scInit').innerHTML=`<div style="font-size:2.5rem">⚠️</div><div class="init-text">準備中にエラーが発生しました。<br>ブラウザを更新してみてください。</div><div class="init-err">${err.message||err}</div>`;}
+});
+
+async function loadMaster(){
+  const cached=localStorage.getItem(STORAGE_KEY),cachedVer=localStorage.getItem(STORAGE_VERSION_KEY);
+  if(GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){if(cached){MASTER=JSON.parse(cached);return;}throw new Error('GAS URLが未設定です。');}
+  try{
+    const vr=await fetch(`${GAS_URL}?action=version`);const vd=await vr.json();
+    if(cached&&cachedVer===vd.version){MASTER=JSON.parse(cached);return;}
+    const r=await fetch(`${GAS_URL}?action=master`);const j=await r.json();
+    MASTER=j.data;localStorage.setItem(STORAGE_KEY,JSON.stringify(MASTER));localStorage.setItem(STORAGE_VERSION_KEY,vd.version);
+  }catch(e){if(cached){MASTER=JSON.parse(cached);return;}throw e;}
+}
+
+function toggleTestMode(){
+  isTestMode=!isTestMode;
+  document.getElementById('testToggleBtn').classList.toggle('active',isTestMode);
+  document.getElementById('testBanner').classList.toggle('show',isTestMode);
+  document.getElementById('testModeLabel').classList.toggle('show',isTestMode);
+}
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scResult').classList.remove('show');
+  const el=document.getElementById(id);if(el){el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+}
+function goBackFromResult(){if(route==='A')show('scA1');else if(route==='B')show('scB1');else show('scC1');}
+
+function buildGradeButtons(){
+  const el=document.getElementById('gradeSteps');el.innerHTML='';
+  const entry=getEntryGroup();
+  // 入口に応じて学年を並べ替え（該当グループを先頭に）
+  let orderedGrades=[...GRADES];
+  if(entry==='es'){
+    // 小学生入口：小学生を先頭、中学生・大人は後ろに
+    orderedGrades=GRADES.filter(g=>g.group==='es').concat(GRADES.filter(g=>g.group==='jh'));
+  }else if(entry==='jh'){
+    // 中学生・大人入口：中学生・大人を先頭、小学生は後ろに
+    orderedGrades=GRADES.filter(g=>g.group==='jh').concat(GRADES.filter(g=>g.group==='es'));
+  }
+
+  // グループ見出しの表示（区切り感を出す）
+  let lastGroup=null;
+  orderedGrades.forEach((g,i)=>{
+    // 入口情報がある場合のみ、グループの境目に区切りを入れる
+    if(entry&&lastGroup!==null&&lastGroup!==g.group){
+      const sep=document.createElement('div');
+      sep.className='grade-separator';
+      sep.textContent=g.group==='es'?'― 小学生 ―':'― 中学生・大人 ―';
+      el.appendChild(sep);
+    }
+    const btn=document.createElement('button');
+    btn.className='gs-btn';
+    // 入口推奨グループは強調表示
+    if(entry&&g.group===entry){btn.classList.add('recommended');}
+    btn.textContent=g.label;
+    btn.dataset.id=g.id;
+    btn.onclick=()=>previewGrade(g.id);
+    el.appendChild(btn);
+    lastGroup=g.group;
+  });
+
+  // 入口に応じた歓迎メッセージ
+  const lead=document.getElementById('gradeLead');
+  if(lead){
+    if(entry==='es'){
+      lead.innerHTML=`こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span>`;
+    }else if(entry==='jh'){
+      lead.innerHTML=`ようこそ。<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">これからの自分を一緒に描いていきましょう。<br>学年・立場を選んでください。</span>`;
+    }else{
+      lead.innerHTML=`こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span>`;
+    }
+  }
+}
+function previewGrade(gid){
+  const g=GRADES.find(x=>x.id===gid);
+  document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
+  const btn=document.querySelector(`.gs-btn[data-id="${gid}"]`);btn.classList.add('active');btn.style.background=g.color;btn.style.borderColor=g.color;
+  const p=document.getElementById('gradePreview');p.style.borderColor=g.color;p.style.display='block';
+  p.innerHTML=`<span class="gc-icon">${g.icon}</span><div class="gc-name">${g.label}</div><div class="gc-desc">${g.desc}</div>`;
+  const cb=document.getElementById('gradeConfirmBtn');cb.style.display='block';cb.style.background=g.grad;cb.dataset.gid=gid;
+}
+function goProfile(){
+  grade=document.getElementById('gradeConfirmBtn').dataset.gid;
+  const sel=document.getElementById('pSchool');sel.innerHTML='<option value="">── 選んでください ──</option>';
+  SCHOOLS.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});show('scProfile');
+}
+function goRoute(){if(!document.getElementById('pSchool').value){document.getElementById('profileErr').classList.add('show');return;}document.getElementById('profileErr').classList.remove('show');show('scRoute');}
+
+function pickRoute(r){
+  route=r;selectedCareerId=null;selectedCareerName=null;selectedValueIds=[];catSelected=[];
+  if(r==='A'){buildRouteA();show('scA1');}else if(r==='B'){buildRouteB();show('scB1');}else{buildRouteC();show('scC1');}
+}
+
+/* ── ルートA ── */
+function buildRouteA(){
+  const g=GRADES.find(x=>x.id===grade);
+  rankingAllList=[...MASTER.careers].filter(c=>c['職業ID']&&c['職業ID']!=='J00200').sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  rankingShown=10;renderRanking();
+  const ce=document.getElementById('catChips');ce.innerHTML='';catSelected=[];
+  MASTER.categories.forEach((c,i)=>{if(!c['カテゴリID']||c['カテゴリID']==='C00099')return;
+    const btn=document.createElement('button');btn.className='chip';btn.style.animationDelay=`${i*0.04}s`;
+    const lk=getCategoryLabelKey();btn.textContent=`${c['絵文字']||''} ${c[lk]||c['カテゴリ名（正式）']||c['カテゴリ名']}`;
+    btn.dataset.id=c['カテゴリID'];btn.onclick=()=>toggleCategory(c['カテゴリID'],btn);ce.appendChild(btn);
+  });
+  document.getElementById('catResultBox').style.display='none';
+}
+function getCategoryLabelKey(){const g=GRADES.find(x=>x.id===grade);if(MASTER.categories[0]&&MASTER.categories[0][g.col]!==undefined)return g.col;return 'カテゴリ名（正式）';}
+function getCareerLabel(c){const g=GRADES.find(x=>x.id===grade);return c[g.col]||c['職業名（正式）']||c['職業名'];}
+function renderRanking(){
+  const el=document.getElementById('rankingChips');el.innerHTML='';
+  rankingAllList.slice(0,rankingShown).forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className=`chip career${i<3?' rank-'+(i+1):''}`;
+    btn.style.animationDelay=`${i*0.03}s`;const m=['🥇','🥈','🥉'];
+    btn.textContent=i<3?`${m[i]} ${getCareerLabel(c)}`:`${i+1}. ${getCareerLabel(c)}`;
+    btn.onclick=()=>selectCareerA(c['職業ID'],getCareerLabel(c),btn);el.appendChild(btn);
+  });
+  document.getElementById('rankingMoreBtn').classList.toggle('show',rankingAllList.length>rankingShown);
+}
+function loadMoreRanking(){rankingShown+=10;renderRanking();}
+function toggleCategory(catId,btn){
+  if(catSelected.includes(catId)){catSelected=catSelected.filter(c=>c!==catId);btn.classList.remove('on-a');}else{catSelected.push(catId);btn.classList.add('on-a');}
+  if(catSelected.length>0){updateCatResults();document.getElementById('catResultBox').style.display='block';}else document.getElementById('catResultBox').style.display='none';
+}
+function updateCatResults(){
+  const g=GRADES.find(x=>x.id===grade);
+  const m=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  const r=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&!catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  catResultList=[...m,...r];catResultShown=10;renderCatResult();
+}
+function renderCatResult(){
+  const el=document.getElementById('catResultChips');el.innerHTML='';
+  catResultList.slice(0,catResultShown).forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='chip career';btn.style.animationDelay=`${i*0.03}s`;
+    btn.textContent=getCareerLabel(c);btn.onclick=()=>selectCareerA(c['職業ID'],getCareerLabel(c),btn);el.appendChild(btn);
+  });
+  document.getElementById('catMoreBtn').classList.toggle('show',catResultList.length>catResultShown);
+}
+function loadMoreCatResult(){catResultShown+=10;renderCatResult();}
+function selectCareerA(id,name,btn){
+  selectedCareerId=id;selectedCareerName=name;
+  document.querySelectorAll('#rankingChips .chip,#catResultChips .chip').forEach(b=>b.classList.remove('on-a'));btn.classList.add('on-a');
+}
+function goResult(rt){
+  if(!selectedCareerId){document.getElementById(rt==='A'?'a1Err':'b1Err').classList.add('show');return;}
+  document.getElementById('a1Err')?.classList.remove('show');document.getElementById('b1Err')?.classList.remove('show');showResult();
+}
+
+/* ── ルートB ── */
+function buildRouteB(){selectedValueIds=[];selectedCareerId=null;selectedCareerName=null;valueShown=10;renderValueChips();document.getElementById('b2ResultBox').style.display='none';}
+function renderValueChips(){
+  const g=GRADES.find(x=>x.id===grade);const el=document.getElementById('valueChips');el.innerHTML='';
+  MASTER.values.slice(0,valueShown).forEach((v,i)=>{
+    const btn=document.createElement('button');btn.className='chip';btn.style.animationDelay=`${i*0.04}s`;
+    btn.textContent=`${v['絵文字']||''} ${v[g.col]||v['価値観名（正式）']}`;btn.dataset.id=v['価値観ID'];
+    btn.onclick=()=>toggleValue(v['価値観ID'],btn);if(selectedValueIds.includes(v['価値観ID']))btn.classList.add('on-b');el.appendChild(btn);
+  });
+  document.getElementById('valueMoreBtn').classList.toggle('show',MASTER.values.length>valueShown);
+}
+function loadMoreValues(){valueShown+=10;renderValueChips();}
+function toggleValue(vid,btn){
+  if(selectedValueIds.includes(vid)){selectedValueIds=selectedValueIds.filter(v=>v!==vid);btn.classList.remove('on-b');}else{selectedValueIds.push(vid);btn.classList.add('on-b');}
+  if(selectedValueIds.length>0){updateB2Results();document.getElementById('b2ResultBox').style.display='block';}else document.getElementById('b2ResultBox').style.display='none';
+}
+function updateB2Results(){
+  const g=GRADES.find(x=>x.id===grade);const sc={};
+  selectedValueIds.forEach(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);if(!v)return;(v['関連職業IDs']||'').split('|').filter(Boolean).forEach(cid=>{sc[cid]=(sc[cid]||0)+1;});});
+  b2List=MASTER.careers.filter(c=>sc[c['職業ID']]).sort((a,b)=>{const sa=sc[a['職業ID']]||0,sb=sc[b['職業ID']]||0;if(sb!==sa)return sb-sa;return(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999);});
+  const mid=b2List.map(c=>c['職業ID']);
+  const rest=MASTER.careers.filter(c=>c['職業ID']&&c['職業ID']!=='J00200'&&!mid.includes(c['職業ID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  b2List=[...b2List,...rest];b2Shown=10;renderB2List();
+}
+function renderB2List(){
+  const el=document.getElementById('b2CareerChips');el.innerHTML='';
+  b2List.slice(0,b2Shown).forEach((c,i)=>{
+    const btn=document.createElement('button');btn.className='chip career';btn.style.animationDelay=`${i*0.03}s`;btn.textContent=getCareerLabel(c);
+    btn.onclick=()=>{selectedCareerId=c['職業ID'];selectedCareerName=getCareerLabel(c);document.querySelectorAll('#b2CareerChips .chip').forEach(b=>b.classList.remove('on-a'));btn.classList.add('on-a');};el.appendChild(btn);
+  });
+  document.getElementById('b2MoreBtn').classList.toggle('show',b2List.length>b2Shown);
+}
+function loadMoreB2(){b2Shown+=10;renderB2List();}
+
+/* ── ルートC ── */
+function buildRouteC(){
+  selectedLikeChips=[];
+  const ms=document.getElementById('cMonth');ms.innerHTML='<option value="">月</option>';for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'月';ms.appendChild(o);}
+  updateDayYear();
+  const isLow=['s1','s2','s3'].includes(grade);const opts=isLow?['おとこのこ','おんなのこ','どちらでもない']:['男性','女性','その他'];
+  const ge=document.getElementById('cGenderGroup');ge.innerHTML='';
+  opts.forEach(o=>{const l=document.createElement('label');l.className='radio-label';l.innerHTML=`<input type="radio" name="cGender" value="${o}"> ${o}`;ge.appendChild(l);});
+  likeShown=10;renderLikeChips();
+}
+function renderLikeChips(){
+  const g=GRADES.find(x=>x.id===grade);const el=document.getElementById('cLikeChips');el.innerHTML='';
+  MASTER.values.slice(0,likeShown).forEach((v,i)=>{
+    const btn=document.createElement('button');btn.className='chip';btn.style.animationDelay=`${i*0.04}s`;
+    btn.textContent=`${v['絵文字']||''} ${v[g.col]||v['価値観名（正式）']}`;btn.dataset.id=v['価値観ID'];
+    btn.onclick=()=>{if(selectedLikeChips.includes(v['価値観ID'])){selectedLikeChips=selectedLikeChips.filter(x=>x!==v['価値観ID']);btn.classList.remove('on-c');}else{selectedLikeChips.push(v['価値観ID']);btn.classList.add('on-c');}};
+    if(selectedLikeChips.includes(v['価値観ID']))btn.classList.add('on-c');el.appendChild(btn);
+  });
+  document.getElementById('likeMoreBtn').classList.toggle('show',MASTER.values.length>likeShown);
+}
+function loadMoreLikes(){likeShown+=10;renderLikeChips();}
+function updateDayYear(){
+  const m=parseInt(document.getElementById('cMonth').value)||0;const ds=document.getElementById('cDay');const pv=ds.value;ds.innerHTML='<option value="">日</option>';
+  const dm=[31,29,31,30,31,30,31,31,30,31,30,31];const md=m>0?dm[m-1]:31;
+  for(let d=1;d<=md;d++){const o=document.createElement('option');o.value=d;o.textContent=d+'日';ds.appendChild(o);}if(pv&&parseInt(pv)<=md)ds.value=pv;updateYear();
+}
+function updateYear(){
+  const m=parseInt(document.getElementById('cMonth').value)||0,d=parseInt(document.getElementById('cDay').value)||0;
+  const ys=document.getElementById('cYear');const pv=ys.value;ys.innerHTML='<option value="">年</option>';
+  const ty=new Date().getFullYear();
+  if(grade==='g'){const b=ty-40;for(let y=b+25;y>=b-25;y--){const o=document.createElement('option');o.value=y;o.textContent=y+'年';ys.appendChild(o);}ys.value=pv||b;return;}
+  const of={s1:6,s2:7,s3:8,s4:9,s5:10,s6:11,m1:12,m2:13,m3:14}[grade]||7;const ny=ty-of,ey=ny+1;
+  if(m>0&&d>0){const tg=(m<4||(m===4&&d===1))?ey:ny;const o=document.createElement('option');o.value=tg;o.textContent=tg+'年';ys.appendChild(o);ys.value=tg;}
+  else{[ey,ny].forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y+'年';ys.appendChild(o);});if(pv)ys.value=pv;}
+}
+function calcAnimalChar(year,month,day){
+  const y=parseInt(year),m=parseInt(month),d=parseInt(day);
+  const dm=[31,29,31,30,31,30,31,31,30,31,30,31];let doy=d;for(let i=0;i<m-1;i++)doy+=dm[i];
+  const idx=(y*366+doy)%60;return MASTER.animals&&MASTER.animals.length>0?MASTER.animals[idx%MASTER.animals.length]:null;
+}
+function generateRouteC(){
+  const month=document.getElementById('cMonth').value,day=document.getElementById('cDay').value,year=document.getElementById('cYear').value;
+  const gender=document.querySelector('input[name="cGender"]:checked')?.value;
+  if(!month||!day||!year||!gender){document.getElementById('cErr').classList.add('show');return;}
+  document.getElementById('cErr').classList.remove('show');
+  animalCharResult=calcAnimalChar(year,month,day);
+  const g=GRADES.find(x=>x.id===grade);const sc={};
+  selectedLikeChips.forEach(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);if(!v)return;(v['関連職業IDs']||'').split('|').filter(Boolean).forEach(cid=>{sc[cid]=(sc[cid]||0)+1;});});
+  const sorted=MASTER.careers.filter(c=>sc[c['職業ID']]).sort((a,b)=>{const sa=sc[a['職業ID']]||0,sb=sc[b['職業ID']]||0;if(sb!==sa)return sb-sa;return(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999);});
+  if(sorted.length>0){selectedCareerId=sorted[0]['職業ID'];selectedCareerName=getCareerLabel(sorted[0]);}
+  else{const top=[...MASTER.careers].filter(c=>c['職業ID']&&c['職業ID']!=='J00200').sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999))[0];selectedCareerId=top['職業ID'];selectedCareerName=getCareerLabel(top);}
+  window._cCandidates=sorted.length>0?sorted.slice(0,6):[...MASTER.careers].filter(c=>c['職業ID']&&c['職業ID']!=='J00200').sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999)).slice(0,6);
+  showResult();
+}
+
+/* ── 結果画面 ── */
+function showResult(){
+  const g=GRADES.find(x=>x.id===grade);
+  document.getElementById('resHeader').style.background=g.grad;
+  document.getElementById('resTitle').textContent=`「${selectedCareerName}」の夢の正体`;
+  document.getElementById('resSub').textContent=`${g.label} ／ ${route==='A'?'なりたい仕事から':route==='B'?'したいことから':'夢を一緒に考えるルート'}`;
+  document.getElementById('transformCareer').textContent=selectedCareerName||'—';
+  const isLow=['s1','s2','s3'].includes(grade);
+  document.getElementById('conceptBodyText').innerHTML=isLow
+    ?`「おいしゃさんになりたい！」— これはゆめの<span class="concept-highlight">なまえ</span>。<br>でも ほんとうの ゆめは もっと ふかいところにある。<br>しごとを とおして だれかに とどける<span class="concept-highlight">「ありがとう」</span>が、<br>ゆめの<span class="concept-highlight">しょうたい</span>だよ。`
+    :`「${selectedCareerName}」は夢の<span class="concept-highlight">名前</span>。<br>でも本当の夢は、もっと深いところにある。<br>仕事を通して誰かに届ける<span class="concept-highlight">「ありがとう」</span>が、<br>夢の<span class="concept-highlight">正体</span>だよ。`;
+  const guide=MASTER.guides.find(x=>x['学年']===g.col);
+  if(guide){document.getElementById('guideTitle').textContent=guide['ガイドタイトル']||'夢の正体って何だろう？';document.getElementById('guideBody').textContent=guide['ガイド本文']||'';}
+  if(route==='C'&&animalCharResult){
+    document.getElementById('resAnimalSection').style.display='block';
+    document.getElementById('resAnimalName').textContent=`${animalCharResult['絵文字']||''} ${animalCharResult['キャラ名']}`;
+    const dk=['s1','s2','s3','s4','s5'].includes(grade)?'特徴（小1-5）':['s6','m1','m2','m3'].includes(grade)?'特徴（小6-中3）':'特徴（大人）';
+    document.getElementById('resAnimalDesc').textContent=animalCharResult[dk]||'';
+    buildDreamCandidates();
+  }else{document.getElementById('resAnimalSection').style.display='none';document.getElementById('resDreamCandidates').style.display='none';}
+  renderHints();heroDataForDoc=renderHeroes();populateTemplates();
+  document.getElementById('kansouInput').value='';document.getElementById('freeInput').value='';document.getElementById('templateOutput').value='';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scResult').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildDreamCandidates(){
+  const cands=window._cCandidates||[];if(!cands.length){document.getElementById('resDreamCandidates').style.display='none';return;}
+  document.getElementById('resDreamCandidates').style.display='block';
+  const grid=document.getElementById('dcGrid');grid.innerHTML='';
+  cands.forEach((c,i)=>{
+    const career=MASTER.careers.find(x=>x['職業ID']===c['職業ID']);if(!career)return;
+    const label=getCareerLabel(career),emoji=career['絵文字']||'💼';
+    const card=document.createElement('div');card.className='dc-card';card.style.animationDelay=`${i*0.07}s`;
+    card.innerHTML=`<span class="dc-emoji">${emoji}</span><div class="dc-name">${label}</div>`;
+    card.onclick=()=>{
+      document.querySelectorAll('.dc-card').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');
+      selectedCareerId=c['職業ID'];selectedCareerName=label;
+      document.getElementById('resTitle').textContent=`「${label}」の夢の正体`;
+      document.getElementById('transformCareer').textContent=label;
+      renderHints();renderHeroes();populateTemplates();
+    };
+    if(c['職業ID']===selectedCareerId)card.classList.add('selected');grid.appendChild(card);
+  });
+}
+
+function toggleAcc(id){
+  const body=document.getElementById(`${id}-body`),toggle=document.getElementById(`${id}-toggle`),isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);toggle.classList.toggle('open',!isOpen);
+}
+
+function renderHints(){
+  const grp=getGradeGroup(grade),cid=selectedCareerId;
+  ['Q1_誰を笑顔に','Q2_ありがとう','Q3_世の中への影響'].forEach((type,idx)=>{
+    const el=document.getElementById(`hint${idx+1}List`);el.innerHTML='';
+    const hint=MASTER.hints.find(h=>h['職業ID']===cid&&h['質問種別']===type&&h['対象学年グループ']===grp);
+    const cls=idx===1?'q2':idx===2?'q3':'';
+    if(hint){
+      ['ヒント1','ヒント2','ヒント3','ヒント4','ヒント5'].forEach(k=>{
+        const v=hint[k];if(!v)return;
+        const item=document.createElement('div');item.className=`hint-item ${cls}`;
+        item.innerHTML=`<span>${v}</span><span class="hint-use-badge">追加</span>`;
+        item.onclick=()=>useHint(v);el.appendChild(item);
+      });
+    }else{const item=document.createElement('div');item.className=`hint-item ${cls}`;item.innerHTML=`<span>ヒントを参考に自分で考えてみよう！</span>`;el.appendChild(item);}
+  });
+}
+
+function useHint(text){
+  const out=writingMode==='template'?document.getElementById('templateOutput'):document.getElementById('freeInput');
+  if(!out)return;out.value=out.value?(out.value+'\n'+text):text;
+  out.classList.add('hint-flash');setTimeout(()=>out.classList.remove('hint-flash'),700);
+}
+
+function renderHeroes(){
+  const g=GRADES.find(x=>x.id===grade);const dk=`夢の正体（${g.col}）`;
+  const sorted=[...MASTER.heroes].sort((a,b)=>{
+    const ra=a['PTA推奨フラグ']==='はい'?0:1,rb=b['PTA推奨フラグ']==='はい'?0:1;if(ra!==rb)return ra-rb;
+    const fA=(a['知名度（小1-大人）']||'').split('|'),fB=(b['知名度（小1-大人）']||'').split('|');
+    const ci=['小1','小2','小3','小4','小5','小6','中1','中2','中3','大人'].indexOf(g.col);
+    return(parseInt(fB[ci])||0)-(parseInt(fA[ci])||0);
+  });
+  const top3=sorted.slice(0,3);const el=document.getElementById('heroCards');el.innerHTML='';
+  top3.forEach((h,i)=>{
+    const card=document.createElement('div');card.className='hero-card';card.style.animationDelay=`${i*0.1}s`;
+    card.innerHTML=`<div class="hero-name"><span class="hero-emoji">${h['絵文字']||'⭐'}</span>${h['偉人名']||''}</div><div class="hero-job">${h['職業']||''}</div><div class="hero-msg">${h[dk]||''}</div>`;
+    el.appendChild(card);
+  });
+  return top3;
+}
+
+function switchMode(mode){
+  writingMode=mode;
+  document.getElementById('tabTemplate').classList.toggle('active',mode==='template');
+  document.getElementById('tabFree').classList.toggle('active',mode==='free');
+  document.getElementById('templateArea').classList.toggle('show',mode==='template');
+  document.getElementById('freeArea').classList.toggle('show',mode==='free');
+}
+
+function populateTemplates(){
+  const g=GRADES.find(x=>x.id===grade);const guide=MASTER.guides.find(x=>x['学年']===g.col);if(!guide)return;
+  const sel=document.getElementById('templateSelect');sel.innerHTML='';
+  ['穴埋めテンプレ1','穴埋めテンプレ2','穴埋めテンプレ3'].forEach((k,i)=>{if(guide[k]){const o=document.createElement('option');o.value=guide[k];o.textContent=`テンプレ${i+1}`;sel.appendChild(o);}});
+  renderTemplate();
+}
+
+function renderTemplate(){
+  const tpl=document.getElementById('templateSelect').value;if(!tpl)return;
+  currentTemplateParts=tpl.split('___');
+  const be=document.getElementById('templateBlanks');be.innerHTML='';
+  currentTemplateParts.slice(0,-1).forEach((_,i)=>{
+    const row=document.createElement('div');row.className='blank-row';
+    const num=document.createElement('span');num.className='blank-num';num.textContent=`${i+1}.`;
+    const inp=document.createElement('input');inp.type='text';inp.className='blank-input-field';
+    inp.placeholder=`空欄${i+1}に入れる言葉`;inp.dataset.idx=i;inp.addEventListener('input',updateTemplatePreview);
+    row.appendChild(num);row.appendChild(inp);be.appendChild(row);
+  });
+  updateTemplatePreview();
+}
+
+function updateTemplatePreview(){
+  const inputs=document.querySelectorAll('.blank-input-field');
+  let preview='',result='';
+  currentTemplateParts.forEach((part,i)=>{
+    preview+=part;result+=part;
+    if(i<currentTemplateParts.length-1){
+      const v=inputs[i]?inputs[i].value.trim():'';
+      preview+=v?`【${v}】`:'【　　　】';result+=v||'___';
+    }
+  });
+  document.getElementById('templatePreview').textContent=preview;
+  document.getElementById('templateOutput').value=result;
+}
+
+function getDreamIdentity(){return writingMode==='template'?document.getElementById('templateOutput').value.trim():document.getElementById('freeInput').value.trim();}
+
+/* ── 宿題提出（no-cors でCORSバグ修正）── */
+async function saveResult(){
+  const dreamIdentity=getDreamIdentity(),kansou=document.getElementById('kansouInput').value.trim();
+  const btn=document.getElementById('submitBtn'),status=document.getElementById('saveStatus');
+  btn.disabled=true;btn.textContent='送信中...';status.style.display='none';
+  if(GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){
+    status.className='save-status err';status.textContent='⚠️ GAS URLが未設定です。セットアップ手順書をご確認ください。';
+    status.style.display='block';btn.disabled=false;btn.textContent='📤 宿題を提出する';return;
+  }
+  const g=GRADES.find(x=>x.id===grade);
+  const valuesText=[...selectedValueIds,...selectedLikeChips].map(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);return v?(v[g.col]||v['価値観名（正式）']):'';}).filter(Boolean).join('・');
+  const payload={timestamp:new Date().toISOString(),isTest:isTestMode,school:document.getElementById('pSchool').value,name:document.getElementById('pName').value.trim()||'（匿名）',grade:g.label,route,careerId:selectedCareerId,careerName:selectedCareerName,values:valuesText,animalChar:animalCharResult?animalCharResult['キャラ名']:'',dreamIdentity,kansou,templateUsed:writingMode==='template'?'穴埋め':'自由入力',sheet:'回答データ'};
+  try{
+    // ★重要：text/plain で送信することで CORS プリフライトを回避
+    // GAS側は e.postData.contents で JSON 文字列を受け取れる
+    await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain;charset=utf-8'}});
+    status.className='save-status ok';status.textContent='✅ 宿題を提出しました！ありがとう！';
+    status.style.display='block';btn.textContent='✅ 提出済み';
+  }catch(e){
+    status.className='save-status err';status.textContent='⚠️ 送信に失敗しました。Wi-Fiを確認してもう一度お試しください。';
+    status.style.display='block';btn.disabled=false;btn.textContent='📤 宿題を提出する';
+  }
+}
+
+/* ── ドキュメントビュー ── */
+function openDocView(){
+  const g=GRADES.find(x=>x.id===grade);
+  document.getElementById('docMeta').textContent=`${g.label} ／ ${document.getElementById('pSchool').value||''} ／ ${document.getElementById('pName').value.trim()||''}`;
+  document.getElementById('docCareerName').textContent=selectedCareerName||'—';
+  const guide=MASTER.guides.find(x=>x['学年']===g.col);
+  document.getElementById('docGuideText').textContent=guide?guide['ガイド本文']:'';
+  document.getElementById('docDreamText').textContent=getDreamIdentity()||'（まだ書いていません）';
+  document.getElementById('docKansouText').textContent=document.getElementById('kansouInput').value.trim()||'（まだ書いていません）';
+  const hl=document.getElementById('docHeroList');hl.innerHTML='';
+  (heroDataForDoc||[]).forEach(h=>{const item=document.createElement('div');item.className='doc-hero-item';item.innerHTML=`<strong>${h['絵文字']||'⭐'} ${h['偉人名']||''}</strong>（${h['職業']||''}）<br>${h[`夢の正体（${g.col}）`]||''}`;hl.appendChild(item);});
+  document.getElementById('docView').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});
+}
+function closeDocView(){document.getElementById('docView').classList.remove('show');}
+function printDoc(){window.print();}
+async function saveDocAsImage(){
+  if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+  try{
+    const canvas=await html2canvas(document.getElementById('docPaper'),{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+    const link=document.createElement('a');link.download=`夢の正体_${selectedCareerName||'result'}.png`;link.href=canvas.toDataURL('image/png');link.click();
+  }catch{alert('画像生成に失敗しました。「印刷・PDFで保存」をお試しください。');}
+}
+
+/* ── お問い合わせ ── */
+function showContact(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='none';show('scContact');}
+function showContactConfirm(){
+  const nm=document.getElementById('cName').value.trim(),em=document.getElementById('cEmail').value.trim(),ct=document.getElementById('cCategory').value,bd=document.getElementById('cBody').value.trim(),err=document.getElementById('contactErr');
+  if(!nm||!em||!ct||!bd){err.classList.add('show');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){err.textContent='正しいメールアドレスを入力してください。';err.classList.add('show');return;}
+  err.classList.remove('show');const rp=document.querySelector('input[name="cReply"]:checked')?.value||'不要';
+  document.getElementById('cfName').textContent=nm;document.getElementById('cfEmail').textContent=em;document.getElementById('cfCat').textContent=ct;document.getElementById('cfReply').textContent=rp;document.getElementById('cfBody').textContent=bd;
+  document.getElementById('contactForm').style.display='none';document.getElementById('contactConfirm').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+function backContactForm(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';}
+async function sendContact(){
+  const payload={timestamp:new Date().toISOString(),name:document.getElementById('cName').value.trim(),email:document.getElementById('cEmail').value.trim(),category:document.getElementById('cCategory').value,reply:document.querySelector('input[name="cReply"]:checked')?.value||'不要',body:document.getElementById('cBody').value.trim(),sheet:'お問い合わせ'};
+  if(GAS_URL!=='YOUR_GAS_WEB_APP_URL_HERE'){try{await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain;charset=utf-8'}});}catch{}}
+  document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+function fullReset(){
+  grade=null;route=null;selectedCareerId=null;selectedCareerName=null;selectedValueIds=[];selectedLikeChips=[];catSelected=[];animalCharResult=null;
+  document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
+  document.getElementById('gradePreview').style.display='none';document.getElementById('gradeConfirmBtn').style.display='none';
+  document.getElementById('scResult').classList.remove('show');show('scGrade');
+}
+</script>
+</body>
+</html>
