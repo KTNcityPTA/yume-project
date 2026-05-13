@@ -31,14 +31,24 @@ main{flex:1;max-width:680px;margin:0 auto;padding:1.2rem 1rem 4rem;width:100%;}
 .section-lead{font-size:1.08rem;font-weight:700;margin-bottom:1rem;color:var(--pta);line-height:1.7;}
 .q-label{font-size:.9rem;font-weight:700;margin:.9rem 0 .4rem;color:var(--ink);line-height:1.5;}
 .q-hint{font-size:.77rem;color:var(--soft);margin-bottom:.55rem;line-height:1.5;}
-.grade-steps{display:flex;flex-wrap:wrap;gap:.4rem;justify-content:center;margin-bottom:1rem;}
-.gs-btn{padding:.45rem .85rem;border-radius:30px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s;color:var(--ink);position:relative;}
+.grade-steps{display:flex;flex-direction:column;gap:.7rem;align-items:center;margin-bottom:1rem;}
+.grade-group-box{
+  width:100%;max-width:480px;
+  border:2px solid #e0e0e0;border-radius:18px;
+  padding:.6rem .8rem .7rem;
+  background:#fafafa;
+  position:relative;
+}
+.grade-group-label{
+  position:absolute;top:-.55rem;left:1rem;
+  background:#fff;padding:0 .55rem;
+  font-size:.72rem;font-weight:700;color:var(--pta);
+  letter-spacing:.05em;
+}
+.grade-group-buttons{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;padding-top:.2rem;}
+.gs-btn{padding:.45rem .85rem;border-radius:30px;border:2px solid #ddd;background:#fff;font-family:inherit;font-size:.8rem;cursor:pointer;transition:all .2s;color:var(--ink);}
 .gs-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
 .gs-btn.active{color:#fff;font-weight:700;}
-.gs-btn.recommended{border-color:var(--gold);background:#fffbeb;font-weight:700;}
-.gs-btn.recommended::after{content:'おすすめ';position:absolute;top:-8px;right:-4px;background:var(--gold);color:#fff;font-size:.55rem;padding:.1rem .35rem;border-radius:8px;font-weight:700;letter-spacing:.05em;}
-.gs-btn.recommended.active::after{background:rgba(255,255,255,.3);}
-.grade-separator{width:100%;text-align:center;font-size:.72rem;color:var(--soft);margin:.5rem 0 .3rem;letter-spacing:.1em;font-weight:700;}
 #testModeLabel{display:none;background:rgba(255,180,0,.18);border:1.5px dashed var(--gold);border-radius:14px;padding:.5rem 1rem;font-size:.8rem;font-weight:700;color:#b45309;text-align:center;margin-bottom:.7rem;}
 #testModeLabel.show{display:block;}
 .grade-card-single{background:#fff;border-radius:22px;padding:1.2rem;box-shadow:var(--shadow);text-align:center;margin-bottom:.8rem;border:3px solid transparent;display:none;}
@@ -633,16 +643,16 @@ const STORAGE_KEY='yumeNavi_master_v1';
 const STORAGE_VERSION_KEY='yumeNavi_master_version';
 const SCHOOLS=['交野みらい学園','倉治小学校','郡津小学校','旭小学校','星田小学校','妙見坂小学校','岩船小学校','私市小学校','藤が尾小学校','第２中学校','第３中学校','第４中学校'];
 const GRADES=[
-  {id:'s1',label:'１ねんせい',icon:'🐣',color:'#FFD93D',grad:'linear-gradient(135deg,#FFD93D,#FFB347)',desc:'えとひらがなでたのしくさがそう！',col:'小1',popKey:'人気度（小1）',group:'es'},
-  {id:'s2',label:'小学２年生',icon:'🌼',color:'#FFCA28',grad:'linear-gradient(135deg,#FFCA28,#FFB347)',desc:'すきなものからゆめをさがそう！',col:'小2',popKey:'人気度（小2）',group:'es'},
-  {id:'s3',label:'小学３年生',icon:'🌸',color:'#FF9A9E',grad:'linear-gradient(135deg,#FFB347,#FF9A9E)',desc:'いろんなお仕事を知って夢を探そう！',col:'小3',popKey:'人気度（小3）',group:'es'},
-  {id:'s4',label:'小学４年生',icon:'🌱',color:'#6BCB77',grad:'linear-gradient(135deg,#6BCB77,#4D96FF)',desc:'仕事の中身を知って夢を見つけよう！',col:'小4',popKey:'人気度（小4）',group:'es'},
-  {id:'s5',label:'小学５年生',icon:'🌿',color:'#4CAF50',grad:'linear-gradient(135deg,#4CAF50,#26C6DA)',desc:'得意なことから夢を考えてみよう！',col:'小5',popKey:'人気度（小5）',group:'es'},
-  {id:'s6',label:'小学６年生',icon:'🚀',color:'#4D96FF',grad:'linear-gradient(135deg,#4D96FF,#C77DFF)',desc:'夢の正体を深く考えてみよう！',col:'小6',popKey:'人気度（小6）',group:'es'},
-  {id:'m1',label:'中学１年生',icon:'⭐',color:'#5E60CE',grad:'linear-gradient(135deg,#5E60CE,#C77DFF)',desc:'将来の第一歩を踏み出そう。',col:'中1',popKey:'人気度（中1）',group:'jh'},
-  {id:'m2',label:'中学２年生',icon:'🔭',color:'#C77DFF',grad:'linear-gradient(135deg,#C77DFF,#FF6B6B)',desc:'これからの自分をリアルに描こう。',col:'中2',popKey:'人気度（中2）',group:'jh'},
-  {id:'m3',label:'中学３年生',icon:'🎯',color:'#E040FB',grad:'linear-gradient(135deg,#E040FB,#FF4081)',desc:'進路と自分の軸を見つめよう。',col:'中3',popKey:'人気度（中3）',group:'jh'},
-  {id:'g',label:'大人',icon:'✨',color:'#1a4a8a',grad:'linear-gradient(135deg,#1a4a8a,#4D96FF)',desc:'大人自身の「目指している自分」を確認しよう。',col:'大人',popKey:'人気度（大人）',group:'jh'},
+  {id:'s1',label:'小学１年生',btnLabel:'１ねんせい',icon:'🐣',color:'#FFD93D',grad:'linear-gradient(135deg,#FFD93D,#FFB347)',desc:'えとひらがなでたのしくさがそう！',col:'小1',popKey:'人気度（小1）',group:'es'},
+  {id:'s2',label:'小学２年生',btnLabel:'２年生',icon:'🌼',color:'#FFCA28',grad:'linear-gradient(135deg,#FFCA28,#FFB347)',desc:'すきなものからゆめをさがそう！',col:'小2',popKey:'人気度（小2）',group:'es'},
+  {id:'s3',label:'小学３年生',btnLabel:'３年生',icon:'🌸',color:'#FF9A9E',grad:'linear-gradient(135deg,#FFB347,#FF9A9E)',desc:'いろんなお仕事を知って夢を探そう！',col:'小3',popKey:'人気度（小3）',group:'es'},
+  {id:'s4',label:'小学４年生',btnLabel:'４年生',icon:'🌱',color:'#6BCB77',grad:'linear-gradient(135deg,#6BCB77,#4D96FF)',desc:'仕事の中身を知って夢を見つけよう！',col:'小4',popKey:'人気度（小4）',group:'es'},
+  {id:'s5',label:'小学５年生',btnLabel:'５年生',icon:'🌿',color:'#4CAF50',grad:'linear-gradient(135deg,#4CAF50,#26C6DA)',desc:'得意なことから夢を考えてみよう！',col:'小5',popKey:'人気度（小5）',group:'es'},
+  {id:'s6',label:'小学６年生',btnLabel:'６年生',icon:'🚀',color:'#4D96FF',grad:'linear-gradient(135deg,#4D96FF,#C77DFF)',desc:'夢の正体を深く考えてみよう！',col:'小6',popKey:'人気度（小6）',group:'es'},
+  {id:'m1',label:'中学１年生',btnLabel:'１年生',icon:'⭐',color:'#5E60CE',grad:'linear-gradient(135deg,#5E60CE,#C77DFF)',desc:'将来の第一歩を踏み出そう。',col:'中1',popKey:'人気度（中1）',group:'jh'},
+  {id:'m2',label:'中学２年生',btnLabel:'２年生',icon:'🔭',color:'#C77DFF',grad:'linear-gradient(135deg,#C77DFF,#FF6B6B)',desc:'これからの自分をリアルに描こう。',col:'中2',popKey:'人気度（中2）',group:'jh'},
+  {id:'m3',label:'中学３年生',btnLabel:'３年生',icon:'🎯',color:'#E040FB',grad:'linear-gradient(135deg,#E040FB,#FF4081)',desc:'進路と自分の軸を見つめよう。',col:'中3',popKey:'人気度（中3）',group:'jh'},
+  {id:'g',label:'大人',btnLabel:'大人',icon:'✨',color:'#1a4a8a',grad:'linear-gradient(135deg,#1a4a8a,#4D96FF)',desc:'大人自身の「目指している自分」を確認しよう。',col:'大人',popKey:'人気度（大人）',group:'adult'},
 ];
 function getGradeGroup(id){
   if(['s1','s2','s3'].includes(id))return '小1-3';
@@ -698,48 +708,67 @@ function goBackFromResult(){if(route==='A')show('scA1');else if(route==='B')show
 function buildGradeButtons(){
   const el=document.getElementById('gradeSteps');el.innerHTML='';
   const entry=getEntryGroup();
-  // 入口に応じて学年を並べ替え（該当グループを先頭に）
-  let orderedGrades=[...GRADES];
-  if(entry==='es'){
-    // 小学生入口：小学生を先頭、中学生・大人は後ろに
-    orderedGrades=GRADES.filter(g=>g.group==='es').concat(GRADES.filter(g=>g.group==='jh'));
-  }else if(entry==='jh'){
-    // 中学生・大人入口：中学生・大人を先頭、小学生は後ろに
-    orderedGrades=GRADES.filter(g=>g.group==='jh').concat(GRADES.filter(g=>g.group==='es'));
+
+  // 小学生グループ・中学生グループ・大人を作成
+  const esGrades=GRADES.filter(g=>g.group==='es');
+  const jhGrades=GRADES.filter(g=>g.group==='jh');
+  const adultGrades=GRADES.filter(g=>g.group==='adult');
+
+  // 入口に応じてグループの並び順を決める
+  let order;
+  if(entry==='jh'){
+    order=['jh','es','adult'];
+  }else{
+    // 'es' または無指定
+    order=['es','jh','adult'];
   }
 
-  // グループ見出しの表示（区切り感を出す）
-  let lastGroup=null;
-  orderedGrades.forEach((g,i)=>{
-    // 入口情報がある場合のみ、グループの境目に区切りを入れる
-    if(entry&&lastGroup!==null&&lastGroup!==g.group){
-      const sep=document.createElement('div');
-      sep.className='grade-separator';
-      sep.textContent=g.group==='es'?'― 小学生 ―':'― 中学生・大人 ―';
-      el.appendChild(sep);
-    }
-    const btn=document.createElement('button');
-    btn.className='gs-btn';
-    // 入口推奨グループは強調表示
-    if(entry&&g.group===entry){btn.classList.add('recommended');}
-    btn.textContent=g.label;
-    btn.dataset.id=g.id;
-    btn.onclick=()=>previewGrade(g.id);
-    el.appendChild(btn);
-    lastGroup=g.group;
+  order.forEach(grp=>{
+    if(grp==='es') renderGradeGroup(el,'小学校',esGrades,'school');
+    else if(grp==='jh') renderGradeGroup(el,'中学校',jhGrades,'school');
+    else if(grp==='adult') renderGradeGroup(el,null,adultGrades,'standalone');
   });
 
   // 入口に応じた歓迎メッセージ
   const lead=document.getElementById('gradeLead');
   if(lead){
-    if(entry==='es'){
-      lead.innerHTML=`こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span>`;
-    }else if(entry==='jh'){
+    if(entry==='jh'){
       lead.innerHTML=`ようこそ。<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">これからの自分を一緒に描いていきましょう。<br>学年・立場を選んでください。</span>`;
     }else{
       lead.innerHTML=`こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span>`;
     }
   }
+}
+
+function renderGradeGroup(parent,groupLabel,grades,type){
+  if(type==='standalone'){
+    // 大人は枠なしでそのまま並べる
+    grades.forEach(g=>{parent.appendChild(makeGradeBtn(g));});
+    return;
+  }
+  // 小学校/中学校は枠グループにする
+  const box=document.createElement('div');
+  box.className='grade-group-box';
+  if(groupLabel){
+    const lbl=document.createElement('div');
+    lbl.className='grade-group-label';
+    lbl.textContent=groupLabel;
+    box.appendChild(lbl);
+  }
+  const inner=document.createElement('div');
+  inner.className='grade-group-buttons';
+  grades.forEach(g=>{inner.appendChild(makeGradeBtn(g));});
+  box.appendChild(inner);
+  parent.appendChild(box);
+}
+
+function makeGradeBtn(g){
+  const btn=document.createElement('button');
+  btn.className='gs-btn';
+  btn.textContent=g.btnLabel;
+  btn.dataset.id=g.id;
+  btn.onclick=()=>previewGrade(g.id);
+  return btn;
 }
 function previewGrade(gid){
   const g=GRADES.find(x=>x.id===gid);
