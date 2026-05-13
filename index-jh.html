@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>これからの自分を描こう｜交野市PTA協議会 夢プロジェクト</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg-dark:#0a0e1a;
+  --bg-mid:#111827;
+  --accent-gold:#d4a574;
+  --accent-light:#e8d5b7;
+  --ink-light:#f5f5f0;
+  --ink-soft:rgba(245,245,240,.65);
+  --ink-mute:rgba(245,245,240,.4);
+  --border:rgba(212,165,116,.25);
+}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Zen Maru Gothic','Noto Serif JP',serif;
+  background:var(--bg-dark);
+  color:var(--ink-light);
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.85;
+}
+
+/* ── ノイズ感のある背景 ── */
+.bg-gradient{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at top left, rgba(212,165,116,.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(168,113,69,.06) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-dark) 0%, #060912 100%);
+}
+
+/* かすかなライン */
+.bg-lines{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+  background-image:linear-gradient(90deg,transparent 0%,#fff 100%);
+  background-size:1px 100%;
+  background-repeat:repeat-x;
+}
+
+.container{
+  position:relative;z-index:1;
+  max-width:680px;margin:0 auto;
+  padding:5rem 1.8rem 4rem;
+}
+
+/* ── ヘッダーバッジ ── */
+.badge-wrap{text-align:center;}
+.badge{
+  display:inline-block;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--accent-gold);
+  font-family:'Noto Serif JP',serif;
+  font-size:.72rem;font-weight:500;
+  padding:.4rem 1.2rem;border-radius:2px;
+  letter-spacing:.25em;
+  margin-bottom:3rem;
+  animation:fadeDown 1s ease both;
+}
+
+/* ── メインタイトル ── */
+.main-title{
+  font-family:'Noto Serif JP',serif;
+  font-weight:900;
+  font-size:clamp(2.2rem,7vw,3.6rem);
+  line-height:1.45;
+  letter-spacing:.02em;
+  margin-bottom:1.5rem;
+  animation:fadeDown 1s .15s ease both;
+  text-align:center;
+}
+.main-title .accent{
+  background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-light) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+/* ── サブタイトル ── */
+.sub-title{
+  text-align:center;
+  font-family:'Noto Serif JP',serif;
+  font-size:.95rem;
+  color:var(--ink-soft);
+  margin-bottom:.6rem;
+  letter-spacing:.05em;
+  animation:fadeDown 1s .3s ease both;
+}
+.org-name{
+  text-align:center;
+  font-family:'Noto Serif JP',serif;
+  font-size:.78rem;
+  color:var(--ink-mute);
+  margin-bottom:5rem;
+  letter-spacing:.15em;
+  animation:fadeDown 1s .45s ease both;
+}
+
+/* ── コンセプトセクション ── */
+.concept{
+  margin-bottom:4rem;
+  animation:fadeUp 1.2s .6s ease both;
+}
+.concept-mark{
+  text-align:center;
+  font-size:1.4rem;
+  margin-bottom:1.2rem;
+  letter-spacing:.5em;
+  color:var(--accent-gold);
+  opacity:.8;
+}
+.concept-q{
+  font-family:'Noto Serif JP',serif;
+  font-size:1.4rem;
+  font-weight:700;
+  text-align:center;
+  margin-bottom:2.5rem;
+  letter-spacing:.05em;
+  color:var(--ink-light);
+}
+
+/* ── 本文セクション（語りかけ）── */
+.message-block{
+  margin-bottom:2.2rem;
+  animation:fadeUp 1.2s ease both;
+}
+.message-block:nth-child(1){animation-delay:.7s;}
+.message-block:nth-child(2){animation-delay:.95s;}
+.message-block:nth-child(3){animation-delay:1.2s;}
+
+.message-text{
+  font-family:'Zen Maru Gothic',sans-serif;
+  font-size:1rem;
+  line-height:2.2;
+  color:var(--ink-soft);
+  letter-spacing:.04em;
+}
+.message-text .quote{
+  display:block;
+  color:var(--accent-light);
+  font-family:'Noto Serif JP',serif;
+  font-size:1.1rem;
+  margin-bottom:.6rem;
+  font-style:italic;
+}
+.message-text strong{
+  color:var(--accent-gold);
+  font-weight:700;
+}
+
+/* 重要な問いの強調 */
+.highlight-question{
+  border-left:2px solid var(--accent-gold);
+  padding:.4rem 0 .4rem 1.3rem;
+  margin:1.5rem 0;
+  color:var(--ink-light);
+  font-family:'Noto Serif JP',serif;
+  font-size:1.05rem;
+  line-height:2;
+  letter-spacing:.05em;
+}
+
+/* ── スタートボタン ── */
+.btn-wrap{
+  text-align:center;
+  margin-top:4rem;
+  animation:fadeUp 1.2s 1.4s ease both;
+}
+.btn-start{
+  display:inline-flex;
+  align-items:center;
+  gap:.8rem;
+  background:transparent;
+  color:var(--ink-light);
+  border:1px solid var(--accent-gold);
+  font-family:'Noto Serif JP',serif;
+  font-size:.95rem;
+  font-weight:500;
+  padding:1.1rem 3rem;
+  border-radius:2px;
+  cursor:pointer;
+  text-decoration:none;
+  letter-spacing:.2em;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  position:relative;
+  overflow:hidden;
+}
+.btn-start::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-light) 100%);
+  opacity:0;
+  transition:opacity .35s;
+  z-index:-1;
+}
+.btn-start:hover::before{opacity:1;}
+.btn-start:hover{
+  color:var(--bg-dark);
+  border-color:var(--accent-light);
+  letter-spacing:.25em;
+}
+.btn-arrow{
+  font-size:1rem;
+  transition:transform .35s;
+}
+.btn-start:hover .btn-arrow{
+  transform:translateX(4px);
+}
+
+/* ── 補足リンク ── */
+.note{
+  text-align:center;
+  margin-top:2.5rem;
+  font-size:.78rem;
+  color:var(--ink-mute);
+  font-family:'Zen Maru Gothic',sans-serif;
+  letter-spacing:.05em;
+  animation:fadeUp 1.2s 1.6s ease both;
+}
+.note a{color:var(--accent-gold);text-decoration:none;border-bottom:1px solid var(--border);}
+.note a:hover{color:var(--accent-light);border-color:var(--accent-light);}
+
+/* ── フッター ── */
+footer{
+  position:relative;z-index:1;
+  text-align:center;
+  padding:2rem 1.5rem;
+  font-size:.72rem;
+  color:var(--ink-mute);
+  border-top:1px solid var(--border);
+  letter-spacing:.1em;
+  font-family:'Noto Serif JP',serif;
+}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+@media(max-width:480px){
+  .container{padding:3.5rem 1.4rem 3rem;}
+  .org-name{margin-bottom:3.5rem;}
+  .concept{margin-bottom:3rem;}
+}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<div class="bg-lines"></div>
+
+<div class="container">
+  <div class="badge-wrap">
+    <div class="badge">2026 SUMMER PROJECT</div>
+  </div>
+
+  <h1 class="main-title">
+    これからの自分を、<br>
+    <span class="accent">描いてみよう。</span>
+  </h1>
+
+  <p class="sub-title">交野市の中学生に贈る</p>
+  <p class="org-name">交野市PTA協議会　夢プロジェクト</p>
+
+  <div class="concept">
+    <div class="concept-mark">・　・　・</div>
+    <div class="concept-q">将来って、なんだろう？</div>
+
+    <div class="message-block">
+      <p class="message-text">
+        <span class="quote">「医師になりたい」「教師になりたい」</span>
+        それは将来の <strong>"職業"</strong> の名前。
+      </p>
+    </div>
+
+    <div class="message-block">
+      <p class="message-text">
+        でも、本当に大切なのは、<br>
+        その職業を通して<br>
+        <strong>どんな人や社会に影響を与えたいか</strong>。
+      </p>
+    </div>
+
+    <div class="message-block">
+      <div class="highlight-question">
+        このプロジェクトで、<br>
+        あなたが本当に大切にしたい、<br>
+        <strong>自分が目指している自分</strong>を確認しよう。
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-wrap">
+    <a class="btn-start" href="yume-navi-v10.html?from=jh">
+      はじめる
+      <span class="btn-arrow">→</span>
+    </a>
+  </div>
+
+  <p class="note">
+    小学生の方は<a href="index.html">こちら</a>
+  </p>
+</div>
+
+<footer>交野市PTA協議会　夢プロジェクト実行委員会</footer>
+</body>
+</html>
