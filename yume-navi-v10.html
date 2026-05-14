@@ -102,9 +102,38 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .radio-label:has(input:checked){background:var(--ocean);color:#fff;border-color:var(--ocean);}
 .radio-label input{display:none;}
 
-/* ── 結果画面 ── */
-#scResult{display:none;}
-#scResult.show{display:block;animation:fadeUp .5s ease;}
+/* ── 結果画面（2分割）── */
+#scResult1,#scResult2{display:none;}
+#scResult1.show,#scResult2.show{display:block;animation:fadeUp .5s ease;}
+
+/* 語りかけセクション */
+.katarikake-card{background:linear-gradient(135deg,#e0f2fe,#ede9fe);border-radius:22px;padding:1.4rem 1.5rem;margin-bottom:.9rem;border-left:5px solid var(--ocean);box-shadow:var(--shadow);}
+.katarikake-label{font-size:.7rem;color:var(--ocean);font-weight:700;letter-spacing:.1em;margin-bottom:.55rem;}
+.katarikake-body{font-size:.95rem;line-height:2.1;color:var(--ink);font-weight:500;}
+.katarikake-body.small-grade{font-size:.9rem;}
+
+/* 次へボタン（画面1→2） */
+.btn-next-page{display:block;width:100%;max-width:320px;margin:1.4rem auto 0;padding:.95rem 1rem;background:linear-gradient(135deg,var(--mint),#059669);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol',serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(16,185,129,.35);text-align:center;}
+.btn-next-page:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(16,185,129,.45);}
+
+/* 偉人アコーディオン（画面2） */
+.hero-acc-section{margin-bottom:.9rem;}
+.hero-acc-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
+.hero-accordion{background:#fff;border-radius:18px;margin-bottom:.6rem;box-shadow:var(--shadow);overflow:hidden;border:1.5px solid #e8e8f0;}
+.hero-acc-header{display:flex;align-items:center;gap:.55rem;padding:.9rem 1rem;cursor:pointer;user-select:none;transition:background .2s;}
+.hero-acc-header:hover{background:#f8f9ff;}
+.hero-acc-emoji{font-size:1.4rem;flex-shrink:0;}
+.hero-acc-name{font-size:.9rem;font-weight:700;flex:1;color:var(--pta);}
+.hero-acc-job{font-size:.72rem;color:var(--ocean);font-weight:700;margin-right:.3rem;}
+.hero-acc-chevron{font-size:.75rem;color:var(--soft);transition:transform .3s;flex-shrink:0;}
+.hero-acc-chevron.open{transform:rotate(180deg);}
+.hero-acc-body{display:none;padding:0 1rem 1rem;}
+.hero-acc-body.open{display:block;animation:fadeUp .2s ease;}
+.hero-acc-row{margin-bottom:.75rem;}
+.hero-acc-row-label{font-size:.67rem;color:var(--soft);font-weight:700;letter-spacing:.1em;margin-bottom:.3rem;}
+.hero-acc-row-text{font-size:.84rem;line-height:1.9;color:var(--ink);}
+.hero-acc-link-row{font-size:.78rem;line-height:1.8;color:var(--ocean);background:#f0f7ff;border-radius:10px;padding:.6rem .85rem;margin-top:.5rem;}
+.hero-acc-divider{border:none;border-top:1px solid #f0f0f0;margin:.5rem 0;}
 .res-header{border-radius:22px;padding:1.5rem;margin-bottom:1rem;color:#fff;text-align:center;position:relative;}
 #resTitle{font-family:'Kaisei Decol',serif;font-size:1.35rem;margin-bottom:.3rem;}
 #resSub{font-size:.76rem;opacity:.85;}
@@ -436,27 +465,21 @@ footer a:hover{text-decoration:underline;}
     </div>
   </div>
 
-  <!-- ── 結果画面 ── -->
-  <div id="scResult">
-    <div class="res-header" id="resHeader">
+  <!-- ── 結果画面1：心に届くページ ── -->
+  <div id="scResult1">
+    <div class="res-header" id="resHeader1">
       <button class="res-back-btn" onclick="goBackFromResult()">← もどる</button>
-      <div id="resTitle">✨ 結果</div>
-      <div id="resSub"></div>
+      <div id="resTitle1">✨ 結果</div>
+      <div id="resSub1"></div>
     </div>
 
-    <!-- ゾーン1：夢の正体の概念（導入） -->
-    <div class="dream-concept-card">
-      <div class="concept-emoji-row">
-        <span>💼</span><span class="concept-arrow">→</span>
-        <span>❓</span><span class="concept-arrow">→</span>
-        <span>✨</span><span class="concept-arrow">→</span>
-        <span>🌍</span>
-      </div>
-      <div class="concept-title">夢の「正体」って何だろう？</div>
-      <div class="concept-body" id="conceptBodyText"></div>
+    <!-- 語りかけ（学年別・マスタから） -->
+    <div class="katarikake-card" id="katarikakeSection">
+      <div class="katarikake-label">💬 あなたへのメッセージ</div>
+      <div class="katarikake-body" id="katarikakeBody"></div>
     </div>
 
-    <!-- ゾーン2：職業→夢の正体 変換イメージ -->
+    <!-- 職業→夢の正体 変換イメージ -->
     <div class="dream-transform-card">
       <div class="transform-label">💡 あなたが選んだ仕事で考えてみよう</div>
       <div class="transform-row">
@@ -472,14 +495,14 @@ footer a:hover{text-decoration:underline;}
       </div>
     </div>
 
-    <!-- ゾーン3：ガイドテキスト（学年別） -->
+    <!-- ガイドテキスト（学年別） -->
     <div class="guide-card">
       <div class="guide-label">💡 夢の正体とは？</div>
       <div class="guide-title" id="guideTitle"></div>
       <div class="guide-body" id="guideBody"></div>
     </div>
 
-    <!-- ルートC：キャラクター -->
+    <!-- ルートC：キャラクター診断（ルートC専用） -->
     <div class="animal-section" id="resAnimalSection" style="display:none">
       <div class="animal-label">🌈 あなたのキャラクター診断</div>
       <div class="animal-name" id="resAnimalName"></div>
@@ -492,7 +515,7 @@ footer a:hover{text-decoration:underline;}
       <div class="dc-grid" id="dcGrid"></div>
     </div>
 
-    <!-- ゾーン4：ヒント（アコーディオン） -->
+    <!-- ヒント（アコーディオン） -->
     <div id="hintSection" style="margin-top:.9rem">
       <p class="hint-intro">👇 ヒントを開いて「夢の正体」を書くときの参考にしよう。<br>気に入ったヒントをタップすると書くエリアに追加できるよ！</p>
       <div class="hint-accordion" id="acc1">
@@ -530,13 +553,19 @@ footer a:hover{text-decoration:underline;}
       </div>
     </div>
 
-    <!-- ゾーン5：偉人 -->
-    <div class="hero-section" style="margin-top:.9rem">
-      <div class="hero-title">📚 偉人たちの「夢の正体」</div>
-      <div class="hero-grid" id="heroCards"></div>
+    <!-- 次へボタン -->
+    <button class="btn-next-page" onclick="goResult2()">次へ → 夢の正体を書こう</button>
+  </div>
+
+  <!-- ── 結果画面2：宿題入力・提出・偉人 ── -->
+  <div id="scResult2">
+    <div class="res-header" id="resHeader2">
+      <button class="res-back-btn" onclick="goResult1FromResult2()">← 画面1に戻る</button>
+      <div id="resTitle2">✍️ 夢の正体を書こう</div>
+      <div id="resSub2"></div>
     </div>
 
-    <!-- ゾーン6：自分で書く（核心） -->
+    <!-- 自分で書く -->
     <div class="writing-card">
       <div class="writing-title">✍️ あなたの「夢の正体」を書こう</div>
       <div class="writing-sub">ヒントや偉人の言葉を参考に、あなただけの言葉で書こう。<br>上手に書かなくていい。素直な気持ちが一番大切！</div>
@@ -584,9 +613,23 @@ footer a:hover{text-decoration:underline;}
       <textarea class="input-field" id="kansouInput" placeholder="今日の気づき・感想を書こう"></textarea>
     </div>
 
+    <!-- 提出ボタン -->
     <div class="result-actions">
       <button id="submitBtn" onclick="saveResult()">📤 宿題を提出する</button>
       <div class="save-status" id="saveStatus"></div>
+    </div>
+
+    <!-- ────── 提出ボタンより下 ────── -->
+
+    <!-- 偉人アコーディオン -->
+    <div class="hero-acc-section" style="margin-top:1.8rem" id="heroAccSection">
+      <div class="hero-acc-title">📚 偉人たちの「夢の正体」を調べてみよう</div>
+      <p style="font-size:.77rem;color:var(--soft);margin-bottom:.8rem;line-height:1.8">偉人たちも、あなたと同じように「夢の正体」を持っていた。<br>開いて読んでみよう！</p>
+      <div id="heroAccordions"></div>
+    </div>
+
+    <!-- ドキュメント保存・再チャレンジ -->
+    <div class="result-actions" style="margin-top:1rem">
       <button class="btn-outline" onclick="openDocView()">📄 ドキュメントとして保存・印刷</button>
       <button class="btn-outline" onclick="fullReset()">🔁 再チャレンジする</button>
     </div>
@@ -700,10 +743,13 @@ function toggleTestMode(){
 
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('scResult').classList.remove('show');
+  document.getElementById('scResult1').classList.remove('show');
+  document.getElementById('scResult2').classList.remove('show');
   const el=document.getElementById(id);if(el){el.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 }
 function goBackFromResult(){if(route==='A')show('scA1');else if(route==='B')show('scB1');else show('scC1');}
+function goResult2(){document.getElementById('scResult1').classList.remove('show');document.getElementById('scResult2').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});}
+function goResult1FromResult2(){document.getElementById('scResult2').classList.remove('show');document.getElementById('scResult1').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});}
 
 function buildGradeButtons(){
   const el=document.getElementById('gradeSteps');el.innerHTML='';
@@ -933,17 +979,18 @@ function generateRouteC(){
   showResult();
 }
 
-/* ── 結果画面 ── */
+/* ── 結果画面（2分割） ── */
 function showResult(){
   const g=GRADES.find(x=>x.id===grade);
-  document.getElementById('resHeader').style.background=g.grad;
-  document.getElementById('resTitle').textContent=`「${selectedCareerName}」の夢の正体`;
-  document.getElementById('resSub').textContent=`${g.label} ／ ${route==='A'?'なりたい仕事から':route==='B'?'したいことから':'夢を一緒に考えるルート'}`;
+  [document.getElementById('resHeader1'),document.getElementById('resHeader2')].forEach(h=>{if(h)h.style.background=g.grad;});
+  const titleText=`「${selectedCareerName}」の夢の正体`;
+  const subText=`${g.label} ／ ${route==='A'?'なりたい仕事から':route==='B'?'したいことから':'夢を一緒に考えるルート'}`;
+  document.getElementById('resTitle1').textContent=titleText;
+  document.getElementById('resSub1').textContent=subText;
+  document.getElementById('resTitle2').textContent='✍️ 夢の正体を書こう';
+  document.getElementById('resSub2').textContent=subText;
   document.getElementById('transformCareer').textContent=selectedCareerName||'—';
-  const isLow=['s1','s2','s3'].includes(grade);
-  document.getElementById('conceptBodyText').innerHTML=isLow
-    ?`「おいしゃさんになりたい！」— これはゆめの<span class="concept-highlight">なまえ</span>。<br>でも ほんとうの ゆめは もっと ふかいところにある。<br>しごとを とおして だれかに とどける<span class="concept-highlight">「ありがとう」</span>が、<br>ゆめの<span class="concept-highlight">しょうたい</span>だよ。`
-    :`「${selectedCareerName}」は夢の<span class="concept-highlight">名前</span>。<br>でも本当の夢は、もっと深いところにある。<br>仕事を通して誰かに届ける<span class="concept-highlight">「ありがとう」</span>が、<br>夢の<span class="concept-highlight">正体</span>だよ。`;
+  renderKatarikake();
   const guide=MASTER.guides.find(x=>x['学年']===g.col);
   if(guide){document.getElementById('guideTitle').textContent=guide['ガイドタイトル']||'夢の正体って何だろう？';document.getElementById('guideBody').textContent=guide['ガイド本文']||'';}
   if(route==='C'&&animalCharResult){
@@ -953,10 +1000,35 @@ function showResult(){
     document.getElementById('resAnimalDesc').textContent=animalCharResult[dk]||'';
     buildDreamCandidates();
   }else{document.getElementById('resAnimalSection').style.display='none';document.getElementById('resDreamCandidates').style.display='none';}
-  renderHints();heroDataForDoc=renderHeroes();populateTemplates();
+  renderHints();heroDataForDoc=renderHeroAccordions();populateTemplates();
   document.getElementById('kansouInput').value='';document.getElementById('freeInput').value='';document.getElementById('templateOutput').value='';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('scResult').classList.add('show');window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('scResult2').classList.remove('show');
+  document.getElementById('scResult1').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* 語りかけ表示 */
+function renderKatarikake(){
+  const g=GRADES.find(x=>x.id===grade);
+  const isSmall=['s1','s2'].includes(grade);
+  const body=document.getElementById('katarikakeBody');
+  const section=document.getElementById('katarikakeSection');
+  if(!body)return;
+  if(MASTER.katarikake&&MASTER.katarikake.length>0){
+    const row=MASTER.katarikake.find(r=>r['職業ID']===selectedCareerId&&r['学年']===g.col);
+    if(row&&row['語りかけ本文']){
+      body.textContent=row['語りかけ本文'];
+      body.className='katarikake-body'+(isSmall?' small-grade':'');
+      section.style.display='block';return;
+    }
+  }
+  const guide=MASTER.guides.find(x=>x['学年']===g.col);
+  if(guide&&guide['ガイド本文']){
+    body.textContent=guide['ガイド本文'].slice(0,120)+(guide['ガイド本文'].length>120?'…':'');
+    body.className='katarikake-body'+(isSmall?' small-grade':'');
+    section.style.display='block';
+  }else{section.style.display='none';}
 }
 
 function buildDreamCandidates(){
@@ -971,9 +1043,10 @@ function buildDreamCandidates(){
     card.onclick=()=>{
       document.querySelectorAll('.dc-card').forEach(x=>x.classList.remove('selected'));card.classList.add('selected');
       selectedCareerId=c['職業ID'];selectedCareerName=label;
-      document.getElementById('resTitle').textContent=`「${label}」の夢の正体`;
+      document.getElementById('resTitle1').textContent=`「${label}」の夢の正体`;
+      document.getElementById('resTitle2').textContent='✍️ 夢の正体を書こう';
       document.getElementById('transformCareer').textContent=label;
-      renderHints();renderHeroes();populateTemplates();
+      renderKatarikake();renderHints();renderHeroAccordions();populateTemplates();
     };
     if(c['職業ID']===selectedCareerId)card.classList.add('selected');grid.appendChild(card);
   });
@@ -1007,21 +1080,48 @@ function useHint(text){
   out.classList.add('hint-flash');setTimeout(()=>out.classList.remove('hint-flash'),700);
 }
 
-function renderHeroes(){
-  const g=GRADES.find(x=>x.id===grade);const dk=`夢の正体（${g.col}）`;
+function renderHeroAccordions(){
+  const g=GRADES.find(x=>x.id===grade);
+  const grpKey=['s1','s2','s3'].includes(grade)?'小1-3':['s4','s5','s6'].includes(grade)?'小4-6':'中1-大人';
+  const dkMap={'小1-3':'小1-3','小4-6':'小4-6','中1-大人':'中1-大人'};
   const sorted=[...MASTER.heroes].sort((a,b)=>{
     const ra=a['PTA推奨フラグ']==='はい'?0:1,rb=b['PTA推奨フラグ']==='はい'?0:1;if(ra!==rb)return ra-rb;
     const fA=(a['知名度（小1-大人）']||'').split('|'),fB=(b['知名度（小1-大人）']||'').split('|');
     const ci=['小1','小2','小3','小4','小5','小6','中1','中2','中3','大人'].indexOf(g.col);
     return(parseInt(fB[ci])||0)-(parseInt(fA[ci])||0);
   });
-  const top3=sorted.slice(0,3);const el=document.getElementById('heroCards');el.innerHTML='';
-  top3.forEach((h,i)=>{
-    const card=document.createElement('div');card.className='hero-card';card.style.animationDelay=`${i*0.1}s`;
-    card.innerHTML=`<div class="hero-name"><span class="hero-emoji">${h['絵文字']||'⭐'}</span>${h['偉人名']||''}</div><div class="hero-job">${h['職業']||''}</div><div class="hero-msg">${h[dk]||''}</div>`;
-    el.appendChild(card);
+  const el=document.getElementById('heroAccordions');if(!el)return sorted.slice(0,3);
+  el.innerHTML='';
+  sorted.forEach((h,i)=>{
+    const heroId=`heroAcc_${i}`;
+    const acc=document.createElement('div');acc.className='hero-accordion';
+    // どんな人テキスト
+    let whoText='',whatText='';
+    if(['s1','s2','s3'].includes(grade)){whoText=h['どんな人（小1-3）']||'';whatText=h['何がすごかった（小1-3）']||'';}
+    else if(['s4','s5','s6'].includes(grade)){whoText=h['どんな人（小4-6）']||'';whatText=h['何がすごかった（小4-6）']||'';}
+    else{whoText=h['どんな人（中1-大人）']||'';whatText=h['何がすごかった（中1-大人）']||'';}
+    const relationText=h['選んだ職業や夢の正体との関係']||'';
+    const researchText=h['自分で調べてみよう']||'';
+    acc.innerHTML=`
+      <div class="hero-acc-header" onclick="toggleHeroAcc('${heroId}')">
+        <span class="hero-acc-emoji">${h['絵文字']||'⭐'}</span>
+        <div style="flex:1"><span class="hero-acc-name">${h['偉人名']||''}</span><br><span class="hero-acc-job">${h['職業']||''}</span></div>
+        <span class="hero-acc-chevron" id="${heroId}-chevron">▼</span>
+      </div>
+      <div class="hero-acc-body" id="${heroId}-body">
+        ${whoText?`<div class="hero-acc-row"><div class="hero-acc-row-label">👤 どんな人？</div><div class="hero-acc-row-text">${whoText}</div></div>`:''}
+        ${whatText?`<hr class="hero-acc-divider"><div class="hero-acc-row"><div class="hero-acc-row-label">✨ 何がすごかった？</div><div class="hero-acc-row-text">${whatText}</div></div>`:''}
+        ${relationText?`<hr class="hero-acc-divider"><div class="hero-acc-row"><div class="hero-acc-row-label">🔗 あなたの選んだ仕事とどうつながる？</div><div class="hero-acc-row-text">${relationText}</div></div>`:''}
+        ${researchText?`<div class="hero-acc-link-row">🔍 <strong>自分で調べてみよう！</strong><br>${researchText}</div>`:''}
+      </div>`;
+    el.appendChild(acc);
   });
-  return top3;
+  return sorted;
+}
+function toggleHeroAcc(id){
+  const body=document.getElementById(`${id}-body`),chev=document.getElementById(`${id}-chevron`);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);chev.classList.toggle('open',!isOpen);
 }
 
 function switchMode(mode){
@@ -1136,7 +1236,9 @@ function fullReset(){
   grade=null;route=null;selectedCareerId=null;selectedCareerName=null;selectedValueIds=[];selectedLikeChips=[];catSelected=[];animalCharResult=null;
   document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
   document.getElementById('gradePreview').style.display='none';document.getElementById('gradeConfirmBtn').style.display='none';
-  document.getElementById('scResult').classList.remove('show');show('scGrade');
+  document.getElementById('scResult1').classList.remove('show');
+  document.getElementById('scResult2').classList.remove('show');
+  show('scGrade');
 }
 </script>
 </body>
