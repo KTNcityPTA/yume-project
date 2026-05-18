@@ -345,6 +345,43 @@ footer a{color:#93c5fd;text-decoration:none;}
 footer a:hover{text-decoration:underline;}
 .footer-privacy{font-size:.66rem;opacity:.75;margin-top:.35rem;}
 @media(max-width:480px){.route-grid{grid-template-columns:1fr;}.birth-row{gap:.35rem;}.dc-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* ── 折りたたみヒント（テンプレ・自由モード共通）── */
+.hint-fold{background:#fff;border-radius:14px;margin-bottom:.55rem;border:1.5px solid #e8e8f0;overflow:hidden;}
+.hint-fold-header{display:flex;align-items:center;gap:.45rem;padding:.7rem .9rem;cursor:pointer;user-select:none;transition:background .2s;font-size:.82rem;font-weight:700;}
+.hint-fold-header:hover{background:#f8f9ff;}
+.hint-fold-icon{font-size:1rem;flex-shrink:0;}
+.hint-fold-label{flex:1;}
+.hint-fold-chevron{font-size:.72rem;color:var(--soft);transition:transform .3s;flex-shrink:0;}
+.hint-fold-chevron.open{transform:rotate(180deg);}
+.hint-fold-body{display:none;padding:0 .9rem .75rem;}
+.hint-fold-body.open{display:block;animation:fadeUp .2s ease;}
+
+/* ── 完了オーバーレイ ── */
+#finishOverlay{display:none;position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0c4a6e 0%,#312e81 100%);overflow-y:auto;padding:2rem 1rem 4rem;}
+#finishOverlay.show{display:flex;flex-direction:column;align-items:center;}
+.finish-stars{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
+.finish-star{position:absolute;font-size:1.2rem;animation:starFloat linear infinite;opacity:.7;}
+@keyframes starFloat{from{transform:translateY(100vh) rotate(0deg);opacity:.8;}to{transform:translateY(-10vh) rotate(360deg);opacity:0;}}
+.finish-card{background:rgba(255,255,255,.1);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:2rem 1.5rem;max-width:460px;width:100%;text-align:center;color:#fff;margin-bottom:1.5rem;position:relative;z-index:1;}
+.finish-emoji{font-size:3.5rem;display:block;margin-bottom:.8rem;animation:popIn .5s ease;}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.finish-title{font-family:'Kaisei Decol',serif;font-size:1.8rem;font-weight:900;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#fbbf24 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.finish-sub{font-size:.9rem;opacity:.85;margin-bottom:1.5rem;line-height:1.8;}
+.finish-doc-wrap{background:rgba(255,255,255,.95);border-radius:20px;padding:1.5rem;color:#1a1a2e;margin-bottom:1.2rem;text-align:left;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:460px;width:100%;position:relative;z-index:1;}
+.finish-doc-title{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:#1a4a8a;margin-bottom:.8rem;text-align:center;}
+.finish-doc-label{font-size:.66rem;color:#6b7280;font-weight:700;letter-spacing:.1em;margin-bottom:.3rem;}
+.finish-doc-value{font-size:.9rem;color:#1a1a2e;line-height:1.9;margin-bottom:.9rem;padding-left:.5rem;border-left:3px solid #fbbf24;white-space:pre-wrap;}
+.finish-thank{font-family:'Kaisei Decol',serif;font-size:1rem;margin-bottom:1.5rem;line-height:1.9;opacity:.95;text-align:center;position:relative;z-index:1;color:#fff;max-width:460px;}
+.finish-actions{display:flex;flex-direction:column;gap:.8rem;width:100%;max-width:280px;position:relative;z-index:1;}
+.finish-btn-save{padding:.9rem;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50px;color:#fff;font-family:'Kaisei Decol',serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;}
+.finish-btn-save:hover{background:rgba(255,255,255,.35);}
+.finish-btn-restart{padding:.9rem;background:transparent;border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:rgba(255,255,255,.75);font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .25s;}
+.finish-btn-restart:hover{border-color:rgba(255,255,255,.7);color:#fff;}
+
+/* 終わりボタン */
+.btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
+.btn-finish:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(251,191,36,.5);}
 </style>
 </head>
 <body>
@@ -391,6 +428,32 @@ footer a:hover{text-decoration:underline;}
       <div class="doc-hero-list" id="docHeroList"></div>
     </div>
     <div class="doc-footer">交野市PTA協議会　夢プロジェクト　2026年 夏休みの宿題</div>
+  </div>
+</div>
+
+<!-- ── 完了オーバーレイ ── -->
+<div id="finishOverlay">
+  <div class="finish-stars" id="finishStars"></div>
+  <div class="finish-card">
+    <span class="finish-emoji">🌟</span>
+    <div class="finish-title" id="finishTitle">よくできました！</div>
+    <div class="finish-sub" id="finishSub">宿題を提出しました！</div>
+  </div>
+  <div class="finish-doc-wrap" id="finishDocWrap">
+    <div class="finish-doc-title">📄 あなたの夢の正体</div>
+    <div class="finish-doc-label">選んだ仕事</div>
+    <div class="finish-doc-value" id="finishCareer">—</div>
+    <div class="finish-doc-label">わたしの夢の正体</div>
+    <div class="finish-doc-value" id="finishDream">（まだ書いていません）</div>
+    <div class="finish-doc-label">感想・気づき</div>
+    <div class="finish-doc-value" id="finishKansou">（まだ書いていません）</div>
+  </div>
+  <div class="finish-thank" id="finishThank">
+    よく考えてくれたね。<br>あなたの夢の正体は、<br>きっと誰かをしあわせにする力がある。✨
+  </div>
+  <div class="finish-actions">
+    <button class="finish-btn-save" onclick="openDocView()">📄 ドキュメントで保存・印刷</button>
+    <button class="finish-btn-restart" onclick="fullReset()">🔄 最初からやり直す</button>
   </div>
 </div>
 
@@ -633,75 +696,106 @@ footer a:hover{text-decoration:underline;}
         <button class="mode-tab" id="tabFree" onclick="switchMode('free')">✏️ 自由に書く</button>
       </div>
 
-      <!-- 穴埋め（インライン入力形式） -->
+      <!-- テンプレートモード -->
       <div class="template-area show" id="templateArea">
         <div class="template-select-wrap">
           <label class="form-label">テンプレートを選ぶ</label>
           <select class="input-field" id="templateSelect" onchange="renderTemplate()"></select>
         </div>
-        <!-- インライン文章エリア -->
+        <!-- インライン文章（直接書き込む） -->
         <div class="inline-template-wrap">
           <div class="inline-tpl-sentence" id="inlineTplSentence"></div>
         </div>
-        <!-- ヒント1 -->
-        <div class="inline-hint-section" id="inlineHint1">
-          <div class="inline-hint-q">🌱 ヒント：この仕事で「誰を笑顔にできる」？</div>
-          <div class="inline-hint-list" id="inlineHint1List"></div>
+        <!-- ヒント1（折りたたみ） -->
+        <div class="hint-fold" id="hintFold1">
+          <div class="hint-fold-header" onclick="toggleHintFold('hintFold1')">
+            <span class="hint-fold-icon">🌱</span>
+            <span class="hint-fold-label">ヒント1：誰を笑顔にできる？</span>
+            <span class="hint-fold-chevron" id="hintFold1-chev">▼</span>
+          </div>
+          <div class="hint-fold-body" id="hintFold1-body">
+            <div class="inline-hint-list" id="inlineHint1List"></div>
+          </div>
         </div>
         <!-- ヒント2 -->
-        <div class="inline-hint-section" id="inlineHint2">
-          <div class="inline-hint-q" style="color:var(--lav)">💬 ヒント：どんな「ありがとう」が届く？</div>
-          <div class="inline-hint-list" id="inlineHint2List"></div>
+        <div class="hint-fold" id="hintFold2">
+          <div class="hint-fold-header" onclick="toggleHintFold('hintFold2')" style="color:var(--lav)">
+            <span class="hint-fold-icon">💬</span>
+            <span class="hint-fold-label">ヒント2：どんな「ありがとう」が届く？</span>
+            <span class="hint-fold-chevron" id="hintFold2-chev">▼</span>
+          </div>
+          <div class="hint-fold-body" id="hintFold2-body">
+            <div class="inline-hint-list" id="inlineHint2List"></div>
+          </div>
         </div>
         <!-- ヒント3 -->
-        <div class="inline-hint-section" id="inlineHint3">
-          <div class="inline-hint-q" style="color:var(--peach)">🌍 ヒント：世の中にどんな影響を残せる？</div>
-          <div class="inline-hint-list" id="inlineHint3List"></div>
+        <div class="hint-fold" id="hintFold3">
+          <div class="hint-fold-header" onclick="toggleHintFold('hintFold3')" style="color:var(--peach)">
+            <span class="hint-fold-icon">🌍</span>
+            <span class="hint-fold-label">ヒント3：世の中への影響は？</span>
+            <span class="hint-fold-chevron" id="hintFold3-chev">▼</span>
+          </div>
+          <div class="hint-fold-body" id="hintFold3-body">
+            <div class="inline-hint-list" id="inlineHint3List"></div>
+          </div>
         </div>
-        <p style="font-size:.72rem;color:var(--soft);margin:.6rem 0 .3rem">↓ 完成した文章を自由に書き直してもOKだよ！</p>
-        <div class="full-edit-wrap">
-          <div class="full-edit-label">🖊️ 完成した夢の正体（自由に書き直せるよ）</div>
-          <textarea class="full-edit-area" id="templateOutput" placeholder="ここに書こう！"></textarea>
+        <!-- 例文 -->
+        <div class="example-box" id="tplExampleBox" style="margin-top:.6rem">
+          <div class="example-label">📖 こんな感じで書くよ（例）</div>
+          <div class="example-item" id="tplExample1"></div>
+          <div class="example-item" id="tplExample2"></div>
         </div>
       </div>
 
-      <!-- 自由入力 -->
+      <!-- 自由入力モード -->
       <div class="template-area" id="freeArea">
-        <!-- ヒントアコーディオン（自由入力時） -->
-        <div class="hint-accordion" id="freeAcc1">
-          <div class="hint-acc-header" onclick="toggleAcc('freeAcc1')">
-            <span class="hint-acc-icon">🌱</span>
-            <span class="hint-acc-label">ヒント1：誰を笑顔にできる？</span>
-            <span class="hint-acc-toggle" id="freeAcc1-toggle">▼</span>
+        <!-- ヒント1（折りたたみ） -->
+        <div class="hint-fold" id="freeHintFold1">
+          <div class="hint-fold-header" onclick="toggleHintFold('freeHintFold1')">
+            <span class="hint-fold-icon">🌱</span>
+            <span class="hint-fold-label">ヒント1：誰を笑顔にできる？</span>
+            <span class="hint-fold-chevron" id="freeHintFold1-chev">▼</span>
           </div>
-          <div class="hint-acc-body" id="freeAcc1-body">
+          <div class="hint-fold-body" id="freeHintFold1-body">
             <div class="inline-hint-list" id="freeHint1List"></div>
           </div>
         </div>
-        <div class="hint-accordion" id="freeAcc2">
-          <div class="hint-acc-header" onclick="toggleAcc('freeAcc2')">
-            <span class="hint-acc-icon">💬</span>
-            <span class="hint-acc-label" style="color:var(--lav)">ヒント2：どんな「ありがとう」が届く？</span>
-            <span class="hint-acc-toggle" id="freeAcc2-toggle">▼</span>
+        <div class="hint-fold" id="freeHintFold2">
+          <div class="hint-fold-header" onclick="toggleHintFold('freeHintFold2')" style="color:var(--lav)">
+            <span class="hint-fold-icon">💬</span>
+            <span class="hint-fold-label">ヒント2：どんな「ありがとう」が届く？</span>
+            <span class="hint-fold-chevron" id="freeHintFold2-chev">▼</span>
           </div>
-          <div class="hint-acc-body" id="freeAcc2-body">
+          <div class="hint-fold-body" id="freeHintFold2-body">
             <div class="inline-hint-list" id="freeHint2List"></div>
           </div>
         </div>
-        <div class="hint-accordion" id="freeAcc3">
-          <div class="hint-acc-header" onclick="toggleAcc('freeAcc3')">
-            <span class="hint-acc-icon">🌍</span>
-            <span class="hint-acc-label" style="color:var(--peach)">ヒント3：世の中への影響は？</span>
-            <span class="hint-acc-toggle" id="freeAcc3-toggle">▼</span>
+        <div class="hint-fold" id="freeHintFold3">
+          <div class="hint-fold-header" onclick="toggleHintFold('freeHintFold3')" style="color:var(--peach)">
+            <span class="hint-fold-icon">🌍</span>
+            <span class="hint-fold-label">ヒント3：世の中への影響は？</span>
+            <span class="hint-fold-chevron" id="freeHintFold3-chev">▼</span>
           </div>
-          <div class="hint-acc-body" id="freeAcc3-body">
+          <div class="hint-fold-body" id="freeHintFold3-body">
             <div class="inline-hint-list" id="freeHint3List"></div>
           </div>
         </div>
-        <div class="full-edit-wrap" style="margin-top:.7rem">
+        <!-- 例文 -->
+        <div class="example-box" style="margin:.6rem 0">
+          <div class="example-label">📖 こんな感じで書くよ（例）</div>
+          <div class="example-item" id="freeExample1"></div>
+          <div class="example-item" id="freeExample2"></div>
+        </div>
+        <div class="full-edit-wrap">
           <div class="full-edit-label">🖊️ あなたの言葉で書こう</div>
           <textarea class="full-edit-area" id="freeInput" placeholder="あなたの「夢の正体」を自由に書いてね！" style="min-height:120px"></textarea>
         </div>
+      </div>
+
+      <!-- 共通：完成した夢の正体（テンプレ時はインラインと連動。1本化） -->
+      <div id="dreamOutputWrap" style="margin-top:.7rem">
+        <div class="full-edit-label">🖊️ あなたの「夢の正体」（自由に書き直してもOK！）</div>
+        <textarea class="full-edit-area" id="dreamOutput" placeholder="ここに書こう！" style="min-height:100px"></textarea>
       </div>
     </div>
 
@@ -724,14 +818,15 @@ footer a:hover{text-decoration:underline;}
       <button class="btn-outline" onclick="fullReset()">🔄 最初からやり直す</button>
     </div>
 
-    <!-- ────── 提出ボタンより下 ────── -->
-
     <!-- 偉人アコーディオン -->
     <div class="hero-acc-section" style="margin-top:1.8rem" id="heroAccSection">
       <div class="hero-acc-title">📚 偉人たちの「夢の正体」を調べてみよう</div>
       <p style="font-size:.77rem;color:var(--soft);margin-bottom:.8rem;line-height:1.8">偉人たちも、あなたと同じように「夢の正体」を持っていた。<br>開いて読んでみよう！</p>
       <div id="heroAccordions"></div>
     </div>
+
+    <!-- 終わりボタン -->
+    <button class="btn-finish" onclick="showFinish()">🌟 おわる</button>
   </div>
 
   <!-- お問い合わせ -->
@@ -1164,7 +1259,9 @@ function showResult(){
   document.getElementById('resAnimalSection').style.display='none';
   document.getElementById('resDreamCandidates').style.display='none';
   renderHints();heroDataForDoc=renderHeroAccordions();populateTemplates();
-  document.getElementById('kansouInput').value='';document.getElementById('freeInput').value='';document.getElementById('templateOutput').value='';
+  document.getElementById('kansouInput').value='';
+  document.getElementById('freeInput').value='';
+  document.getElementById('dreamOutput').value='';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('scResultC').classList.remove('active');
   document.getElementById('scResult2').classList.remove('show');
@@ -1256,24 +1353,34 @@ function renderHintItems(el,cid,type,grp,cls,mode){
 
 function useHint(text,itemEl,badgeEl,mode){
   if(mode==='inline'){
-    // テンプレ穴埋め：未入力の最初のblankに入れる
     const inputs=document.querySelectorAll('.tpl-blank-input');
     let filled=false;
     for(const inp of inputs){
       if(!inp.value.trim()){inp.value=text;inp.classList.add('has-hint');inp.dispatchEvent(new Event('input'));filled=true;break;}
     }
     if(!filled){
-      // 全部埋まっていたらtemplateOutputに追記
-      const out=document.getElementById('templateOutput');
+      const out=document.getElementById('dreamOutput');
       if(out){out.value=out.value?(out.value+'\n'+text):text;}
     }
   }else{
-    const out=document.getElementById('freeInput');
+    const out=document.getElementById('dreamOutput');
     if(out){out.value=out.value?(out.value+'\n'+text):text;}
   }
-  // 視覚フィードバック
   if(itemEl){itemEl.classList.add('hint-flash-green');setTimeout(()=>itemEl.classList.remove('hint-flash-green'),600);}
   if(badgeEl){badgeEl.textContent='✓ 追加済';badgeEl.className='hint-add-badge done';}
+}
+
+function switchMode(mode){
+  writingMode=mode;
+  document.getElementById('tabTemplate').classList.toggle('active',mode==='template');
+  document.getElementById('tabFree').classList.toggle('active',mode==='free');
+  document.getElementById('templateArea').classList.toggle('show',mode==='template');
+  document.getElementById('freeArea').classList.toggle('show',mode==='free');
+  // dreamOutputを同期
+  const out=document.getElementById('dreamOutput');
+  const free=document.getElementById('freeInput');
+  if(mode==='free'&&free&&out){free.value=out.value;free.addEventListener('input',()=>{out.value=free.value;});}
+  if(mode==='template')updateInlineTemplate();
 }
 
 /* 偉人アコーディオン（現スプレッドシート形式：夢の正体（学年別）を使用） */
@@ -1333,7 +1440,6 @@ function populateTemplates(){
 function renderTemplate(){
   const tpl=document.getElementById('templateSelect').value;if(!tpl)return;
   const isSmall=['s1','s2','s3'].includes(grade);
-  // ___で分割してインライン入力フォームを構築
   const parts=tpl.split('___');
   currentTemplateParts=parts;
   currentBlankInputs=[];
@@ -1342,16 +1448,11 @@ function renderTemplate(){
   sentence.innerHTML='';
   sentence.className='inline-tpl-sentence'+(isSmall?' small-grade':'');
   parts.forEach((part,i)=>{
-    // テキスト部分
-    if(part){
-      // 職業名を自動プリセット（___の前後のテキストで判断）
-      const span=document.createElement('span');span.textContent=part;sentence.appendChild(span);
-    }
+    if(part){const span=document.createElement('span');span.textContent=part;sentence.appendChild(span);}
     if(i<parts.length-1){
       const wrap=document.createElement('span');wrap.className='tpl-blank-wrap';
       const inp=document.createElement('input');inp.type='text';inp.className='tpl-blank-input';
       inp.placeholder='？';
-      // 職業名を最初の空欄にプリセット
       if(i===0&&selectedCareerName){inp.value=selectedCareerName;inp.classList.add('has-hint');}
       inp.addEventListener('input',updateInlineTemplate);
       const lbl=document.createElement('span');lbl.className='tpl-blank-label';lbl.textContent=`空欄${i+1}`;
@@ -1360,8 +1461,26 @@ function renderTemplate(){
       currentBlankInputs.push(inp);
     }
   });
+  // テンプレ例文（職業名を使った例を生成）
+  const g=GRADES.find(x=>x.id===grade);
+  const guide=MASTER.guides.find(x=>x['学年']===g.col);
+  const ex1=document.getElementById('tplExample1');
+  const ex2=document.getElementById('tplExample2');
+  if(ex1&&ex2&&guide){
+    const t1=guide['穴埋めテンプレ1']||'';
+    const t2=guide['穴埋めテンプレ2']||'';
+    // 例：1つ目の空欄に職業名・2つ目にサンプルを入れた文例
+    const fill=(tpl,vals)=>{const p=tpl.split('___');return p.map((s,i)=>s+(vals[i]||'')).join('').replace(/\s+/g,' ').trim();};
+    ex1.textContent=fill(t1,[selectedCareerName||'お医者さん','病気で苦しむ人','助けたい']);
+    ex2.textContent=fill(t2,[selectedCareerName||'お医者さん','健康','守る']);
+  }
+  const fe1=document.getElementById('freeExample1');
+  const fe2=document.getElementById('freeExample2');
+  if(fe1&&fe2){
+    fe1.textContent=`「${selectedCareerName||'お医者さん'}になって、病気で苦しむ人を助けたい。」`;
+    fe2.textContent=`「${selectedCareerName||'お医者さん'}という仕事を通して、人が安心して暮らせる世界を作りたい。」`;
+  }
   updateInlineTemplate();
-  // ヒント再描画（入力欄が更新されたので）
   renderHints();
 }
 
@@ -1374,13 +1493,56 @@ function updateInlineTemplate(){
       result+=v||'___';
     }
   });
-  const out=document.getElementById('templateOutput');
-  if(out)out.value=result;
+  const out=document.getElementById('dreamOutput');
+  if(out&&writingMode==='template')out.value=result;
 }
 
-function getDreamIdentity(){return writingMode==='template'?document.getElementById('templateOutput').value.trim():document.getElementById('freeInput').value.trim();}
+function toggleHintFold(id){
+  const body=document.getElementById(`${id}-body`),chev=document.getElementById(`${id}-chev`);
+  if(!body||!chev)return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);chev.classList.toggle('open',!isOpen);
+}
 
-/* ── 宿題提出（no-cors でCORSバグ修正）── */
+function getDreamIdentity(){return document.getElementById('dreamOutput').value.trim();}
+
+function showFinish(){
+  const g=GRADES.find(x=>x.id===grade);
+  const isSmall=['s1','s2','s3'].includes(grade);
+  // 内容セット
+  document.getElementById('finishCareer').textContent=selectedCareerName||'—';
+  document.getElementById('finishDream').textContent=getDreamIdentity()||'（まだ書いていません）';
+  document.getElementById('finishKansou').textContent=document.getElementById('kansouInput').value.trim()||'（まだ書いていません）';
+  // 学年別メッセージ
+  const thankMsgs={
+    s1:'よく かんがえたね！✨\nあなたの ゆめの しょうたいは、\nきっと だれかを えがおにする ちからがある！',
+    s2:'よく かんがえたね！✨\nあなたが かいた「ゆめの しょうたい」、\nとっても すてきだよ！',
+    s3:'よく考えたね！✨\nあなたの「夢の正体」は、\nきっと誰かを喜ばせる力がある。',
+    s4:'よく考えたね！✨\nあなたが見つけた夢の正体——\nそれがこれからの道しるべになるよ。',
+    s5:'すごい！✨\nあなたが自分の言葉で書いた夢の正体、\nそれが本当の夢の始まりだよ。',
+    s6:'よくできました！✨\nあなたが見つけた夢の正体は、\n職業の名前より深くて強いものだよ。',
+    m1:'よく向き合いました！✨\n自分の軸を見つけることは、\nこれからの選択を強くしてくれる。',
+    m2:'素晴らしい。✨\nあなたが言語化した夢の正体、\nそれが本物のあなたの姿だ。',
+    m3:'よくやり遂げました。✨\n進路を選ぶとき、今日書いた言葉を\nもう一度読み返してみてください。',
+    g:'ありがとうございました。✨\nあなた自身の夢の正体を\n言葉にしていただけたこと、嬉しく思います。'
+  };
+  document.getElementById('finishThank').textContent=thankMsgs[grade]||thankMsgs['s4'];
+  document.getElementById('finishTitle').textContent=isSmall?'よくできました！':'お疲れ様でした！';
+  document.getElementById('finishSub').textContent=isSmall?'宿題をていしゅつしました！':'提出が完了しました。';
+  // 星エフェクト
+  const stars=document.getElementById('finishStars');stars.innerHTML='';
+  const emojis=['⭐','🌟','✨','💫','🌠'];
+  for(let i=0;i<20;i++){
+    const s=document.createElement('div');s.className='finish-star';
+    s.textContent=emojis[i%emojis.length];
+    s.style.left=`${Math.random()*100}%`;
+    s.style.animationDuration=`${3+Math.random()*5}s`;
+    s.style.animationDelay=`${Math.random()*4}s`;
+    stars.appendChild(s);
+  }
+  document.getElementById('finishOverlay').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 async function saveResult(){
   const dreamIdentity=getDreamIdentity(),kansou=document.getElementById('kansouInput').value.trim();
   const btn=document.getElementById('submitBtn'),status=document.getElementById('saveStatus');
@@ -1451,6 +1613,8 @@ function fullReset(){
   document.getElementById('scResult1').classList.remove('show');
   document.getElementById('scResult2').classList.remove('show');
   document.getElementById('scResultC').classList.remove('active');
+  document.getElementById('finishOverlay').classList.remove('show');
+  const dOut=document.getElementById('dreamOutput');if(dOut)dOut.value='';
   show('scGrade');
 }
 </script>
