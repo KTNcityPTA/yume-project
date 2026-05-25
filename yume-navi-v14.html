@@ -1189,7 +1189,7 @@ footer a:hover{text-decoration:underline;}
 
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbyGe-GLAYQvgLp24RhajYoOKk2laNhmfOM15au3ODfM1c2hYzaYQZj5beWQTUWqC8Lgmg/exec';
-const STORAGE_KEY='yumeNavi_master_v1';
+const STORAGE_KEY='yumeNavi_master_v2';
 const STORAGE_VERSION_KEY='yumeNavi_master_version';
 const SCHOOLS=['交野みらい学園','倉治小学校','郡津小学校','旭小学校','星田小学校','妙見坂小学校','岩船小学校','私市小学校','藤が尾小学校','第２中学校','第３中学校','第４中学校'];
 const GRADES=[
@@ -2076,10 +2076,29 @@ function renderQuestionChips(elementId, cid, type, grp, targetInputId, chipClass
           chip.classList.add('used');
           const qNum=targetInputId==='blank1'?1:targetInputId==='blank2'?2:3;
           onDreamInput(qNum);
-          // Q3タップ後はプレビューへスクロール
+          // Q3タップ後はプレビューへスクロール＋フォーカス
           if(qNum===3){
             const preview=document.getElementById('dreamPreviewBubble');
-            if(preview) setTimeout(()=>preview.scrollIntoView({behavior:'smooth',block:'start'}),120);
+            if(preview){
+              setTimeout(()=>{
+                preview.scrollIntoView({behavior:'smooth',block:'center'});
+                // スクロール完了後にフォーカス（contenteditable要素はfocus()で末尾にカーソル）
+                setTimeout(()=>{
+                  preview.focus();
+                  // カーソルを末尾に移動
+                  const sel=window.getSelection();
+                  const range=document.createRange();
+                  range.selectNodeContents(preview);
+                  range.collapse(false);
+                  sel.removeAllRanges();
+                  sel.addRange(range);
+                  // 軽くハイライト演出
+                  preview.style.transition='box-shadow .3s';
+                  preview.style.boxShadow='0 0 0 4px rgba(59,130,246,.35)';
+                  setTimeout(()=>{preview.style.boxShadow='';},1200);
+                },350);
+              },120);
+            }
           } else {
             inp.scrollIntoView({behavior:'smooth',block:'nearest'});
           }
@@ -2121,32 +2140,85 @@ function toggleHintFold(id){
 function renderHeroAccordions(){
   const g=GRADES.find(x=>x.id===grade);
   const dk=`夢の正体（${g.col}）`;
-  const sorted=[...MASTER.heroes].sort((a,b)=>{
-    const ra=a['PTA推奨フラグ']==='はい'?0:1,rb=b['PTA推奨フラグ']==='はい'?0:1;if(ra!==rb)return ra-rb;
-    const fA=(a['知名度（小1-大人）']||'').split('|'),fB=(b['知名度（小1-大人）']||'').split('|');
-    const ci=['小1','小2','小3','小4','小5','小6','中1','中2','中3','大人'].indexOf(g.col);
-    return(parseInt(fB[ci])||0)-(parseInt(fA[ci])||0);
-  });
+  const ci=['小1','小2','小3','小4','小5','小6','中1','中2','中3','大人'].indexOf(g.col);
+
+  // ── 現代有名人 判定（H00016〜H00090の中の現役活動者）──
+  const MODERN_IDS=new Set([
+    'H00016','H00017','H00018','H00021','H00022','H00023','H00024','H00025',
+    'H00027','H00028','H00041','H00042','H00043','H00044','H00045','H00046',
+    'H00054','H00055','H00056','H00060','H00061','H00062','H00063','H00064',
+    'H00065','H00066','H00081','H00082','H00083','H00084','H00085','H00086',
+    'H00087','H00088','H00089','H00090'
+  ]);
+
+  // ── 職業・夢の正体との関連スコア計算 ──
+  function heroScore(h){
+    let score=0;
+    const job=(h['職業']||'').toLowerCase();
+    const relation=(h['選んだ職業や夢の正体との関係']||'').toLowerCase();
+    const dream=(h[dk]||'').toLowerCase();
+    const careerName=(selectedCareerName||'').toLowerCase();
+    // 選択職業名との一致
+    if(careerName&&job.includes(careerName)) score+=50;
+    if(careerName&&relation.includes(careerName)) score+=30;
+    if(careerName&&dream.includes(careerName)) score+=20;
+    // 知名度スコア
+    const kn=(h['知名度（小1-大人）']||'').split('|');
+    score+=(parseInt(kn[ci])||0)*2;
+    // PTA推奨
+    if(h['PTA推奨フラグ']==='はい') score+=10;
+    return score;
+  }
+
+  const allHeroes=[...MASTER.heroes];
+
+  // カテゴリ別に分ける
+  const historicals=allHeroes.filter(h=>!MODERN_IDS.has(h['偉人ID']));
+  const moderns=allHeroes.filter(h=>MODERN_IDS.has(h['偉人ID']));
+
+  // それぞれスコア順ソート
+  historicals.sort((a,b)=>heroScore(b)-heroScore(a));
+  moderns.sort((a,b)=>heroScore(b)-heroScore(a));
+
+  // 5人選出：THE偉人2・現代有名人2・お任せ1（残り全体からスコア最高）
+  const picked=[];
+  const usedIds=new Set();
+
+  // THE偉人 2人
+  historicals.filter(h=>h[dk]).slice(0,2).forEach(h=>{picked.push({hero:h,tag:'📚 図書館でも読める偉人'});usedIds.add(h['偉人ID']);});
+  // 現代有名人 2人
+  moderns.filter(h=>h[dk]).slice(0,2).forEach(h=>{picked.push({hero:h,tag:'✨ 今も活躍する有名人'});usedIds.add(h['偉人ID']);});
+  // お任せ 1人（残りからスコア最高・既出除く）
+  const rest=[...allHeroes].filter(h=>!usedIds.has(h['偉人ID'])&&h[dk]).sort((a,b)=>heroScore(b)-heroScore(a));
+  if(rest.length>0) picked.push({hero:rest[0],tag:'🌟 あなたへのおすすめ'});
+
+  const sorted=picked.map(p=>p.hero);
   const el=document.getElementById('heroAccordions');if(!el)return sorted;
   el.innerHTML='';
-  sorted.forEach((h,i)=>{
+  picked.forEach(({hero:h,tag},i)=>{
     const heroId=`heroAcc_${i}`;
     const dreamText=h[dk]||'';
+    const relationText=h['選んだ職業や夢の正体との関係']||'';
     const researchText=h['自分で調べてみよう']||'';
     const acc=document.createElement('div');acc.className='hero-accordion';
     acc.innerHTML=`
       <div class="hero-acc-header" onclick="toggleHeroAcc('${heroId}')">
         <span class="hero-acc-emoji">${h['絵文字']||'⭐'}</span>
-        <div style="flex:1"><span class="hero-acc-name">${h['偉人名']||''}</span><br><span class="hero-acc-job">${h['職業']||''}</span></div>
+        <div style="flex:1">
+          <span style="font-size:.63rem;color:#7c3aed;font-weight:700;display:block;margin-bottom:.1rem">${tag}</span>
+          <span class="hero-acc-name">${h['偉人名']||''}</span><br>
+          <span class="hero-acc-job">${h['職業']||''}</span>
+        </div>
         <span class="hero-acc-chevron" id="${heroId}-chevron">▼</span>
       </div>
       <div class="hero-acc-body" id="${heroId}-body">
         ${dreamText?`<div class="hero-acc-row"><div class="hero-acc-row-label">✨ 夢の正体</div><div class="hero-acc-row-text">${dreamText}</div></div>`:''}
+        ${relationText?`<div class="hero-acc-row"><div class="hero-acc-row-label">🔗 あなたの夢との繋がり</div><div class="hero-acc-row-text">${relationText}</div></div>`:''}
         ${researchText?`<div class="hero-acc-link-row">🔍 <strong>自分で調べてみよう！</strong><br>${researchText}</div>`:''}
       </div>`;
     el.appendChild(acc);
   });
-  return sorted;
+  return sorted; // docView用に全5人返す
 }
 function toggleHeroAcc(id){
   const body=document.getElementById(`${id}-body`),chev=document.getElementById(`${id}-chevron`);
