@@ -705,7 +705,308 @@
 
   <div class="page-footer">
     <span>交野市PTA協議会　夢プロジェクト　企画書</span>
-    <span>P.5　／　END</span>
+    <span>P.5</span>
+  </div>
+</div>
+
+<!-- ========== PAGE 6: 夢ナビ全体構成 ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number" style="background:linear-gradient(135deg,var(--green),#34D399);">6</div>
+    <div>
+      <div class="section-title">夢ナビアプリの全体構成</div>
+      <div class="section-subtitle">子どもが自分で「夢の正体」を発見できるWebアプリ（無料・登録不要）</div>
+    </div>
+  </div>
+
+  <!-- 3つの入り口 -->
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>3つの入り口から始められる</div>
+    <p>夢ナビは「どこから考え始めるか」が人によってちがうことを想定し、<span class="em-sky">3パターンの入り口</span>を用意しています。</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin:3mm 0 5mm;">
+    <div style="background:var(--sky-pale);border:2px solid #BFDBFE;border-radius:3mm;padding:4mm;text-align:center;">
+      <div style="font-size:16pt;margin-bottom:1.5mm;">🌍</div>
+      <div style="font-size:8.5pt;font-weight:900;color:var(--sky);margin-bottom:1.5mm;">職業から考える</div>
+      <div style="font-size:7.5pt;color:var(--text-sub);line-height:1.7;">「なりたい職業がある」<br>その職業が誰かに与える<br>影響から夢を再定義する</div>
+    </div>
+    <div style="background:var(--sun-light);border:2px solid #FDE68A;border-radius:3mm;padding:4mm;text-align:center;">
+      <div style="font-size:16pt;margin-bottom:1.5mm;">💌</div>
+      <div style="font-size:8.5pt;font-weight:900;color:#B45309;margin-bottom:1.5mm;">与えたい影響から考える</div>
+      <div style="font-size:7.5pt;color:var(--text-sub);line-height:1.7;">「誰かをこうしたい」<br>という気持ちから出発して<br>夢と職業を一緒に探す</div>
+    </div>
+    <div style="background:var(--green-light);border:2px solid #A7F3D0;border-radius:3mm;padding:4mm;text-align:center;">
+      <div style="font-size:16pt;margin-bottom:1.5mm;">🤝</div>
+      <div style="font-size:8.5pt;font-weight:900;color:#047857;margin-bottom:1.5mm;">一緒に考える</div>
+      <div style="font-size:7.5pt;color:var(--text-sub);line-height:1.7;">「まだよくわからない」<br>診断や価値観カードから<br>対話しながら夢を発見する</div>
+    </div>
+  </div>
+
+  <!-- アプリ画面フロー -->
+  <div style="background:var(--page-bg);border:1.5px solid var(--border);border-radius:4mm;padding:4mm;margin-bottom:4mm;">
+    <div style="font-size:8pt;font-weight:700;color:var(--text-light);letter-spacing:0.1em;margin-bottom:3mm;">📱 夢ナビ アプリ　全体フロー</div>
+    <div style="display:flex;gap:0;align-items:stretch;flex-wrap:nowrap;">
+
+      <div style="flex:1;background:white;border:1.5px solid #BFDBFE;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:var(--sky);margin-bottom:1mm;">START</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">🏠</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">対象選択</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">小学生<br>中学生<br>大人</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 1mm;color:var(--sun);font-size:10pt;font-weight:900;">›</div>
+
+      <div style="flex:1;background:white;border:1.5px solid #FDE68A;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:#B45309;margin-bottom:1mm;">STEP 1</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">🦁</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">動物キャラ提案</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">生年月日・好き<br>なこと・得意な<br>ことから向いていそうな職業提案</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 1mm;color:var(--sun);font-size:10pt;font-weight:900;">›</div>
+
+      <div style="flex:1;background:white;border:1.5px solid #A7F3D0;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:#047857;margin-bottom:1mm;">STEP 2</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">💡</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">価値観カード</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">47枚から<br>大切なことを<br>選ぶ</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 1mm;color:var(--sun);font-size:10pt;font-weight:900;">›</div>
+
+      <div style="flex:1;background:white;border:1.5px solid #C4B5FD;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:#6D28D9;margin-bottom:1mm;">STEP 3</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">🌍</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">職業探索</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">390以上の職業<br>と影響を<br>探索する</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 1mm;color:var(--sun);font-size:10pt;font-weight:900;">›</div>
+
+      <div style="flex:1;background:linear-gradient(135deg,#FEF9C3,#FEF3C7);border:2px solid #FCD34D;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:#B45309;margin-bottom:1mm;">GOAL</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">🌟</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">夢の言語化</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">「〇〇な人を<br>笑顔にする<br>こと」</div>
+      </div>
+      <div style="display:flex;align-items:center;padding:0 1mm;color:var(--sun);font-size:10pt;font-weight:900;">›</div>
+
+      <div style="flex:1;background:white;border:1.5px solid #FED7AA;border-radius:3mm;padding:3mm 2mm;text-align:center;min-width:0;">
+        <div style="font-size:7pt;font-weight:700;color:#C2410C;margin-bottom:1mm;">EXTRA</div>
+        <div style="font-size:11pt;margin-bottom:1mm;">🏛️</div>
+        <div style="font-size:7pt;font-weight:700;color:var(--text);margin-bottom:1mm;">偉人紹介</div>
+        <div style="font-size:6.5pt;color:var(--text-sub);line-height:1.5;">170人の<br>恩送りの<br>物語</div>
+      </div>
+    </div>
+    <div style="margin-top:2.5mm;font-size:7pt;color:var(--text-light);text-align:center;">
+      ※ 偉人紹介は夢の言語化後に表示。夢に向かって進んだ先人の物語で、恩送りの連鎖を体感します。
+    </div>
+  </div>
+
+  <!-- 個人情報の取り扱い -->
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>収集する個人情報について</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-bottom:3mm;">
+    <div class="callout callout-green" style="margin:0;">
+      <div class="callout-title">✅ 収集するもの（最小限）</div>
+      <p>・学校名（分析・フィードバックのため）<br>・氏名（任意。入力しなくてもOK）</p>
+    </div>
+    <div class="callout callout-coral" style="margin:0;">
+      <div class="callout-title">🚫 収集しないもの</div>
+      <p>・生年月日は保存しません<br>　（動物キャラ提案にのみ使用・即廃棄）<br>・住所・電話番号等は不要</p>
+    </div>
+  </div>
+
+  <div class="callout callout-sky">
+    <div class="callout-title">🔒 個人情報の管理方針</div>
+    <p>収集した情報はすべて交野市PTA協議会の規約に定める個人情報取扱いに則り厳重に管理します。目的外使用は行いません。学校名は夢ナビの結果分析・学校へのフィードバックにのみ使用します。</p>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.6</span>
+  </div>
+</div>
+
+<!-- ========== PAGE 7: しおり挿入・宿題プリントイメージ＋教育委員会依頼 ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number" style="background:linear-gradient(135deg,var(--sun),#FCD34D);color:#92400E;">7</div>
+    <div>
+      <div class="section-title">配布・宿題プリントのイメージ</div>
+      <div class="section-subtitle">しおりへの挿入 ＋ 別紙プリント1枚（対象：小学生・中学生）</div>
+    </div>
+  </div>
+
+  <!-- しおり＋プリント横並び -->
+  <div style="display:grid;grid-template-columns:1fr 8mm 1fr;gap:0;align-items:start;margin:3mm 0 4mm;">
+
+    <!-- 左：しおりイメージ -->
+    <div>
+      <div style="font-size:7.5pt;font-weight:700;color:var(--text-sub);margin-bottom:1.5mm;">📋 夏休みのしおり（宿題一覧末尾）</div>
+      <div style="border:2px solid var(--border);border-radius:3mm;overflow:hidden;font-size:7.5pt;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <div style="background:#F1F5F9;padding:2mm 3mm;font-weight:700;color:var(--text);border-bottom:1px solid var(--border);font-size:7.5pt;">
+          ○○小学校　2026年度　夏休みのしおり
+        </div>
+        <div style="padding:2.5mm 3mm;border-bottom:1px solid var(--border);">
+          <div style="font-weight:700;color:var(--text);margin-bottom:1.5mm;font-size:7.5pt;">📝 夏休みの宿題</div>
+          <div style="color:var(--text-sub);line-height:2;font-size:7pt;">
+            ・読書感想文（400字以上）<br>
+            ・算数ドリル　p.1〜20<br>
+            ・自由研究（テーマ自由）<br>
+            ・絵日記（3枚以上）<br>
+            ・理科観察ノート
+          </div>
+        </div>
+        <div style="padding:2.5mm 3mm;background:var(--sky-pale);border-left:3px solid var(--sky);">
+          <div style="font-weight:700;color:var(--sky);font-size:7.5pt;margin-bottom:1mm;">💌 PTAからの宿題（夢プロジェクト）</div>
+          <div style="color:var(--text-sub);line-height:1.6;font-size:7pt;">
+            「夢ナビ」で自分の夢を見つけよう！<br>
+            詳しくは別紙をご覧ください。
+          </div>
+        </div>
+      </div>
+      <div style="font-size:7pt;color:var(--text-light);margin-top:1.5mm;text-align:center;">↑ 宿題一覧の末尾に1行追加（学校にお願い）</div>
+    </div>
+
+    <!-- 中央：＋別紙 -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:14mm;gap:1mm;">
+      <div style="font-size:14pt;color:var(--sun);font-weight:900;line-height:1;">＋</div>
+      <div style="font-size:6.5pt;color:var(--text-light);text-align:center;line-height:1.4;">別紙<br>1枚</div>
+    </div>
+
+    <!-- 右：宿題プリントイメージ（縮小版） -->
+    <div>
+      <div style="font-size:7.5pt;font-weight:700;color:var(--text-sub);margin-bottom:1.5mm;">📄 別紙プリント（1枚・実物イメージ）</div>
+      <div style="border:2px solid #1E3A5F;border-radius:2mm;overflow:hidden;font-size:6.5pt;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+        <!-- プリントヘッダー -->
+        <div style="background:#1E3A5F;color:white;padding:2mm 3mm;">
+          <div style="display:flex;align-items:center;gap:1.5mm;margin-bottom:0.5mm;">
+            <span style="background:#F59E0B;color:#1E293B;font-size:6pt;font-weight:900;padding:0.5mm 2mm;border-radius:1mm;">💌 PTAからの宿題</span>
+            <span style="font-size:6pt;opacity:0.7;">交野市PTA協議会</span>
+          </div>
+          <div style="font-size:9pt;font-weight:900;color:white;line-height:1.2;">夢プロジェクト〜夢の正体を知ろう〜</div>
+          <div style="font-size:6pt;color:#93C5FD;margin-top:0.5mm;">対象：小学生・中学生　／　提出期限：8月末</div>
+        </div>
+        <!-- 2択 -->
+        <div style="padding:2mm 3mm;background:#F8FAFC;">
+          <div style="font-size:6.5pt;font-weight:700;color:var(--text);margin-bottom:1.5mm;">📌 参加方法は2つ！どちらかを選んでね</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1.5mm;align-items:center;">
+            <div style="background:#EFF6FF;border:1.5px solid #3B82F6;border-radius:2mm;padding:2mm;text-align:center;">
+              <div style="font-size:6pt;font-weight:700;color:#1D4ED8;margin-bottom:0.5mm;">コース A</div>
+              <div style="font-size:9pt;margin-bottom:0.5mm;">🎪</div>
+              <div style="font-size:6.5pt;font-weight:700;color:#1E293B;margin-bottom:0.5mm;line-height:1.3;">ワークショップ<br>に参加する</div>
+              <div style="font-size:5.5pt;color:#475569;line-height:1.6;">7/18（土）13:30〜<br>ゆうゆうセンター<br>→夢ナビで提出</div>
+            </div>
+            <div style="font-size:7pt;font-weight:900;color:#F59E0B;text-align:center;">or</div>
+            <div style="background:#ECFDF5;border:1.5px solid #10B981;border-radius:2mm;padding:2mm;text-align:center;">
+              <div style="font-size:6pt;font-weight:700;color:#047857;margin-bottom:0.5mm;">コース B</div>
+              <div style="font-size:9pt;margin-bottom:0.5mm;">📱</div>
+              <div style="font-size:6.5pt;font-weight:700;color:#1E293B;margin-bottom:0.5mm;line-height:1.3;">動画を見て<br>自分で取り組む</div>
+              <div style="font-size:5.5pt;color:#475569;line-height:1.6;">①動画を観る<br>②夢ナビで診断<br>→夢を見つけて提出</div>
+            </div>
+          </div>
+        </div>
+        <!-- QR行 -->
+        <div style="padding:2mm 3mm;display:flex;gap:2mm;border-top:1px solid #E2E8F0;">
+          <div style="flex:1;text-align:center;">
+            <div style="width:100%;aspect-ratio:1;background:white;border:1px solid #E2E8F0;border-radius:1mm;display:flex;align-items:center;justify-content:center;font-size:10pt;color:#CBD5E1;margin-bottom:0.5mm;">▣</div>
+            <div style="font-size:5.5pt;color:#475569;line-height:1.3;">申込フォーム</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="width:100%;aspect-ratio:1;background:white;border:1px solid #E2E8F0;border-radius:1mm;display:flex;align-items:center;justify-content:center;font-size:10pt;color:#CBD5E1;margin-bottom:0.5mm;">▣</div>
+            <div style="font-size:5.5pt;color:#475569;line-height:1.3;">解説動画</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="width:100%;aspect-ratio:1;background:white;border:1px solid #E2E8F0;border-radius:1mm;display:flex;align-items:center;justify-content:center;font-size:10pt;color:#CBD5E1;margin-bottom:0.5mm;">▣</div>
+            <div style="font-size:5.5pt;color:#475569;line-height:1.3;">夢ナビアプリ</div>
+          </div>
+          <div style="flex:1;text-align:center;">
+            <div style="width:100%;aspect-ratio:1;background:white;border:1px solid #E2E8F0;border-radius:1mm;display:flex;align-items:center;justify-content:center;font-size:10pt;color:#CBD5E1;margin-bottom:0.5mm;">▣</div>
+            <div style="font-size:5.5pt;color:#475569;line-height:1.3;">詳しい説明</div>
+          </div>
+        </div>
+        <!-- 夢記入欄 -->
+        <div style="padding:2mm 3mm;background:#EFF6FF;border-top:1px solid #BFDBFE;">
+          <div style="font-size:6pt;font-weight:700;color:#1D4ED8;margin-bottom:1mm;">🌟 見つけた夢を書こう！</div>
+          <div style="font-size:6.5pt;color:#1E293B;line-height:2;">わたしの夢は、<span style="display:inline-block;width:18mm;border-bottom:1px solid #1D4ED8;"></span>な人を笑顔にすること！！</div>
+        </div>
+      </div>
+      <div style="font-size:7pt;color:var(--text-light);margin-top:1.5mm;text-align:center;">↑ 別紙プリント1枚（PTAが印刷・納品）</div>
+    </div>
+  </div>
+
+  <div class="callout callout-sky" style="margin-top:1mm;">
+    <div class="callout-title">📬 配布フロー（学校へのお願い）</div>
+    <p>PTAがプリントを印刷・学校へ納品 → 学校がしおりに同封して配布。しおりへの1行追加とプリント同封のみご協力いただければ、それ以外（印刷・告知・運営）はPTAが行います。</p>
+  </div>
+
+  <hr>
+
+  <div class="section-label" style="margin-top:3mm;">
+    <div class="section-number" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">8</div>
+    <div>
+      <div class="section-title">教育委員会・学校へのご協力のお願い</div>
+      <div class="section-subtitle">学校の負担は最小限・PTAがすべて準備します</div>
+    </div>
+  </div>
+
+  <table>
+    <tr>
+      <th style="width:28mm;">項目</th>
+      <th>学校・教育委員会へのお願い</th>
+      <th style="width:26mm;">PTAが担うこと</th>
+    </tr>
+    <tr>
+      <td><strong>しおりへの記載</strong></td>
+      <td>宿題一覧末尾に「PTAからの宿題（夢プロジェクト）」の1行追加</td>
+      <td>文言・素材を提供</td>
+    </tr>
+    <tr>
+      <td><strong>プリント配布</strong></td>
+      <td>別紙プリント1枚をしおりに同封して配布</td>
+      <td>印刷・学校へ納品</td>
+    </tr>
+    <tr>
+      <td><strong>周知協力</strong></td>
+      <td>学校通信・連絡帳アプリ等での告知（可能な範囲で）</td>
+      <td>文案・画像素材を提供</td>
+    </tr>
+    <tr>
+      <td><strong>ワークショップ</strong></td>
+      <td>情報の周知（可能な範囲で）</td>
+      <td>企画・運営・会場手配すべて</td>
+    </tr>
+    <tr>
+      <td><strong>結果共有</strong></td>
+      <td>特になし</td>
+      <td>分析結果を学校へフィードバック（希望校のみ）</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-green" style="margin-top:3mm;">
+    <div class="callout-title">✅ 先生方へのご負担について</div>
+    <p>授業時間への組み込み・教員による指導・採点は一切お願いしません。しおりへの1行追加とプリント同封のみで、残りはすべてPTAが対応します。</p>
+  </div>
+
+  <div class="vision-box" style="margin-top:4mm;">
+    <div class="vision-label">教育委員会・学校の先生方へ</div>
+    <div class="vision-text" style="font-size:11pt;">
+      子どもたちが「夢をあきらめない」ために、<br>PTAにできることを、PTAがやります。
+    </div>
+    <div class="vision-sub">
+      ご多忙の中、お力添えいただければ幸いです。<br>ご不明な点・ご意見は交野市PTA協議会までお気軽にお申し付けください。
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.7　／　END</span>
   </div>
 </div>
 
