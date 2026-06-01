@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夢プロジェクト 企画書｜交野市PTA協議会</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #3B82F6;
+    --sky-light: #DBEAFE;
+    --sky-pale: #EFF6FF;
+    --sun: #F59E0B;
+    --sun-light: #FEF3C7;
+    --green: #10B981;
+    --green-light: #D1FAE5;
+    --coral: #F97316;
+    --coral-light: #FFF7ED;
+    --purple: #8B5CF6;
+    --purple-light: #EDE9FE;
+    --text: #1E293B;
+    --text-sub: #475569;
+    --text-light: #94A3B8;
+    --border: #E2E8F0;
+    --white: #FFFFFF;
+    --page-bg: #F8FAFC;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 12mm auto;
+    background: var(--white);
+    padding: 14mm 16mm 18mm;
+    position: relative;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    page-break-after: always;
+  }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; page-break-after: always; }
+    .no-print { display: none; }
+  }
+
+  .page-corner {
+    position: absolute; top: 0; left: 0;
+    width: 28mm; height: 28mm;
+    background: linear-gradient(135deg, var(--sky) 0%, #60A5FA 100%);
+    border-radius: 0 0 100% 0; opacity: 0.10;
+  }
+  .page-corner-br {
+    position: absolute; bottom: 0; right: 0;
+    width: 20mm; height: 20mm;
+    background: linear-gradient(315deg, var(--sun) 0%, #FCD34D 100%);
+    border-radius: 100% 0 0 0; opacity: 0.10;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 297mm; padding: 14mm 16mm;
+    background: linear-gradient(160deg, #EFF6FF 0%, #FFF7ED 55%, #ECFDF5 100%);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .cover::before {
+    content: ''; position: absolute; top: -30mm; right: -20mm;
+    width: 90mm; height: 90mm;
+    background: radial-gradient(circle, rgba(59,130,246,0.13) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: ''; position: absolute; bottom: -25mm; left: -15mm;
+    width: 70mm; height: 70mm;
+    background: radial-gradient(circle, rgba(245,158,11,0.16) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cover-badge {
+    background: linear-gradient(135deg, var(--sky), #60A5FA);
+    color: white; font-size: 8pt; font-weight: 700;
+    letter-spacing: 0.15em; padding: 3mm 8mm;
+    border-radius: 20px; margin-bottom: 7mm; display: inline-block;
+  }
+  .cover-emoji-row { font-size: 26pt; line-height: 1; margin-bottom: 5mm; letter-spacing: 3mm; }
+  .cover-title-ja {
+    font-family: 'Noto Serif JP', serif; font-size: 29pt;
+    font-weight: 700; color: var(--text); line-height: 1.25; margin-bottom: 2mm;
+  }
+  .cover-title-en {
+    font-size: 10pt; font-weight: 500; color: var(--sky);
+    letter-spacing: 0.22em; margin-bottom: 6mm;
+  }
+  .cover-tagline {
+    font-size: 11.5pt; color: var(--text-sub); line-height: 1.95;
+    max-width: 145mm; margin-bottom: 5mm; font-weight: 400;
+  }
+  .cover-tagline strong { color: var(--sky); font-weight: 700; }
+
+  .cover-okurimono {
+    background: linear-gradient(135deg, #1E3A5F 0%, #1a4a6e 100%);
+    border-radius: 5mm; padding: 5mm 10mm; margin: 4mm 0 6mm;
+    color: white; max-width: 155mm; text-align: center;
+  }
+  .cover-okurimono .oku-label { font-size: 7.5pt; letter-spacing: 0.25em; opacity: 0.65; margin-bottom: 1.5mm; }
+  .cover-okurimono .oku-text { font-size: 11.5pt; font-weight: 900; color: #FEF9C3; line-height: 1.7; }
+
+  .cover-divider {
+    width: 30mm; height: 2px;
+    background: linear-gradient(90deg, var(--sky), var(--sun), var(--green));
+    border-radius: 2px; margin: 5mm auto;
+  }
+  .cover-meta { font-size: 9pt; color: var(--text-light); line-height: 2.2; }
+  .cover-meta strong { color: var(--text-sub); }
+
+  /* ── SECTION HEADERS ── */
+  .section-label { display: flex; align-items: center; gap: 3mm; margin-bottom: 5mm; }
+  .section-number {
+    width: 8mm; height: 8mm;
+    background: linear-gradient(135deg, var(--sky), #60A5FA);
+    color: white; border-radius: 50%; font-size: 8pt; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .section-title { font-size: 14pt; font-weight: 900; color: var(--text); line-height: 1.2; }
+  .section-subtitle { font-size: 9pt; color: var(--text-light); font-weight: 400; }
+
+  .block { margin-bottom: 5mm; }
+  .block-title {
+    font-size: 10pt; font-weight: 700; color: var(--text);
+    margin-bottom: 2mm; display: flex; align-items: center; gap: 2mm;
+  }
+  .block-title .dot { width: 2mm; height: 2mm; border-radius: 50%; background: var(--sky); flex-shrink: 0; }
+  p { font-size: 9.5pt; line-height: 1.85; color: var(--text-sub); }
+
+  /* ── CALLOUT ── */
+  .callout { border-radius: 4mm; padding: 4mm 5mm; margin: 3mm 0; }
+  .callout-sky { background: var(--sky-pale); border-left: 3px solid var(--sky); }
+  .callout-sun { background: var(--sun-light); border-left: 3px solid var(--sun); }
+  .callout-green { background: var(--green-light); border-left: 3px solid var(--green); }
+  .callout-coral { background: var(--coral-light); border-left: 3px solid var(--coral); }
+  .callout-purple { background: var(--purple-light); border-left: 3px solid var(--purple); }
+  .callout-title { font-size: 9pt; font-weight: 700; margin-bottom: 1.5mm; }
+  .callout-sky .callout-title { color: var(--sky); }
+  .callout-sun .callout-title { color: #B45309; }
+  .callout-green .callout-title { color: #047857; }
+  .callout-coral .callout-title { color: #C2410C; }
+  .callout-purple .callout-title { color: #6D28D9; }
+  .callout p { font-size: 9pt; line-height: 1.75; }
+
+  /* ── COMPARE ── */
+  .compare-wrap {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 3mm; align-items: center; margin: 4mm 0;
+  }
+  .compare-box { border-radius: 3mm; padding: 4mm; text-align: center; }
+  .compare-box .compare-icon { font-size: 18pt; margin-bottom: 2mm; }
+  .compare-box .compare-label { font-size: 8pt; font-weight: 700; margin-bottom: 1.5mm; }
+  .compare-box .compare-text { font-size: 8.5pt; color: var(--text-sub); line-height: 1.7; }
+  .compare-old { background: #FEF2F2; border: 1.5px solid #FECACA; }
+  .compare-old .compare-label { color: #DC2626; }
+  .compare-new { background: var(--sky-pale); border: 1.5px solid #BFDBFE; }
+  .compare-new .compare-label { color: var(--sky); }
+  .compare-arrow { font-size: 16pt; color: var(--sun); font-weight: 900; text-align: center; }
+
+  /* ── CARD GRID ── */
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; margin: 3mm 0; }
+  .card { border-radius: 3mm; padding: 4mm; border: 1.5px solid var(--border); }
+  .card-icon { font-size: 16pt; margin-bottom: 2mm; }
+  .card-title { font-size: 9pt; font-weight: 700; color: var(--text); margin-bottom: 1.5mm; }
+  .card-desc { font-size: 8pt; color: var(--text-sub); line-height: 1.7; }
+  .card-sky { background: var(--sky-pale); border-color: #BFDBFE; }
+  .card-sun { background: var(--sun-light); border-color: #FDE68A; }
+  .card-green { background: var(--green-light); border-color: #A7F3D0; }
+  .card-coral { background: var(--coral-light); border-color: #FED7AA; }
+  .card-purple { background: var(--purple-light); border-color: #C4B5FD; }
+
+  /* ── PROGRAM FLOW ── */
+  .program-flow { display: flex; flex-direction: column; gap: 0; margin: 3mm 0; }
+  .program-step { display: flex; align-items: stretch; gap: 0; }
+  .program-connector { display: flex; flex-direction: column; align-items: center; width: 12mm; flex-shrink: 0; }
+  .program-dot {
+    width: 8mm; height: 8mm; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8pt; font-weight: 900; color: white;
+    background: linear-gradient(135deg, var(--sky), #60A5FA);
+  }
+  .program-line { width: 2px; flex: 1; background: #BFDBFE; min-height: 4mm; }
+  .program-content { flex: 1; padding: 0 0 5mm 3mm; }
+  .program-title { font-size: 9.5pt; font-weight: 700; color: var(--text); margin-bottom: 1mm; }
+  .program-desc { font-size: 8.5pt; color: var(--text-sub); line-height: 1.7; }
+  .program-step:last-child .program-line { display: none; }
+
+  /* ── 恩送りフロー ── */
+  .onsokuri-flow {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0; margin: 4mm 0;
+  }
+  .onsokuri-node {
+    background: var(--sky-pale); border: 1.5px solid #BFDBFE;
+    border-radius: 3mm; padding: 3mm 4mm;
+    text-align: center; flex: 1;
+  }
+  .onsokuri-node .on-icon { font-size: 14pt; }
+  .onsokuri-node .on-label { font-size: 7.5pt; font-weight: 700; color: var(--sky); margin-top: 1mm; line-height: 1.5; }
+  .onsokuri-arrow-wrap { display: flex; align-items: center; justify-content: center; padding: 0 1.5mm; }
+  .onsokuri-arrow { font-size: 14pt; color: var(--sun); font-weight: 900; }
+  .onsokuri-node.highlight-node { background: linear-gradient(135deg, #FEF9C3, #FEF3C7); border-color: #FCD34D; }
+  .onsokuri-node.highlight-node .on-label { color: #B45309; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 3mm 0; }
+  th { background: var(--sky); color: white; font-weight: 700; padding: 2.5mm 3mm; text-align: left; }
+  td { padding: 2.5mm 3mm; border-bottom: 1px solid var(--border); color: var(--text-sub); line-height: 1.6; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: var(--page-bg); }
+
+  /* ── HIGHLIGHT ── */
+  .highlight-sentence {
+    background: linear-gradient(135deg, var(--sky-pale) 0%, #EFF6FF 100%);
+    border: 2px solid #BFDBFE; border-radius: 4mm;
+    padding: 4mm 6mm; margin: 4mm 0; text-align: center;
+    font-size: 11pt; font-weight: 700; color: var(--sky); line-height: 1.7;
+  }
+
+  /* ── VISION BOX ── */
+  .vision-box {
+    background: linear-gradient(135deg, #1E3A5F 0%, #1E4D6B 100%);
+    border-radius: 5mm; padding: 6mm 7mm; color: white; margin: 4mm 0; text-align: center;
+  }
+  .vision-box .vision-label { font-size: 8pt; letter-spacing: 0.2em; opacity: 0.65; margin-bottom: 2mm; }
+  .vision-box .vision-text { font-size: 13pt; font-weight: 900; line-height: 1.6; color: #FEF9C3; }
+  .vision-box .vision-sub { font-size: 8.5pt; opacity: 0.8; margin-top: 2mm; line-height: 1.75; }
+
+  /* ── EVENT BOX ── */
+  .event-box {
+    background: linear-gradient(135deg, #FEF9C3 0%, #FEF3C7 100%);
+    border: 2px solid #FCD34D; border-radius: 4mm; padding: 4mm 6mm; margin: 4mm 0;
+  }
+  .event-box .event-label { font-size: 8pt; font-weight: 700; color: #92400E; letter-spacing: 0.1em; margin-bottom: 2mm; }
+  .event-box .event-main { font-size: 14pt; font-weight: 900; color: #1E293B; line-height: 1.4; }
+  .event-box .event-sub { font-size: 9pt; color: #B45309; margin-top: 1.5mm; line-height: 1.8; }
+
+  /* ── PHASE BOXES (第1弾・第2弾) ── */
+  .phase-row { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin: 4mm 0; }
+  .phase-box { border-radius: 4mm; padding: 4mm 5mm; }
+  .phase-box-1 { background: var(--sky-pale); border: 2px solid #BFDBFE; }
+  .phase-box-2 { background: var(--purple-light); border: 2px dashed #C4B5FD; }
+  .phase-label { font-size: 8pt; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 1.5mm; }
+  .phase-box-1 .phase-label { color: var(--sky); }
+  .phase-box-2 .phase-label { color: var(--purple); }
+  .phase-title { font-size: 10pt; font-weight: 900; color: var(--text); margin-bottom: 1.5mm; line-height: 1.4; }
+  .phase-desc { font-size: 8pt; color: var(--text-sub); line-height: 1.7; }
+  .phase-box-2 .phase-title { color: #5B21B6; }
+
+  /* ── FOOTER ── */
+  .page-footer {
+    position: absolute; bottom: 6mm; left: 16mm; right: 16mm;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 7.5pt; color: var(--text-light);
+    border-top: 1px solid var(--border); padding-top: 2mm;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 5mm 0; }
+
+  .print-btn {
+    position: fixed; bottom: 20px; right: 20px;
+    background: linear-gradient(135deg, var(--sky), #60A5FA);
+    color: white; border: none; padding: 10px 20px;
+    border-radius: 30px; font-size: 13px; font-weight: 700;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(59,130,246,0.4);
+    font-family: 'Noto Sans JP', sans-serif; z-index: 100;
+  }
+  .print-btn:hover { opacity: 0.9; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 2mm; margin: 2mm 0; }
+  .tag { font-size: 7.5pt; font-weight: 700; padding: 1mm 3mm; border-radius: 10px; }
+  .tag-sky { background: var(--sky-light); color: #1D4ED8; }
+  .tag-sun { background: var(--sun-light); color: #92400E; }
+  .tag-green { background: var(--green-light); color: #065F46; }
+  .tag-purple { background: var(--purple-light); color: #5B21B6; }
+
+  .em-sky { color: var(--sky); font-weight: 700; }
+  .em-sun { color: #B45309; font-weight: 700; }
+  .em-green { color: #047857; font-weight: 700; }
+  .em-coral { color: #C2410C; font-weight: 700; }
+  .em-purple { color: #6D28D9; font-weight: 700; }
+
+  .voice-box {
+    background: #FAFAFA; border: 1.5px solid var(--border);
+    border-radius: 3mm; padding: 3mm 4mm 3mm 8mm; margin: 2mm 0;
+    font-size: 9pt; color: var(--text-sub); line-height: 1.75; position: relative;
+  }
+  .voice-box::before {
+    content: '「'; position: absolute; left: 2.5mm; top: 2.5mm;
+    font-size: 14pt; font-weight: 900; color: #CBD5E1; line-height: 1;
+  }
+
+  .target-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--sky), #60A5FA);
+    color: white; font-size: 8pt; font-weight: 700;
+    padding: 1mm 3mm; border-radius: 10px; margin: 0 1mm 1mm 0;
+  }
+  .target-badge.sub { background: linear-gradient(135deg, var(--green), #34D399); }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ 印刷する</button>
+
+<!-- ========== PAGE 1: COVER ========== -->
+<div class="page cover">
+  <div class="cover-badge">交野市PTA協議会　夢プロジェクト</div>
+  <div class="cover-emoji-row">🌟💌🚀</div>
+  <div class="cover-title-ja">「夢の正体」を知ろう</div>
+  <div class="cover-title-en">YUME PROJECT — Dream Redefined</div>
+
+  <div class="cover-tagline">
+    夢って、なりたい職業のこと？<br>
+    ちがいます。夢の正体は、<br>
+    <strong>「誰かを笑顔にする、自分だけの力」</strong> のこと。
+  </div>
+
+  <div class="cover-okurimono">
+    <div class="oku-label">このプロジェクトの根底にある考え方</div>
+    <div class="oku-text">
+      私たちは生まれた瞬間から、<br>
+      先人たちの恩にまみれて生きている。<br>
+      その恩を、今度は未来へ送っていく——それが<span style="color:#FCD34D;">恩送り</span>。<br>
+      夢とは、その恩送りを生きることそのもの。
+    </div>
+  </div>
+
+  <div class="cover-divider"></div>
+
+  <div class="cover-tagline" style="font-size:10pt; margin-bottom:5mm;">
+    夢をあきらめてしまった大人たちへ。<br>
+    夢を語れなくなってしまった子どもたちへ。<br>
+    交野市のみんなで「夢」を取り戻すプロジェクトです。
+  </div>
+
+  <div class="cover-meta">
+    <strong>主催：</strong>交野市PTA協議会　／　<strong>対象：</strong>小学５年生〜中学生・保護者<br>
+    <strong>第１弾ワークショップ：</strong>2026年7月18日（土）13:30〜16:00　ゆうゆうセンター 多目的ホール<br>
+    <strong>申込：</strong>Googleフォーム（チラシ配布：6月下旬予定）
+  </div>
+</div>
+
+<!-- ========== PAGE 2: BACKGROUND ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number">1</div>
+    <div>
+      <div class="section-title">なぜ今、このプロジェクトが必要か</div>
+      <div class="section-subtitle">背景と課題</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>小学生から中学生への「夢の消え方」</div>
+    <p>小学生の頃は、目を輝かせて夢を語ります。ところが中学生になると、自分の成績や実力となりたい職業を照らし合わせ、<span class="em-coral">「どうせ無理だ」と感じた瞬間に、夢を語ることが恥ずかしくなってしまう</span>子どもがいます。</p>
+  </div>
+
+  <div class="callout callout-sun">
+    <div class="callout-title">⚠️ 子どもに届く、矛盾したメッセージ</div>
+    <div class="voice-box">夢を持て。とにかく夢を持て。</div>
+    <div class="voice-box">いつまでも夢みたいなことを言っていないで、現実を見なさい。</div>
+    <p style="margin-top:2mm; font-size:8.5pt; color:#92400E;">どちらもよかれと思って言う言葉。でも子どもの耳には、どちらを信じればいいかわからない矛盾として届きます。</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>夢に疲弊し、夢を描くことすらやめてしまう</div>
+    <p>夢を持てと言われながら、就職が近づくと「現実を見ろ」と言われる。その矛盾の中で、多くの人が<span class="em-coral">夢に振り回され、夢に疲れ、やがて夢を描くことをやめてしまいます。</span>夢を持てなくなった大人が、子どもに「夢を持て」と言う——そのさびしい連鎖が続いています。</p>
+  </div>
+
+  <div class="compare-wrap">
+    <div class="compare-box compare-old">
+      <div class="compare-icon">😔</div>
+      <div class="compare-label">今の「夢」の使われ方</div>
+      <div class="compare-text">職業名＝夢<br>成績が足りない→あきらめ<br>大人になったら消えるもの</div>
+    </div>
+    <div class="compare-arrow">→</div>
+    <div class="compare-box compare-new">
+      <div class="compare-icon">🌟</div>
+      <div class="compare-label">夢の正体</div>
+      <div class="compare-text">誰かへの贈り物＝夢<br>道は何通りもある<br>生きている限り失われない</div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>「叶う夢」と「叶わない夢」の違い</div>
+    <p>「医師になる」は職業目標です。もし医師になれなくても、「病気で苦しむ人を笑顔にしたい」という想いは、看護師として、研究者として、医療ITエンジニアとして実現できます。<span class="em-sky">職業は変わっていい。「誰かを笑顔にしたい」という想いは、失われる瞬間がない夢です。</span></p>
+  </div>
+
+  <div class="vision-box">
+    <div class="vision-label">このプロジェクトが伝えたいこと</div>
+    <div class="vision-text">夢はあきらめるものじゃない。<br>もっと大きく、もっと自由に描けるもの。</div>
+    <div class="vision-sub">「叶わない夢」とは、職業名にしばられた夢のこと。<br>「誰かへの贈り物」として描き直せば、夢は失われる瞬間がない。</div>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.2</span>
+  </div>
+</div>
+
+<!-- ========== PAGE 3: PURPOSE & CONCEPT ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number">2</div>
+    <div>
+      <div class="section-title">プロジェクトの目的と考え方</div>
+      <div class="section-subtitle">ゴールとコアコンセプト</div>
+    </div>
+  </div>
+
+  <div class="highlight-sentence">
+    大人も子どもも、いつまでも夢を語り、<br>
+    みんなが夢を叶え続ける未来をつくる。
+  </div>
+
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>コアコンセプト「恩送り」とは</div>
+    <p>私たちは生まれた瞬間から、無数の先人たちの恩のうえに生きています。言葉、文化、医療、道路、学校——そのすべてが、会ったこともない誰かが贈ってくれたものです。<span class="em-purple">恩送りとは、受けた恩を同じ人に返すのではなく、自分もまた未来の誰かへ贈っていくこと。</span>夢とは、その恩送りを自分の人生で体現することです。</p>
+  </div>
+
+  <div class="onsokuri-flow">
+    <div class="onsokuri-node">
+      <div class="on-icon">🏛️</div>
+      <div class="on-label">先人たちからの<br>無数の恩</div>
+    </div>
+    <div class="onsokuri-arrow-wrap"><div class="onsokuri-arrow">→</div></div>
+    <div class="onsokuri-node">
+      <div class="on-icon">🧒</div>
+      <div class="on-label">生まれた瞬間から<br>恩を受けている</div>
+    </div>
+    <div class="onsokuri-arrow-wrap"><div class="onsokuri-arrow">→</div></div>
+    <div class="onsokuri-node highlight-node">
+      <div class="on-icon">🌟</div>
+      <div class="on-label">自分の夢＝<br>未来の誰かへ贈る</div>
+    </div>
+    <div class="onsokuri-arrow-wrap"><div class="onsokuri-arrow">→</div></div>
+    <div class="onsokuri-node">
+      <div class="on-icon">🌏</div>
+      <div class="on-label">恩送りの連鎖が<br>世界を豊かに</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="block">
+    <div class="block-title"><span class="dot"></span>「夢」の新しい2段階表現</div>
+    <p>このプロジェクトでは、子どもたちが自分の夢を次のように言語化することを目指します。</p>
+  </div>
+
+  <div class="callout callout-sky">
+    <div class="callout-title">💬 夢の2段階表現</div>
+    <p>
+      <strong>「私の夢は、〇〇な人を笑顔にすることです！！」</strong><br>
+      ─ 誰かへ贈りたいもの（本当の夢）<br>
+      　例：「困っている人に安心を届けたい」「悲しんでいる人に希望を見せたい」<br><br>
+      <strong>「そのために、今は〇〇を目標にしています」</strong><br>
+      ─ 今の具体的な行動目標（手段としての職業・勉強・活動）
+    </p>
+  </div>
+
+  <div class="callout callout-green">
+    <div class="callout-title">✅ この表現のよいところ</div>
+    <p>
+      ・職業に就けなくても、夢は失われる瞬間がない<br>
+      ・目標（手段）は変えていい。夢は深まることも広がることもあっても、消えることはない<br>
+      ・「今やっていること」が夢とつながり、毎日に意味と活力が生まれる<br>
+      ・誰かへの貢献が動機の中心になり、モチベーションが強くなり長続きする
+    </p>
+  </div>
+
+  <div class="block" style="margin-top:3mm;">
+    <div class="block-title"><span class="dot"></span>メインターゲット</div>
+    <p style="margin-bottom:2mm;">
+      <span class="target-badge">小学5年生〜中学生</span>
+      <span class="target-badge">保護者</span>
+      <span class="target-badge sub">地域のみなさん</span>
+    </p>
+    <p>進路を意識しはじめ、夢と現実のギャップを感じやすい時期の子どもたちと、その保護者を中心に届けます。保護者自身も「夢の正体」を知ることで、家庭での会話が変わります。</p>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.3</span>
+  </div>
+</div>
+
+<!-- ========== PAGE 4: PROGRAM ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number">3</div>
+    <div>
+      <div class="section-title">第１弾　プログラムの全体像</div>
+      <div class="section-subtitle">ワークショップを起点に、すべての子どもへ届ける3ステップ</div>
+    </div>
+  </div>
+
+  <div class="event-box">
+    <div class="event-label">📅 第１弾メインイベント</div>
+    <div class="event-main">夢プロジェクト ワークショップ</div>
+    <div class="event-sub">
+      2026年7月18日（土）　13:30〜16:00<br>
+      ゆうゆうせンター 多目的ホール（交野市）<br>
+      対象：小学5年生〜中学生・保護者　／　参加費：無料<br>
+      申込：Googleフォーム（チラシ配布：6月下旬予定）
+    </div>
+  </div>
+
+  <div class="program-flow" style="margin-top:4mm;">
+
+    <div class="program-step">
+      <div class="program-connector">
+        <div class="program-dot">1</div>
+        <div class="program-line"></div>
+      </div>
+      <div class="program-content">
+        <div class="program-title">🎪 ワークショップ　— 夢の正体を体験で知る</div>
+        <div class="program-desc">
+          グループワークやカードゲームを通じて、「夢の正体」と「恩送り」を楽しく体験します。<br>
+          <strong>①夢の正体とは何か</strong>を丁寧に解説したうえで、<strong>②参加した一人ひとりが自分の夢を言語化する</strong>ワークを行います。「〇〇な人を笑顔にしたい」という自分だけの言葉を、この日見つけてもらうことが目標です。<br>
+          外部講師不要でPTA役員が進行できる設計。保護者も一緒に参加し、家庭で語れる共通言語をつくります。
+        </div>
+      </div>
+    </div>
+
+    <div class="program-step">
+      <div class="program-connector">
+        <div class="program-dot" style="background:linear-gradient(135deg,var(--sun),#FCD34D);color:#92400E;">2</div>
+        <div class="program-line" style="background:#FDE68A;"></div>
+      </div>
+      <div class="program-content">
+        <div class="program-title">📄 夏休みの配布プリント　— 来られなかった子にも、同じ体験を</div>
+        <div class="program-desc">
+          ワークショップに参加できなかった子どもたちのために、<strong>学校の夏休みの宿題にプリント1枚を組み込んでもらいます。</strong>プリントにはQRコードを掲載し、そこからスライド動画・詳しいチラシ・夢ナビアプリのすべてに誘導します。<br>
+          動画を観て、プリントのワークに取り組むだけで、ワークショップと同じ「夢の正体」の気づきを得られる設計です。学校・PTAと連携し、できるだけ多くの子どもに届けます。
+        </div>
+      </div>
+    </div>
+
+    <div class="program-step">
+      <div class="program-connector">
+        <div class="program-dot" style="background:linear-gradient(135deg,var(--green),#34D399);">3</div>
+      </div>
+      <div class="program-content">
+        <div class="program-title">📱 夢ナビアプリで提出・深掘り</div>
+        <div class="program-desc">
+          プリントやワークショップで見つけた「自分の夢」を、夢ナビアプリで深掘りして完成させます。価値観・個性・偉人エピソードなどを通じて「誰かへの贈り方」をより具体化。ワークショップ参加者も夏休み中にアプリで振り返りができます。
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="callout callout-sky" style="margin-top:2mm;">
+    <div class="callout-title">🔒 個人情報の取り扱いについて</div>
+    <p>申込情報・夢ナビの利用情報等はすべて、交野市PTA協議会の規約に定める個人情報取扱いに則り、目的外使用を行わず厳重に管理します。</p>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.4</span>
+  </div>
+</div>
+
+<!-- ========== PAGE 5: SCHEDULE & VISION ========== -->
+<div class="page">
+  <div class="page-corner"></div>
+  <div class="page-corner-br"></div>
+
+  <div class="section-label">
+    <div class="section-number">4</div>
+    <div>
+      <div class="section-title">夢ナビアプリの特長</div>
+      <div class="section-subtitle">自分で「夢の正体」を発見できるWebアプリ（無料）</div>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns: repeat(2,1fr);">
+    <div class="card card-sky">
+      <div class="card-icon">🦁</div>
+      <div class="card-title">動物キャラクター診断</div>
+      <div class="card-desc">60種類の動物キャラクターで自分の個性を発見。親しみやすいビジュアルで楽しく自己理解できます。</div>
+    </div>
+    <div class="card card-sun">
+      <div class="card-icon">💡</div>
+      <div class="card-title">価値観の見える化</div>
+      <div class="card-desc">47種類の価値観カードから「自分が誰かへ贈れるもの」を選ぶシンプルなワーク。</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">🌍</div>
+      <div class="card-title">390以上の職業データ</div>
+      <div class="card-desc">職業の名前だけでなく「その仕事が誰かに与える影響」まで解説。PTAが地域に合わせてキュレーション済み。</div>
+    </div>
+    <div class="card card-coral">
+      <div class="card-icon">🏛️</div>
+      <div class="card-title">偉人170人のエピソード</div>
+      <div class="card-desc">恩送りを体現した人たちの物語。回り道をした偉人の話が、子どもの背中を押します。</div>
+    </div>
+  </div>
+
+  <hr>
+
+  <div class="section-label" style="margin-top:4mm;">
+    <div class="section-number" style="background:linear-gradient(135deg,var(--sun),#FCD34D);color:#92400E;">5</div>
+    <div>
+      <div class="section-title">スケジュールと今後の展開</div>
+      <div class="section-subtitle">2026年4月始動・第1弾から第2弾へ</div>
+    </div>
+  </div>
+
+  <table>
+    <tr>
+      <th style="width:16mm;">時期</th>
+      <th>内容</th>
+      <th style="width:16mm;">状況</th>
+    </tr>
+    <tr>
+      <td><strong>4月〜</strong></td>
+      <td>プロジェクト始動。内容の企画・ワークショップ設計・夢ナビアプリ開発・内容精査</td>
+      <td style="color:var(--green);font-weight:700;">✅ 進行中</td>
+    </tr>
+    <tr>
+      <td><strong>6月下旬</strong></td>
+      <td>チラシ配布・Googleフォームによる参加申込み開始</td>
+      <td style="color:var(--sky);font-weight:700;">🔵 準備中</td>
+    </tr>
+    <tr>
+      <td><strong>7月18日</strong></td>
+      <td>【第１弾】ワークショップ本番（ゆうゆうセンター 多目的ホール　13:30〜16:00）</td>
+      <td style="color:var(--sun);font-weight:700;">⭐ メイン</td>
+    </tr>
+    <tr>
+      <td><strong>夏休み</strong></td>
+      <td>配布プリント・スライド動画・夢ナビで夢を言語化・提出</td>
+      <td style="color:var(--text-light);">📋 予定</td>
+    </tr>
+    <tr>
+      <td><strong>夏休み明け</strong></td>
+      <td>夢ナビの結果を分析。子どもたちの「夢の正体」の傾向を把握・第2弾の内容検討</td>
+      <td style="color:var(--text-light);">📋 予定</td>
+    </tr>
+    <tr>
+      <td><strong>冬休み</strong></td>
+      <td>【第２弾】「夢の追い方」ワークショップ・冬休みの取り組みを検討・実施</td>
+      <td style="color:var(--purple);font-weight:700;">🔮 検討中</td>
+    </tr>
+  </table>
+
+  <div class="phase-row" style="margin-top:4mm;">
+    <div class="phase-box phase-box-1">
+      <div class="phase-label">第１弾　2026年夏</div>
+      <div class="phase-title">「夢の正体」を知る</div>
+      <div class="phase-desc">夢とは何かを体験で理解し、自分の夢を初めて言語化する。「〇〇な人を笑顔にしたい」という言葉を見つける。</div>
+    </div>
+    <div class="phase-box phase-box-2">
+      <div class="phase-label">第２弾　2026年冬　（検討中）</div>
+      <div class="phase-title">「夢の追い方」を学ぶ</div>
+      <div class="phase-desc">第１弾の結果分析をもとに、夢に向かって具体的に動くための方法を深掘り。夢を日常に紐づけ、活力に変える。</div>
+    </div>
+  </div>
+
+  <div class="vision-box" style="margin-top:4mm;">
+    <div class="vision-label">VISION</div>
+    <div class="vision-text">
+      大人も子どもも、いつまでも夢を語り、<br>
+      みんなが夢を叶え続ける交野市をつくる。
+    </div>
+    <div class="vision-sub">
+      先人から受けた恩を、未来の誰かへ——その恩送りの連鎖を、PTAが始めます。
+    </div>
+  </div>
+
+  <div class="tags" style="margin-top: 3mm;">
+    <span class="tag tag-sky">#夢の正体</span>
+    <span class="tag tag-sky">#思考の転換</span>
+    <span class="tag tag-purple">#恩送り</span>
+    <span class="tag tag-sun">#モチベーション</span>
+    <span class="tag tag-green">#キャリア教育</span>
+    <span class="tag tag-green">#交野市PTA</span>
+  </div>
+
+  <div class="page-footer">
+    <span>交野市PTA協議会　夢プロジェクト　企画書</span>
+    <span>P.5　／　END</span>
+  </div>
+</div>
+
+</body>
+</html>
