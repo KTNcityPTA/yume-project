@@ -1,4 +1,25 @@
 <!DOCTYPE html>
+<!-- ═══════════════════════════════════════════════════════
+  夢ナビ v17（2026-06-12）交野市PTA協議会 夢プロジェクト
+  【v17 変更点】
+  1. 選択フィードバック強化：金銀銅ランキングカードも選択時に青く変化（CSS詳細度バグ修正）＋全チップに✓印
+  2. 全ルートに「いま選んでいる仕事」確認バーを追加
+  3. 氏名入力を廃止（hidden温存・送信は（匿名）固定）。印刷ドキュメントに手書き名前欄を追加
+  4. カテゴリの学年別表記（小1表記など）が使われていなかったバグ修正
+  5. 「もっと見る」再描画で選択ハイライトが消えるバグ修正
+  6. ルートA「ここにない仕事は自分で書こう」自由入力を追加（J00200として保存）
+  7. 存在しない日付（2/29×非うるう年）のバリデーション追加
+  8. 学校「その他」選択時にセレクトリストを破壊していたバグ修正
+  9. ルートC結果画面で進捗バーが更新されないバグ修正
+  10. 「最初からやり直す」で提出ボタンが復帰しないバグ修正
+  11. 【互換性】ルビ付与のlookbehind正規表現を廃止（iOS16.3以前のSafariで小1〜3画面が実行時エラーで壊れる問題）
+      → プレースホルダ2パス方式＋長い語優先置換に変更
+  12. 【互換性】ラジオボタン選択表示の:has()にJSクラス同期フォールバックを追加（Safari15.3以前で選択が見えない問題）
+  13. 偉人マッチングをID基準に刷新：旧版は低学年表記（おいしゃさん）と偉人職業欄（医師）の文字列照合で
+      170人中39人しかマッチしなかった。マスタv2.3.0の関連職業IDs列で完全一致+100点、正式名フォールバック、
+      ルートBの価値観共鳴(+4/個)を追加。※マスタv2.3.0以上が必須
+  ※ GAS側は MASTER_VERSION を '2.1.0' に更新してください（キャッシュ無効化のため）
+═══════════════════════════════════════════════════════ -->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -129,6 +150,11 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .chip.career.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;border-color:#f59e0b;font-weight:700;}
 .chip.career.rank-2{background:linear-gradient(135deg,#9ca3af,#6b7280);color:#fff;border-color:#6b7280;font-weight:700;}
 .chip.career.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:#fff;border-color:#b45309;font-weight:700;}
+/* ── 選択状態の視覚フィードバック強化（v17）──
+   rank-1〜3（3クラス指定）より後に同等以上の詳細度で定義し、
+   金銀銅カードでも選択時に確実に青へ切り替わるようにする */
+.chip.career.on-a,.chip.career.rank-1.on-a,.chip.career.rank-2.on-a,.chip.career.rank-3.on-a{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-color:#1e40af;font-weight:700;box-shadow:0 0 0 3px rgba(59,130,246,.35),0 4px 12px rgba(37,99,235,.35);transform:scale(1.05);}
+.chip.on-a::before,.chip.on-b::before,.chip.on-c::before{content:'✓ ';font-weight:900;}
 .q-label{font-size:.9rem;font-weight:700;margin:.9rem 0 .4rem;color:var(--ink);line-height:1.5;}
 .q-hint{font-size:.77rem;color:var(--soft);margin-bottom:.55rem;line-height:1.5;}
 
@@ -157,6 +183,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .radio-label{display:flex;align-items:center;gap:.28rem;padding:.3rem .8rem;border:1.5px solid #d1d5db;border-radius:20px;cursor:pointer;font-size:.82rem;transition:all .15s;}
 .radio-label:hover{background:#f0f4ff;border-color:var(--ocean);}
 .radio-label:has(input:checked){background:var(--ocean);color:#fff;border-color:var(--ocean);}
+.radio-label.checked{background:var(--ocean);color:#fff;border-color:var(--ocean);} /* v17: 旧Safari(:has非対応)用フォールバック */
 .radio-label input{display:none;}
 .routec-section{margin-bottom:.9rem;}
 .routec-section-title{font-size:.82rem;font-weight:700;color:var(--pta);margin-bottom:.45rem;display:flex;align-items:center;gap:.3rem;}
@@ -726,6 +753,7 @@ footer a:hover{text-decoration:underline;}
     <div class="doc-header">
       <div class="doc-title">わたしの　夢の正体</div>
       <div class="doc-sub" id="docMeta"></div>
+      <div class="doc-sub" style="margin-top:.5rem;font-size:1rem;">なまえ：<span style="display:inline-block;min-width:14rem;border-bottom:1.5px solid #94a3b8;">&nbsp;</span></div>
       <div class="doc-badge">交野市PTA協議会 夢プロジェクト 2026</div>
     </div>
     <div class="doc-section">
@@ -797,7 +825,7 @@ footer a:hover{text-decoration:underline;}
   <div class="screen" id="scProfile">
     <button class="btn-back" onclick="show('scGrade')">← 学年選択にもどる</button>
     <div class="profile-card">
-      <h2>あなたのことを教えてください</h2>
+      <h2>学校を教えてください</h2>
       <div class="form-row">
         <label class="form-label" for="pSchool" id="pSchoolLabel">🏫 学校名（必須）</label>
         <select class="input-field" id="pSchool"><option value="">── 選んでください ──</option></select>
@@ -805,10 +833,8 @@ footer a:hover{text-decoration:underline;}
           <input class="input-field" id="pSchoolOtherInput" type="text" placeholder="学校名・所属を入力してください">
         </div>
       </div>
-      <div class="form-row">
-        <label class="form-label" for="pName">👤 お名前</label>
-        <input class="input-field" id="pName" type="text" placeholder="名前を入力してください">
-      </div>
+      <!-- v17: 氏名入力は廃止（個人情報配慮）。送信の仕組みは温存するため hidden で残す -->
+      <input type="hidden" id="pName" value="">
       <p class="err-msg" id="profileErr">学校名を選んでください！</p>
       <button class="btn-go" onclick="goRoute()">ルートを選ぶ →</button>
     </div>
@@ -872,6 +898,17 @@ footer a:hover{text-decoration:underline;}
       </div>
     </div>
 
+    <!-- 自分で入力枠（v17：マスタにない仕事も選べる。J00200として保存） -->
+    <div class="route-a-box" style="margin-top:.9rem">
+      <div class="route-a-box-title">🖊 ここにない仕事は自分で書こう</div>
+      <p class="q-hint">リストにない仕事でもOK！書いて「この仕事にする」を押してね</p>
+      <div style="display:flex;gap:.45rem;align-items:stretch;">
+        <input class="input-field" id="customCareerInput" type="text" placeholder="例：ゲームせっけいし" style="flex:1;">
+        <button class="btn-outline" style="width:auto;max-width:none;margin:0;padding:.5rem .9rem;white-space:nowrap;font-size:.78rem;" onclick="selectCustomCareer()">✔ この仕事にする</button>
+      </div>
+    </div>
+
+    <div class="selected-career-bar" id="selBarA" style="display:none"><span class="selected-career-bar-emoji">✅</span><div style="font-size:.8rem;color:var(--soft)">いま選んでいる仕事：<span class="selected-career-bar-name" id="selBarAName"></span></div></div>
     <p class="err-msg" id="a1Err">気になる仕事を選んでね！</p>
     <button class="btn-go" onclick="goResult('A')">この仕事で進む →</button>
   </div>
@@ -888,6 +925,7 @@ footer a:hover{text-decoration:underline;}
       <div class="chips-wrap" id="b2CareerChips"></div>
       <button class="more-btn" id="b2MoreBtn" onclick="loadMoreB2()">＋ もっと見る</button>
     </div>
+    <div class="selected-career-bar" id="selBarB" style="display:none"><span class="selected-career-bar-emoji">✅</span><div style="font-size:.8rem;color:var(--soft)">いま選んでいる仕事：<span class="selected-career-bar-name" id="selBarBName"></span></div></div>
     <p class="err-msg" id="b1Err">気持ちと仕事をそれぞれ選んでね！</p>
     <button class="btn-go" onclick="goResult('B')">この仕事で進む →</button>
   </div>
@@ -980,6 +1018,7 @@ footer a:hover{text-decoration:underline;}
       <button class="more-btn" id="dcMoreBtnC" onclick="loadMoreCandidatesC()" style="margin:.8rem auto 0;display:flex;">＋ もっと見る</button>
     </div>
 
+    <div class="selected-career-bar" id="selBarC" style="display:none"><span class="selected-career-bar-emoji">✅</span><div style="font-size:.8rem;color:var(--soft)">いま選んでいる仕事：<span class="selected-career-bar-name" id="selBarCName"></span></div></div>
     <button class="btn-next-page" onclick="goResultCToResult1()">この仕事で夢の正体を探す →</button>
   </div>
 
@@ -1086,10 +1125,10 @@ footer a:hover{text-decoration:underline;}
       <div class="dream-step" id="dreamStep2">
         <div class="dream-step-head">
           <div class="dream-step-badge q2" id="dreamBadge2">2</div>
-          <div class="dream-step-question" id="dreamQ2Label">どんなことをしてあげたい？</div>
+          <div class="dream-step-question" id="dreamQ2Label">どんなうれしいことを届けたい？</div>
           <div class="dream-step-check" id="dreamCheck2">✅</div>
         </div>
-        <input type="text" class="dream-step-input" id="blank2" placeholder="例：げんきにしてあげたい" oninput="onDreamInput(2)">
+        <input type="text" class="dream-step-input" id="blank2" placeholder="例：元気" oninput="onDreamInput(2)">
         <div class="dream-hint-area">
           <div class="dream-hint-label">💡 タップして入れられるヒント</div>
           <div class="dream-hint-chips" id="hintChipsQ2"></div>
@@ -1218,6 +1257,7 @@ let rankingAllList=[],rankingShown=10,catSelected=[],catResultList=[],catResultS
 let valueShown=10,b2List=[],b2Shown=10,likeShown=10,tokiShown=10;
 let currentTemplateParts=[],currentBlankInputs=[];
 let heroDataForDoc=[];
+let customSchool='';
 
 function getEntryGroup(){
   const params=new URLSearchParams(window.location.search);
@@ -1227,7 +1267,24 @@ function getEntryGroup(){
 window.addEventListener('DOMContentLoaded',async()=>{
   try{await loadMaster();buildGradeButtons();document.getElementById('scInit').classList.remove('show');document.getElementById('scGrade').classList.add('active');updateProgress('scGrade');}
   catch(err){document.getElementById('scInit').innerHTML=`<div style="font-size:2.5rem">⚠️</div><div class="init-text">準備中にエラーが発生しました。<br>ブラウザを更新してみてください。</div><div class="init-err">${err.message||err}</div>`;}
+  // v17: 旧Safari(:has非対応)向けにラジオ選択状態をクラスで同期（イベント委譲＝動的生成にも対応）
+  document.addEventListener('change',ev=>{
+    const inp=ev.target;
+    if(!inp||inp.type!=='radio')return;
+    document.querySelectorAll(`input[type="radio"][name="${inp.name}"]`).forEach(r=>{
+      const lbl=r.closest('.radio-label');
+      if(lbl)lbl.classList.toggle('checked',r.checked);
+    });
+  });
+  syncRadioLabels();
 });
+/* v17: checked属性付きラジオ等の初期表示同期 */
+function syncRadioLabels(){
+  document.querySelectorAll('.radio-label input[type="radio"]').forEach(r=>{
+    const lbl=r.closest('.radio-label');
+    if(lbl)lbl.classList.toggle('checked',r.checked);
+  });
+}
 
 async function loadMaster(){
   const cached=localStorage.getItem(STORAGE_KEY),cachedVer=localStorage.getItem(STORAGE_VERSION_KEY);
@@ -1385,20 +1442,31 @@ function goProfile(){
 function goRoute(){
   const sel=document.getElementById('pSchool');
   const isAdult=grade==='g';
-  if(!isAdult&&!sel.value){document.getElementById('profileErr').classList.add('show');return;}
-  // その他選択時は自由入力欄の内容を使う
+  const err=document.getElementById('profileErr');
+  if(!isAdult&&!sel.value){err.textContent='学校名を選んでください！';err.classList.add('show');return;}
+  // その他選択時は自由入力欄の内容を採用（セレクトの中身は壊さない：戻った時に再選択できるように）
   if(sel.value==='__other__'){
     const otherVal=document.getElementById('pSchoolOtherInput').value.trim();
-    if(!isAdult&&!otherVal){document.getElementById('profileErr').textContent='学校名を入力してください！';document.getElementById('profileErr').classList.add('show');return;}
-    sel.innerHTML=`<option value="${otherVal}" selected>${otherVal}</option>`;
-    document.getElementById('pSchoolOtherWrap').style.display='none';
+    if(!isAdult&&!otherVal){err.textContent='学校名を入力してください！';err.classList.add('show');return;}
+    customSchool=otherVal;
+  }else{
+    customSchool='';
   }
-  document.getElementById('profileErr').classList.remove('show');
+  err.classList.remove('show');
   show('scRoute');
+}
+/* v17: 送信・ドキュメント用の学校名取得（その他入力に対応） */
+function getSchoolValue(){
+  const sel=document.getElementById('pSchool');
+  if(!sel)return '';
+  if(sel.value==='__other__')return customSchool||document.getElementById('pSchoolOtherInput').value.trim();
+  return sel.value;
 }
 
 function pickRoute(r){
   route=r;selectedCareerId=null;selectedCareerName=null;selectedValueIds=[];catSelected=[];
+  const ci=document.getElementById('customCareerInput');if(ci)ci.value='';
+  updateSelBars();
   if(r==='A'){buildRouteA();show('scA1');}else if(r==='B'){buildRouteB();show('scB1');}else{buildRouteC();show('scC1');}
 }
 
@@ -1415,7 +1483,7 @@ function buildRouteA(){
   });
   document.getElementById('catResultBox').style.display='none';
 }
-function getCategoryLabelKey(){const g=GRADES.find(x=>x.id===grade);if(MASTER.categories[0]&&MASTER.categories[0][g.col]!==undefined)return g.col;return 'カテゴリ名（正式）';}
+function getCategoryLabelKey(){const g=GRADES.find(x=>x.id===grade);const key=`${g.col}表記`;if(MASTER.categories[0]&&MASTER.categories[0][key]!==undefined)return key;return 'カテゴリ名（正式）';}
 function getCareerLabel(c){const g=GRADES.find(x=>x.id===grade);return c[g.col]||c['職業名（正式）']||c['職業名'];}
 function renderRanking(){
   const el=document.getElementById('rankingChips');el.innerHTML='';
@@ -1423,6 +1491,7 @@ function renderRanking(){
     const btn=document.createElement('button');btn.className=`chip career${i<3?' rank-'+(i+1):''}`;
     btn.style.animationDelay=`${i*0.03}s`;const m=['🥇','🥈','🥉'];
     btn.textContent=i<3?`${m[i]} ${getCareerLabel(c)}`:`${i+1}. ${getCareerLabel(c)}`;
+    if(c['職業ID']===selectedCareerId&&selectedCareerId!=='J00200')btn.classList.add('on-a');
     btn.onclick=()=>selectCareerA(c['職業ID'],getCareerLabel(c),btn);el.appendChild(btn);
   });
   document.getElementById('rankingMoreBtn').classList.toggle('show',rankingAllList.length>rankingShown);
@@ -1449,7 +1518,7 @@ function renderCatResult(){
   const el=document.getElementById('catResultChips');el.innerHTML='';
   catResultList.slice(0,catResultShown).forEach((c,i)=>{
     const btn=document.createElement('button');btn.className='chip career';btn.style.animationDelay=`${i*0.03}s`;
-    btn.textContent=getCareerLabel(c);btn.onclick=()=>selectCareerA(c['職業ID'],getCareerLabel(c),btn);el.appendChild(btn);
+    btn.textContent=getCareerLabel(c);if(c['職業ID']===selectedCareerId&&selectedCareerId!=='J00200')btn.classList.add('on-a');btn.onclick=()=>selectCareerA(c['職業ID'],getCareerLabel(c),btn);el.appendChild(btn);
   });
   document.getElementById('catMoreBtn').classList.toggle('show',catResultList.length>catResultShown);
 }
@@ -1457,6 +1526,29 @@ function loadMoreCatResult(){catResultShown+=10;renderCatResult();}
 function selectCareerA(id,name,btn){
   selectedCareerId=id;selectedCareerName=name;
   document.querySelectorAll('#rankingChips .chip,#catResultChips .chip').forEach(b=>b.classList.remove('on-a'));btn.classList.add('on-a');
+  const ci=document.getElementById('customCareerInput');if(ci)ci.value='';
+  document.getElementById('a1Err')?.classList.remove('show');
+  updateSelBars();
+}
+/* v17: マスタにない仕事を自分で入力（J00200=自分で書く として保存） */
+function selectCustomCareer(){
+  const ci=document.getElementById('customCareerInput');
+  const v=(ci?.value||'').trim();
+  if(!v){document.getElementById('a1Err').textContent='仕事の名前を書いてから押してね！';document.getElementById('a1Err').classList.add('show');return;}
+  selectedCareerId='J00200';selectedCareerName=v;
+  document.querySelectorAll('#rankingChips .chip,#catResultChips .chip').forEach(b=>b.classList.remove('on-a'));
+  document.getElementById('a1Err').textContent='気になる仕事を選んでね！';
+  document.getElementById('a1Err').classList.remove('show');
+  updateSelBars();
+}
+/* v17: 「いま選んでいる仕事」バーを全ルートで同期表示 */
+function updateSelBars(){
+  [['selBarA','selBarAName'],['selBarB','selBarBName'],['selBarC','selBarCName']].forEach(([barId,nameId])=>{
+    const bar=document.getElementById(barId),nm=document.getElementById(nameId);
+    if(!bar||!nm)return;
+    if(selectedCareerName){nm.textContent=selectedCareerName;bar.style.display='flex';}
+    else bar.style.display='none';
+  });
 }
 function goResult(rt){
   if(!selectedCareerId){document.getElementById(rt==='A'?'a1Err':'b1Err').classList.add('show');return;}
@@ -1491,7 +1583,8 @@ function renderB2List(){
   const el=document.getElementById('b2CareerChips');el.innerHTML='';
   b2List.slice(0,b2Shown).forEach((c,i)=>{
     const btn=document.createElement('button');btn.className='chip career';btn.style.animationDelay=`${i*0.03}s`;btn.textContent=getCareerLabel(c);
-    btn.onclick=()=>{selectedCareerId=c['職業ID'];selectedCareerName=getCareerLabel(c);document.querySelectorAll('#b2CareerChips .chip').forEach(b=>b.classList.remove('on-a'));btn.classList.add('on-a');};el.appendChild(btn);
+    if(c['職業ID']===selectedCareerId)btn.classList.add('on-a');
+    btn.onclick=()=>{selectedCareerId=c['職業ID'];selectedCareerName=getCareerLabel(c);document.querySelectorAll('#b2CareerChips .chip').forEach(b=>b.classList.remove('on-a'));btn.classList.add('on-a');updateSelBars();};el.appendChild(btn);
   });
   document.getElementById('b2MoreBtn').classList.toggle('show',b2List.length>b2Shown);
 }
@@ -1550,7 +1643,7 @@ function updateYear(){
   else{[ey,ny].forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;ys.appendChild(o);});if(pv)ys.value=pv;}
 }
 
-// 動物占い（日干支）アルゴリズム（精密検証済）
+// 動物占い（日干支）アルゴリズム（精密検証済：公開換算例4件・1970年以前・うるう年で一致確認）
 function calcAnimalChar(year, month, day){
   // 1970/1/1 を基準とし、日干支番号（1〜60）を算出する。
   // 1970年1月1日は「辛巳(18)」。
@@ -1558,9 +1651,15 @@ function calcAnimalChar(year, month, day){
   const days = Math.floor(d.getTime() / (1000 * 60 * 60 * 24));
   let num = (days + 18) % 60;
   if (num <= 0) num += 60;
-  
-  return MASTER.animals && MASTER.animals.length > 0 ? 
-         (MASTER.animals.find(a => parseInt(a['ID']) === num) || MASTER.animals[num-1] || null) : null;
+
+  if(!MASTER.animals || MASTER.animals.length === 0) return null;
+  // キャラID（K00011等）・ID（11等）どちらの列名/形式でも数値部分で照合する
+  const hit = MASTER.animals.find(a => {
+    const raw = a['キャラID'] ?? a['ID'] ?? a['id'] ?? '';
+    const n = parseInt(String(raw).replace(/[^0-9]/g, ''), 10);
+    return n === num;
+  });
+  return hit || MASTER.animals[num-1] || null;
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -1573,7 +1672,13 @@ function calcAnimalChar(year, month, day){
 function generateRouteC(){
   const month=document.getElementById('cMonth').value,day=document.getElementById('cDay').value,year=document.getElementById('cYear').value;
   const gender=document.querySelector('input[name="cGender"]:checked')?.value||'ひみつ';
-  if(!month||!day||!year){document.getElementById('cErr').classList.add('show');return;}
+  if(!month||!day||!year){document.getElementById('cErr').textContent='生まれた月・日・年と性別を選んでね！';document.getElementById('cErr').classList.add('show');return;}
+  // v17: 2/29×非うるう年など、存在しない日付をブロック（Dateの自動繰り上がりで誤った診断になるのを防ぐ）
+  const chk=new Date(Date.UTC(parseInt(year),parseInt(month)-1,parseInt(day)));
+  if(chk.getUTCFullYear()!==parseInt(year)||chk.getUTCMonth()!==parseInt(month)-1||chk.getUTCDate()!==parseInt(day)){
+    document.getElementById('cErr').textContent='その年には存在しない日付です。月と日をもう一度確認してね！';
+    document.getElementById('cErr').classList.add('show');return;
+  }
   document.getElementById('cErr').classList.remove('show');
 
   animalCharResult=calcAnimalChar(year,month,day);
@@ -1685,13 +1790,15 @@ const FURIGANA_MAP = [
 ];
 
 function addFurigana(text){
-  // テキストノードに rubyタグ を差し込む（HTMLエスケープ済みテキストに適用）
-  let result = text;
-  FURIGANA_MAP.forEach(([kanji, yomi]) => {
-    // すでに <ruby> で囲まれているものはスキップ
-    const re = new RegExp(`(?<!<ruby>)${kanji}(?!</ruby>)`, 'g');
-    result = result.replace(re, `<ruby>${kanji}<rt>${yomi}</rt></ruby>`);
-  });
+  // v17: 旧Safari（iOS16.3以前）はlookbehind正規表現で実行時エラーになるため、
+  // プレースホルダ2パス方式に変更。長い語から置換し「体験」内の「体」等の誤マッチも防ぐ。
+  const sorted=FURIGANA_MAP.map((pair,idx)=>({kanji:pair[0],yomi:pair[1],idx}))
+    .sort((a,b)=>b.kanji.length-a.kanji.length);
+  let result=text;
+  // パス1：漢字→トークン（挿入済みrubyの中身を後続置換から保護）
+  sorted.forEach(({kanji,idx})=>{result=result.split(kanji).join(`\u0000${idx}\u0000`);});
+  // パス2：トークン→rubyタグ展開
+  sorted.forEach(({kanji,yomi,idx})=>{result=result.split(`\u0000${idx}\u0000`).join(`<ruby>${kanji}<rt>${yomi}</rt></ruby>`);});
   return result;
 }
 
@@ -1706,8 +1813,11 @@ function showResultC(){
   /* 動物占い表示 */
   if(animalCharResult){
     const ck={s1:'小1向け',s2:'小1向け',s3:'小3向け',s4:'小3向け',s5:'小5向け',s6:'小5向け',m1:'中1向け',m2:'中1向け',m3:'中3向け',g:'中3向け'}[grade]||'小1向け';
-    const emoji=animalCharResult['絵文字']||'';
     const name=animalCharResult['本質キャラクター']||animalCharResult['キャラ名']||'';
+    // 絵文字列が無いマスタでもキャラ名から自動判定
+    const EMOJI_MAP=[['チータ','🐆'],['たぬき','🦝'],['コアラ','🐨'],['クロヒョウ','🐈‍⬛'],['黒ひょう','🐈‍⬛'],['こじか','🦌'],['ゾウ','🐘'],['ひつじ','🐑'],['ペガサス','🦄'],['ライオン','🦁'],['狼','🐺'],['猿','🐵'],['虎','🐯']];
+    const emojiHit=EMOJI_MAP.find(([k])=>name.includes(k));
+    const emoji=animalCharResult['絵文字']||(emojiHit?emojiHit[1]:'🌟');
     const group=animalCharResult['天体グループ']?`${animalCharResult['天体グループ']}グループ`:'';
     // キャラ名にもルビ
     const nameDisplay=useRuby?addFurigana(name):name;
@@ -1738,10 +1848,12 @@ function showResultC(){
   }else{document.getElementById('rcTokiSection').style.display='none';}
 
   renderCandidatesC();
+  updateSelBars();
 
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('scResultC').classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
+  updateProgress('scResultC');
 }
 
 /* 2ブロック描画 */
@@ -1792,6 +1904,7 @@ function makeDcCard(c,allGrids){
     allGrids.forEach(g=>{if(g)g.querySelectorAll('.dc-card').forEach(x=>x.classList.remove('selected'));});
     card.classList.add('selected');
     selectedCareerId=c['職業ID'];selectedCareerName=label;
+    updateSelBars();
   };
   if(c['職業ID']===selectedCareerId)card.classList.add('selected');
   return card;
@@ -1885,36 +1998,38 @@ function toggleAcc(id){
   body.classList.toggle('open',!isOpen);toggle.classList.toggle('open',!isOpen);
 }
 
-/* ═══ 夢の正体 v14 コア定数・関数群 ═══ */
+/* ═══ 夢の正体 v16 コア定数・関数群 ═══
+   全学年共通の「名詞句契約」：Q1=人（名詞）／Q2=届けるもの（名詞）／Q3=〜社会・世界（名詞句）
+   ※マスタ「夢の正体ガイド」の文型テンプレが優先。以下は同一内容のフォールバック。 */
 const DREAM_TEMPLATES = {
-  s1: '私の夢は、{Q1}を{Q2}して、{Q3}に貢献することです！！\nそのために、今は{職業}になることを目標にしています。',
-  s2: '私の夢は、{Q1}を{Q2}して、{Q3}に貢献することです！！\nそのために、今は{職業}になることを目標にしています。',
-  s3: '私の夢は、{Q1}に{Q2}を届けて、{Q3}に貢献することです！！\nそのために、今は{職業}になることを目標にしています。',
-  s4: '私の夢は、{Q1}に{Q2}を届けて、{Q3}に貢献することです！！\nそのために、今は{職業}になることを目標にしています。',
-  s5: '私の夢は、{Q1}に{Q2}を届け、{Q3}を実現することに貢献することです！！\nそのために、今は{職業}として活躍することを目標にしています。',
-  s6: '私の夢は、{Q1}に{Q2}を届け、{Q3}を実現することに貢献することです！！\nそのために、今は{職業}として活躍することを目標にしています。',
-  m1: '私の夢は、{Q1}に{Q2}を届け、{Q3}を実現していくことに貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標としています。',
-  m2: '私の夢は、{Q1}に{Q2}を届け、{Q3}を実現していくことに貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標としています。',
-  m3: '私の夢は、{Q1}に対して{Q2}を届け、{Q3}を実現することに貢献していくことです！！\nその夢に向かう手段として、現在は{職業}という職業に就くことを目標の一つとしています。',
-  g:  '私の夢は、{Q1}に対して{Q2}を提供し、{Q3}という価値を社会に実現していくことに貢献することです！！\nその夢の実現に向けた手段として、{職業}という仕事を選び、その道を歩んでいきたいと考えています。',
+  s1: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}に なることを もくひょうに しています。',
+  s2: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}に なることを もくひょうに しています。',
+  s3: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}になることを目標にしています。',
+  s4: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}になることを目標にしています。',
+  s5: '私の夢は、{Q1}に{Q2}を届けて、{Q3}の実現に貢献することです！！\nその夢のために、今は{職業}として活躍することを目標にしています。',
+  s6: '私の夢は、{Q1}に{Q2}を届けて、{Q3}の実現に貢献することです！！\nその夢のために、今は{職業}として活躍することを目標にしています。',
+  m1: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標にしています。',
+  m2: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標にしています。',
+  m3: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献していくことです！！\nその夢に向かう手段として、今は{職業}という仕事に就くことを目標の一つにしています。',
+  g:  '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献していくことです！！\nその夢の実現に向けた手段として、{職業}という仕事を選び、この道を歩んでいきます。',
 };
 
 const DREAM_QUESTIONS = {
-  es_low:{ q1:'だれをえがおにしたい？', q2:'どんなことをしてあげたい？', q3:'どんな社会になってほしい？',
-           p1:'例：びょうきのひと', p2:'例：げんきにしてあげたい', p3:'例：みんながえがおのせかい',
-           d1:'（だれ）', d2:'（してあげること）', d3:'（どんな社会）' },
-  es_mid:{ q1:'誰を笑顔にしたい？', q2:'どんなことをしてあげたい？', q3:'どんな社会になってほしい？',
-           p1:'例：病気でこまっている人', p2:'例：元気にしてあげたい', p3:'例：みんなが安心して暮らせる社会',
-           d1:'（だれ）', d2:'（してあげること）', d3:'（どんな社会）' },
-  es_high:{ q1:'誰を笑顔にしたい？', q2:'どんな喜びを届けたい？', q3:'どんな社会・未来になってほしい？',
-            p1:'例：病気で苦しむ人たち', p2:'例：元気・希望を届けたい', p3:'例：誰もが健康に生きられる社会',
-            d1:'（誰に）', d2:'（どんな喜び）', d3:'（どんな社会・未来）' },
-  jh:    { q1:'誰に何を届けたい？', q2:'どんな変化・喜びをもたらしたい？', q3:'どんな社会・未来になってほしい？',
-           p1:'例：病気で苦しむ人・スポーツが好きな人', p2:'例：病気を治したい・笑顔や感動を届けたい', p3:'例：誰もが安心して生きられる社会',
-           d1:'（誰に）', d2:'（どんな変化・喜び）', d3:'（どんな社会・未来）' },
-  adult: { q1:'誰のどんな課題を解決したい？', q2:'どんな変化や喜びをもたらしたい？', q3:'どんな社会・未来になってほしい？',
-           p1:'例：医療アクセスに困る人々', p2:'例：命を守る・生活の質を高める・感動を届ける', p3:'例：誰もが尊厳を持って生きられる社会',
-           d1:'（誰のどんな課題）', d2:'（どんな変化・喜び）', d3:'（どんな社会・未来）' },
+  es_low:{ q1:'だれを えがおに したい？', q2:'どんな うれしいことを とどけたい？', q3:'どんな せかいに なって ほしい？',
+           p1:'例：びょうきの ひと', p2:'例：げんき', p3:'例：みんなが えがおの せかい',
+           d1:'（だれ）', d2:'（とどけたいもの）', d3:'（どんな せかい）' },
+  es_mid:{ q1:'誰を笑顔にしたい？', q2:'どんなうれしいことを届けたい？', q3:'どんな世界になってほしい？',
+           p1:'例：病気でこまっている人', p2:'例：元気', p3:'例：みんなが安心してくらせる世界',
+           d1:'（だれ）', d2:'（届けたいもの）', d3:'（どんな世界）' },
+  es_high:{ q1:'誰を笑顔にしたい？', q2:'どんな喜びを届けたい？', q3:'どんな社会になってほしい？',
+            p1:'例：病気で苦しむ人たち', p2:'例：元気と希望', p3:'例：誰もが健康に生きられる社会',
+            d1:'（誰に）', d2:'（どんな喜び）', d3:'（どんな社会）' },
+  jh:    { q1:'誰の力になりたい？', q2:'どんな価値・喜びを届けたい？', q3:'どんな社会・未来になってほしい？',
+           p1:'例：病気で苦しむ人・スポーツが好きな人', p2:'例：安心できる治療・心が動く感動', p3:'例：誰もが安心して挑戦できる社会',
+           d1:'（誰に）', d2:'（どんな価値・喜び）', d3:'（どんな社会・未来）' },
+  adult: { q1:'誰の力になりたい？', q2:'どんな価値・変化を届けたい？', q3:'どんな社会・未来を実現したい？',
+           p1:'例：医療にアクセスしづらい人々', p2:'例：質の高い医療・生活の安心', p3:'例：誰もが尊厳を持って生きられる社会',
+           d1:'（誰に）', d2:'（どんな価値・変化）', d3:'（どんな社会・未来）' },
 };
 
 function getDreamQKey(){
@@ -2026,17 +2141,17 @@ function populateTemplatesAndHints(){
   renderQuestionChips('hintChipsQ2', cid, 'Q2_ありがとう',  grp, 'blank2', 'q2');
   renderQuestionChips('hintChipsQ3', cid, 'Q3_世の中への影響', grp, 'blank3', 'q3');
 
-  // 例文（1件・お医者さん固定）
+  // 例文（1件・お医者さん固定／文型テンプレと完全整合）
   const ex1=document.getElementById('tplExample1');
   if(ex1){
     if(isSmall){
-      ex1.textContent='「私の夢は、びょうきのひとをげんきにして、みんながえがおのせかいに貢献することです！！\nそのために、今はおいしゃさんになることを目標にしています。」';
+      ex1.textContent='「わたしの ゆめは、びょうきの ひとに げんきを とどけて、みんなが えがおの せかいを つくることです！！\nそのために、いまは おいしゃさんに なることを もくひょうに しています。」';
     }else if(['s3','s4'].includes(grade)){
-      ex1.textContent='「私の夢は、病気でこまっている人を元気にして、みんなが安心できる世界に貢献することです！！\nそのために、今はお医者さんになることを目標にしています。」';
+      ex1.textContent='「私の夢は、病気でこまっている人に 元気を届けて、みんなが安心してくらせる世界をつくることです！！\nそのために、今は お医者さんになることを目標にしています。」';
     }else if(['s5','s6'].includes(grade)){
-      ex1.textContent='「私の夢は、病気で苦しむ人に治療を届け、誰もが健康に生きられる社会の実現に貢献することです！！\nその夢のために、今はお医者さんとして活躍することを目標にしています。」';
+      ex1.textContent='「私の夢は、病気で苦しむ人に元気と希望を届けて、誰もが健康に生きられる社会の実現に貢献することです！！\nその夢のために、今はお医者さんとして活躍することを目標にしています。」';
     }else{
-      ex1.textContent='「私の夢は、病気で苦しむ人に最善の医療を届け、誰もが尊厳を持って生きられる社会の実現に貢献することです！！\nその夢の実現に向けた手段として、医師という仕事を選び、その道を歩んでいきたいと考えています。」';
+      ex1.textContent='「私の夢は、病気で苦しむ人に最善の医療を届け、誰もが尊厳を持って生きられる社会の実現に貢献していくことです！！\nその夢に向かう手段として、今は医師という仕事に就くことを目標の一つにしています。」';
     }
     if(useRuby) ex1.innerHTML=addFurigana(ex1.textContent);
   }
@@ -2151,30 +2266,79 @@ function renderHeroAccordions(){
     'H00087','H00088','H00089','H00090'
   ]);
 
-  // ── 職業・夢の正体との関連スコア計算 ──
+  // ── 職業・夢の正体との関連スコア計算（v17.1: ID基準マッチングに刷新）──
+  // 旧版は学年別表記（例:小1「おいしゃさん」）と偉人の職業欄（「医師」）を文字列照合して
+  // いたため低学年でほぼ全滅していた。関連職業IDs列（v2.3.0新設）での照合を最優先にする。
   function heroScore(h){
     let score=0;
+    // 1) 関連職業IDs完全一致（最優先・言語非依存）
+    if(selectedCareerId&&selectedCareerId!=='J00200'){
+      const rel=(h['関連職業IDs']||'').split('|');
+      if(rel.includes(selectedCareerId)) score+=100;
+      // 1.5) 同じ職業カテゴリの偉人（マスタv2.4.0: 関連カテゴリID）。
+      //      細分化された職業（例:小児科医・卓球選手）でも同カテゴリの偉人に出会えるようにする。
+      const crowC=MASTER.careers.find(c=>c['職業ID']===selectedCareerId);
+      const myCat=crowC?crowC['カテゴリID']:'';
+      if(myCat&&(h['関連カテゴリID']||'').split('|').includes(myCat)) score+=30;
+    }
+    // 2) 正式名フォールバック（表示名でなく職業マスタの正式名で照合）
+    const crow=selectedCareerId?MASTER.careers.find(c=>c['職業ID']===selectedCareerId):null;
+    const formal=((crow&&crow['職業名（正式）'])||selectedCareerName||'').toLowerCase();
     const job=(h['職業']||'').toLowerCase();
     const relation=(h['選んだ職業や夢の正体との関係']||'').toLowerCase();
     const dream=(h[dk]||'').toLowerCase();
-    const careerName=(selectedCareerName||'').toLowerCase();
-    // 選択職業名との一致
-    if(careerName&&job.includes(careerName)) score+=50;
-    if(careerName&&relation.includes(careerName)) score+=30;
-    if(careerName&&dream.includes(careerName)) score+=20;
-    // 知名度スコア
+    if(formal){
+      if(job.includes(formal)) score+=40;
+      if(relation.includes(formal)) score+=20;
+      if(dream.includes(formal)) score+=10;
+    }
+    // 3) 価値観共鳴（ルートB: 選んだ価値観が偉人の夢の正体に響くか）
+    if(selectedValueIds&&selectedValueIds.length&&MASTER.values){
+      selectedValueIds.forEach(vid=>{
+        const v=MASTER.values.find(x=>x['価値観ID']===vid);
+        const w=v?((v['大人']||v['価値観名']||'')+''):'';
+        if(w&&dream.includes(w.toLowerCase())) score+=4;
+      });
+    }
+    // 4) 知名度スコア
     const kn=(h['知名度（小1-大人）']||'').split('|');
     score+=(parseInt(kn[ci])||0)*2;
-    // PTA推奨
+    // 5) PTA推奨
     if(h['PTA推奨フラグ']==='はい') score+=10;
     return score;
   }
 
   const allHeroes=[...MASTER.heroes];
 
-  // カテゴリ別に分ける
-  const historicals=allHeroes.filter(h=>!MODERN_IDS.has(h['偉人ID']));
-  const moderns=allHeroes.filter(h=>MODERN_IDS.has(h['偉人ID']));
+  // v17.1: マッチング2段構え。まず職業ID直接一致(関連職業IDs)の偉人を最優先で集め、
+  // それが3人に満たない場合だけ、同カテゴリの偉人(関連カテゴリID)で補う。
+  // これにより「陶芸家にこんまり」のようなカテゴリ経由ノイズが直接一致を押しのけない。
+  let directHeroes=[], categoryHeroes=[];
+  if(selectedCareerId&&selectedCareerId!=='J00200'){
+    const crowC=MASTER.careers.find(c=>c['職業ID']===selectedCareerId);
+    const myCat=crowC?crowC['カテゴリID']:'';
+    allHeroes.forEach(h=>{
+      const rel=(h['関連職業IDs']||'').split('|');
+      if(rel.includes(selectedCareerId)) directHeroes.push(h);
+      else if(myCat&&(h['関連カテゴリID']||'').split('|').includes(myCat)) categoryHeroes.push(h);
+    });
+  }
+
+  // 選出母集団：直接一致を最優先。3人未満ならカテゴリ偉人で補い、それも足りなければ全偉人。
+  let pool;
+  if(directHeroes.length>=3){
+    pool=[...directHeroes, ...categoryHeroes]; // 直接一致を先頭に、カテゴリは予備として後ろに
+  }else if(directHeroes.length+categoryHeroes.length>=3){
+    pool=[...directHeroes, ...categoryHeroes];
+  }else{
+    pool=[...directHeroes, ...categoryHeroes, ...allHeroes.filter(h=>!directHeroes.includes(h)&&!categoryHeroes.includes(h))];
+  }
+  // 重複除去
+  const seen=new Set(); pool=pool.filter(h=>{const id=h['偉人ID'];if(seen.has(id))return false;seen.add(id);return true;});
+
+  // カテゴリ別に分ける（pool内で）
+  const historicals=pool.filter(h=>!MODERN_IDS.has(h['偉人ID']));
+  const moderns=pool.filter(h=>MODERN_IDS.has(h['偉人ID']));
 
   // それぞれスコア順ソート
   historicals.sort((a,b)=>heroScore(b)-heroScore(a));
@@ -2188,9 +2352,11 @@ function renderHeroAccordions(){
   historicals.filter(h=>h[dk]).slice(0,2).forEach(h=>{picked.push({hero:h,tag:'📚 図書館でも読める偉人'});usedIds.add(h['偉人ID']);});
   // 現代有名人 2人
   moderns.filter(h=>h[dk]).slice(0,2).forEach(h=>{picked.push({hero:h,tag:'✨ 今も活躍する有名人'});usedIds.add(h['偉人ID']);});
-  // お任せ 1人（残りからスコア最高・既出除く）
-  const rest=[...allHeroes].filter(h=>!usedIds.has(h['偉人ID'])&&h[dk]).sort((a,b)=>heroScore(b)-heroScore(a));
-  if(rest.length>0) picked.push({hero:rest[0],tag:'🌟 あなたへのおすすめ'});
+  // お任せ 1人（pool優先・残りからスコア最高・既出除く。poolが尽きたら全偉人から）
+  let restPool=pool.filter(h=>!usedIds.has(h['偉人ID'])&&h[dk]);
+  if(restPool.length===0) restPool=allHeroes.filter(h=>!usedIds.has(h['偉人ID'])&&h[dk]);
+  restPool.sort((a,b)=>heroScore(b)-heroScore(a));
+  if(restPool.length>0) picked.push({hero:restPool[0],tag:'🌟 あなたへのおすすめ'});
 
   const sorted=picked.map(p=>p.hero);
   const el=document.getElementById('heroAccordions');if(!el)return sorted;
@@ -2270,7 +2436,7 @@ async function saveResult(){
   }
   const g=GRADES.find(x=>x.id===grade);
   const valuesText=[...selectedValueIds,...selectedLikeChips,...selectedTokiChips].map(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);return v?(v[g.col]||v['価値観名（正式）']):'';}).filter(Boolean).join('・');
-  const payload={timestamp:new Date().toISOString(),isTest:isTestMode,school:document.getElementById('pSchool').value,name:document.getElementById('pName').value.trim()||'（匿名）',grade:g.label,route,careerId:selectedCareerId,careerName:selectedCareerName,values:valuesText,animalChar:animalCharResult?(animalCharResult['本質キャラクター']||animalCharResult['キャラ名']||''):'',dreamIdentity,kansou,templateUsed:'ステップ穴埋め',sheet:'回答データ'};
+  const payload={timestamp:new Date().toISOString(),isTest:isTestMode,school:getSchoolValue(),name:document.getElementById('pName').value.trim()||'（匿名）',grade:g.label,route,careerId:selectedCareerId,careerName:selectedCareerName,values:valuesText,animalChar:animalCharResult?(animalCharResult['本質キャラクター']||animalCharResult['キャラ名']||''):'',dreamIdentity,kansou,templateUsed:'ステップ穴埋め',sheet:'回答データ'};
   try{
     await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain;charset=utf-8'}});
     status.className='save-status ok';status.textContent='✅ 宿題を提出しました！ありがとう！';
@@ -2283,7 +2449,7 @@ async function saveResult(){
 
 function openDocView(){
   const g=GRADES.find(x=>x.id===grade);
-  document.getElementById('docMeta').textContent=`${g.label} ／ ${document.getElementById('pSchool').value||''} ／ ${document.getElementById('pName').value.trim()||''}`;
+  document.getElementById('docMeta').textContent=[g.label,getSchoolValue()].filter(Boolean).join(' ／ ');
   document.getElementById('docCareerName').textContent=selectedCareerName||'—';
   const guide=MASTER.guides.find(x=>x['学年']===g.col);
   document.getElementById('docGuideText').textContent=guide?guide['ガイド本文']:'';
@@ -2303,7 +2469,7 @@ async function saveDocAsImage(){
   }catch{alert('画像生成に失敗しました。「印刷・PDFで保存」をお試しください。');}
 }
 
-function showContact(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='none';show('scContact');}
+function showContact(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='none';syncRadioLabels();show('scContact');}
 function showContactConfirm(){
   const nm=document.getElementById('cName').value.trim(),em=document.getElementById('cEmail').value.trim(),ct=document.getElementById('cCategory').value,bd=document.getElementById('cBody').value.trim(),err=document.getElementById('contactErr');
   if(!nm||!em||!ct||!bd){err.classList.add('show');return;}
@@ -2319,7 +2485,7 @@ async function sendContact(){
   document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
 }
 function fullReset(){
-  grade=null;route=null;selectedCareerId=null;selectedCareerName=null;
+  grade=null;route=null;selectedCareerId=null;selectedCareerName=null;customSchool='';
   selectedValueIds=[];selectedLikeChips=[];selectedTokiChips=[];catSelected=[];animalCharResult=null;
   window._cAnimalList=[];window._cValueList=[];window._cAnimalShown=5;window._cValueShown=5;
   document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
@@ -2329,6 +2495,11 @@ function fullReset(){
   document.getElementById('scResultC').classList.remove('active');
   document.getElementById('finishOverlay').classList.remove('show');
   const dOut=document.getElementById('dreamOutput');if(dOut)dOut.value='';
+  const ci=document.getElementById('customCareerInput');if(ci)ci.value='';
+  const so=document.getElementById('pSchoolOtherInput');if(so)so.value='';
+  const sb=document.getElementById('submitBtn');if(sb){sb.disabled=false;sb.textContent='📤 宿題を提出する';}
+  const ss=document.getElementById('saveStatus');if(ss)ss.style.display='none';
+  updateSelBars();
   show('scGrade');
 }
 </script>
