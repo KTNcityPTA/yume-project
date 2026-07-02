@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <!-- ═══════════════════════════════════════════════════════
+  夢ナビ v22（2026-07-02）交野市PTA協議会 夢プロジェクト
+  【v22 変更点】E2E全数テスト（全学年×全ルート×送信×フォールバック 44項目合格）後の仕上げ。
+  1. 画面右下にデータ取得元バッジを実装（v19で設計・未実装だった機能）。
+     「v22・master.json（静的）」等を小さく表示 → 学校iPadで読み込み経路を現場確認できる。
+  2. フォントのフォールバック強化。学校iPad（i-FILTERがGoogle Fonts遮断）でも
+     iPad標準の「ヒラギノ丸ゴ ProN」で丸ゴシックの雰囲気を維持する。
+  ─────────────────────────────────────────────────────
   夢ナビ v21（2026-07-02）交野市PTA協議会 夢プロジェクト
   【v21 変更点】学校iPadでのSupabase送信テスト結果を反映（GASなし収集の確定版）。
   1. 学校iPadから supabase.co へ到達可能を確認済み。Supabase収集を本採用。
@@ -79,7 +86,7 @@
   --grad-c:linear-gradient(135deg,#f97316,#fbbf24);
   --grad-hero:linear-gradient(160deg,#0c4a6e,#1a4a8a 40%,#312e81);
 }
-body{font-family:'Zen Maru Gothic',sans-serif;background:var(--white);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+body{font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','ヒラギノ丸ゴ ProN W4','BIZ UDGothic','Meiryo',sans-serif;background:var(--white);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
 
 /* ── ヘッダー ── */
 header{background:var(--grad-hero);color:#fff;padding:.7rem 1rem .8rem;text-align:center;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.22);}
@@ -87,7 +94,7 @@ header{background:var(--grad-hero);color:#fff;padding:.7rem 1rem .8rem;text-alig
 #testToggleBtn{font-size:1rem;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:50%;width:1.9rem;height:1.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;flex-shrink:0;color:#fff;}
 #testToggleBtn:hover{background:rgba(255,255,255,.22);transform:rotate(20deg);}
 #testToggleBtn.active{background:rgba(255,220,0,.35);border-color:gold;filter:drop-shadow(0 0 5px gold);}
-header h1{font-family:'Kaisei Decol',serif;font-size:1.25rem;letter-spacing:.04em;}
+header h1{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.25rem;letter-spacing:.04em;}
 header .sub{font-size:.65rem;opacity:.78;margin-top:.1rem;}
 /* ── グローバル進捗バー（ヘッダー直下）── */
 #globalProgressBar{height:5px;background:#1a3a7a;position:sticky;top:56px;z-index:190;width:100%;}
@@ -117,7 +124,7 @@ main{flex:1;max-width:680px;margin:0 auto;padding:1rem 1rem 5rem;width:100%;}
 .init-err{font-size:.85rem;color:var(--coral);background:#fee2e2;border-radius:var(--radius-sm);padding:1rem;max-width:400px;margin:1rem auto;}
 
 /* ── ページ共通ヘッダー（タイトル+サブ） ── */
-.page-title{font-family:'Kaisei Decol',serif;font-size:1.15rem;color:var(--pta);margin-bottom:.25rem;line-height:1.4;}
+.page-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.15rem;color:var(--pta);margin-bottom:.25rem;line-height:1.4;}
 .page-sub{font-size:.78rem;color:var(--soft);line-height:1.7;margin-bottom:1rem;}
 
 /* ── ボタン類 ── */
@@ -128,9 +135,9 @@ main{flex:1;max-width:680px;margin:0 auto;padding:1rem 1rem 5rem;width:100%;}
 .screen>.btn-back:first-child{margin-top:.6rem;}
 .btn-confirm{display:none;width:100%;max-width:300px;margin:.8rem auto 0;padding:.85rem 1rem;border:none;border-radius:50px;color:#fff;font-family:inherit;font-size:.97rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 5px 18px rgba(0,0,0,.18);}
 .btn-confirm:hover{transform:translateY(-2px);}
-.btn-next-page{display:block;width:100%;max-width:320px;margin:1.4rem auto 0;padding:1rem 1rem;background:linear-gradient(135deg,var(--mint),#059669);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol',serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(16,185,129,.35);text-align:center;}
+.btn-next-page{display:block;width:100%;max-width:320px;margin:1.4rem auto 0;padding:1rem 1rem;background:linear-gradient(135deg,var(--mint),#059669);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .25s;box-shadow:0 6px 20px rgba(16,185,129,.35);text-align:center;}
 .btn-next-page:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(16,185,129,.45);}
-.btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
+.btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
 .btn-finish:hover{transform:translateY(-3px);}
 .btn-outline{display:block;width:100%;max-width:280px;margin:0 auto;padding:.65rem;background:#fff;border:2px solid var(--pta);border-radius:50px;color:var(--pta);font-family:inherit;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
 .btn-outline:hover{background:var(--pta);color:#fff;}
@@ -160,7 +167,7 @@ main{flex:1;max-width:680px;margin:0 auto;padding:1rem 1rem 5rem;width:100%;}
 
 /* ── プロフィール ── */
 .profile-card{background:#fff;border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
-.profile-card h2{font-family:'Kaisei Decol',serif;font-size:1.05rem;margin-bottom:1rem;color:var(--pta);}
+.profile-card h2{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;margin-bottom:1rem;color:var(--pta);}
 .form-label{font-size:.82rem;font-weight:700;margin-bottom:.35rem;display:block;color:var(--soft);}
 .form-row{margin-bottom:.8rem;}
 .input-field{width:100%;padding:.7rem 1rem;border:2px solid #e5e7eb;border-radius:var(--radius-sm);font-family:inherit;font-size:.92rem;color:var(--ink);transition:border-color .2s;background:#fff;}
@@ -212,7 +219,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 
 /* ── ルートC ── */
 .uranai-card{background:#fff;border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);}
-.uranai-card h2{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.45rem;}
+.uranai-card h2{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.45rem;}
 .uranai-card>p{font-size:.82rem;color:var(--soft);margin-bottom:1.1rem;line-height:1.7;}
 .birth-row{display:flex;gap:.35rem;align-items:center;width:100%;}
 .birth-row select{padding:.6rem .4rem;font-size:.85rem;text-overflow:ellipsis;}
@@ -231,13 +238,13 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 
 /* ── ルートC結果 ── */
 .res-header{border-radius:22px;padding:2.8rem 1.5rem 1.5rem;margin-bottom:1rem;color:#fff;text-align:center;position:relative;}
-#resTitle{font-family:'Kaisei Decol',serif;font-size:1.35rem;margin-bottom:.3rem;}
+#resTitle{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.35rem;margin-bottom:.3rem;}
 #resSub{font-size:.76rem;opacity:.85;}
 .res-back-btn{position:absolute;top:1rem;left:.8rem;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.42);color:#fff;border-radius:16px;padding:.28rem .75rem;font-family:inherit;font-size:.72rem;cursor:pointer;transition:all .2s;}
 .res-back-btn:hover{background:rgba(255,255,255,.38);}
 
 /* 動物キャラ */
-.animal-name-large{font-size:1.5rem;font-weight:900;color:var(--pta);margin-bottom:.4rem;text-align:center;font-family:'Kaisei Decol',serif;}
+.animal-name-large{font-size:1.5rem;font-weight:900;color:var(--pta);margin-bottom:.4rem;text-align:center;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;}
 .animal-group-badge{display:table;margin:0 auto 1.2rem;font-size:.75rem;font-weight:700;color:var(--lav);background:#f3e8ff;padding:.2rem .8rem;border-radius:30px;border:1px solid #d8b4fe;}
 .animal-prop-box{background:#fff;border-radius:var(--radius-sm);padding:.85rem 1rem;margin-bottom:.65rem;box-shadow:var(--shadow);}
 .animal-prop-title{font-size:.72rem;font-weight:700;color:var(--pta);margin-bottom:.35rem;letter-spacing:.04em;}
@@ -245,7 +252,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 
 /* 職業候補2ブロック */
 .rc-result-header{background:#fff;border-radius:var(--radius);padding:1rem 1rem .9rem;box-shadow:var(--shadow);border:2px solid #e8ecf4;margin-bottom:.9rem;}
-.rc-result-label{font-size:.92rem;font-weight:700;color:var(--pta);margin-bottom:.5rem;font-family:'Kaisei Decol',serif;}
+.rc-result-label{font-size:.92rem;font-weight:700;color:var(--pta);margin-bottom:.5rem;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;}
 .rc-selection-prompt{background:#fffbeb;border:2px dashed var(--gold);border-radius:14px;padding:.8rem .7rem;text-align:center;font-size:.83rem;font-weight:700;color:#92400e;margin-bottom:1rem;line-height:1.5;animation:pulsePrompt 2.5s infinite ease-in-out;}
 @keyframes pulsePrompt{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.3);}50%{box-shadow:0 0 0 6px rgba(251,191,36,.0);}}
 .rc-block-label{font-size:.75rem;font-weight:700;color:var(--pta);margin-bottom:.5rem;padding:.28rem .7rem;background:rgba(26,74,138,.07);border-radius:8px;display:inline-block;}
@@ -274,27 +281,27 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .transform-arrow-big{font-size:1.5rem;color:var(--gold);}
 .guide-card{background:linear-gradient(135deg,#fff7ed,#fef3c7);border-radius:var(--radius-sm);padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.8rem;border:2px solid var(--gold);}
 .guide-label{font-size:.75rem;color:#b45309;font-weight:700;margin-bottom:.5rem;}
-.guide-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
+.guide-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
 .guide-body{font-size:.88rem;line-height:2.1;color:var(--ink);}
 /* ── 仕切りバナー（大型・目立つ版）── */
 .divider-banner{border-radius:var(--radius);padding:1.7rem 1.5rem 1.8rem;margin:1.5rem 0;text-align:center;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,.35);}
 .divider-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed,#0ea5e9,#059669);background-size:200% 200%;animation:gradShift 4s ease infinite;}
 @keyframes gradShift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
 .divider-banner-label{font-size:.75rem;letter-spacing:.2em;opacity:.88;margin-bottom:.55rem;position:relative;z-index:1;text-transform:uppercase;font-weight:700;}
-.divider-banner-text{font-family:'Kaisei Decol',serif;font-size:1.35rem;font-weight:700;line-height:1.55;position:relative;z-index:1;}
+.divider-banner-text{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.35rem;font-weight:700;line-height:1.55;position:relative;z-index:1;}
 .divider-banner-text.small{font-size:1.15rem;}
 .divider-banner-emoji{font-size:2.4rem;display:block;margin-bottom:.65rem;position:relative;z-index:1;animation:bannerBounce 1.8s ease infinite;}
 @keyframes bannerBounce{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-7px) scale(1.08);}}
 .dream-concept-card{background:var(--grad-hero);border-radius:var(--radius);padding:1.5rem;margin-bottom:.8rem;color:#fff;text-align:center;overflow:hidden;position:relative;}
 .concept-emoji-row{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:1.6rem;margin-bottom:.9rem;}
 .concept-arrow{font-size:.9rem;opacity:.6;}
-.concept-title{font-family:'Kaisei Decol',serif;font-size:1.15rem;margin-bottom:.55rem;}
+.concept-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.15rem;margin-bottom:.55rem;}
 .concept-body{font-size:.86rem;line-height:2;opacity:.95;}
 .concept-highlight{display:inline-block;background:rgba(251,191,36,.22);border:1px solid rgba(251,191,36,.5);border-radius:6px;padding:.05rem .4rem;color:#fbbf24;font-weight:700;}
 
 /* ── 夢の正体入力（v14新設計）── */
 .writing-card{background:linear-gradient(160deg,#f0fdf4 0%,#ecfeff 50%,#f5f3ff 100%);border:2px solid var(--mint);border-radius:24px;padding:1.4rem 1.2rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
-.writing-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.2rem;}
+.writing-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.2rem;}
 .writing-sub{font-size:.78rem;color:var(--soft);margin-bottom:1rem;line-height:1.8;}
 .example-box{background:#fffbeb;border:1.5px dashed var(--gold);border-radius:14px;padding:.85rem 1rem;margin-bottom:1.1rem;}
 .example-label{font-size:.68rem;font-weight:700;color:#92400e;margin-bottom:.5rem;letter-spacing:.08em;}
@@ -348,14 +355,14 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 /* ── 感想カード（強調版）── */
 .kansou-card{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:3px solid var(--gold);border-radius:var(--radius);padding:1.5rem 1.3rem;box-shadow:0 6px 24px rgba(245,158,11,.2);margin-bottom:.9rem;position:relative;}
 .kansou-card::before{content:'✏️';position:absolute;top:-1rem;left:50%;transform:translateX(-50%);font-size:1.8rem;background:var(--white);border-radius:50%;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold);}
-.kansou-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:#92400e;margin-bottom:.35rem;margin-top:.5rem;text-align:center;}
+.kansou-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:#92400e;margin-bottom:.35rem;margin-top:.5rem;text-align:center;}
 .kansou-sub{font-size:.78rem;color:#b45309;text-align:center;margin-bottom:.85rem;line-height:1.6;}
 .kansou-textarea{width:100%;padding:.85rem 1rem;border:2px solid #fcd34d;border-radius:var(--radius-sm);font-family:inherit;font-size:.93rem;color:var(--ink);background:#fff;resize:vertical;min-height:110px;line-height:1.8;transition:border-color .2s;}
 .kansou-textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(251,191,36,.18);}
 
 /* ── 偉人アコーディオン ── */
 .hero-acc-section{margin-bottom:.9rem;}
-.hero-acc-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
+.hero-acc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
 .hero-accordion{background:#fff;border-radius:18px;margin-bottom:.6rem;box-shadow:var(--shadow);overflow:hidden;border:1.5px solid #e8ecf4;}
 .hero-acc-header{display:flex;align-items:center;gap:.55rem;padding:.9rem 1rem;cursor:pointer;user-select:none;transition:background .2s;}
 .hero-acc-header:hover{background:#f8f9ff;}
@@ -389,12 +396,12 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .doc-bar-btn.secondary{background:#fff;color:var(--pta);border:2px solid var(--pta);}
 .doc-paper{background:#fff;max-width:620px;margin:0 auto;padding:2.5rem 2.2rem;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.15);}
 .doc-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:3px double var(--pta);}
-.doc-title{font-family:'Kaisei Decol',serif;font-size:1.7rem;color:var(--pta);margin-bottom:.4rem;}
+.doc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.7rem;color:var(--pta);margin-bottom:.4rem;}
 .doc-sub{font-size:.78rem;color:var(--soft);margin-bottom:.4rem;}
 .doc-badge{display:inline-block;background:var(--pta);color:#fff;padding:.2rem .9rem;border-radius:20px;font-size:.7rem;}
 .doc-section{margin-bottom:1.4rem;}
 .doc-section-title{font-size:.68rem;font-weight:700;color:var(--soft);letter-spacing:.12em;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid #e0e0e0;text-transform:uppercase;}
-.doc-career-name{font-family:'Kaisei Decol',serif;font-size:1.35rem;color:var(--pta);}
+.doc-career-name{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.35rem;color:var(--pta);}
 .doc-guide-box{background:#fffbeb;border-left:4px solid var(--gold);padding:.8rem 1rem;border-radius:0 10px 10px 0;font-size:.84rem;line-height:2;}
 .doc-dream-box{background:linear-gradient(135deg,#f0fdf4,#ecfeff);border:2px solid var(--mint);border-radius:var(--radius-sm);padding:1rem 1.2rem;font-size:.95rem;line-height:2.1;min-height:70px;white-space:pre-wrap;}
 .doc-kansou-box{background:#f8f9ff;border-radius:var(--radius-sm);padding:1rem 1.2rem;font-size:.87rem;line-height:2;min-height:60px;color:var(--soft);white-space:pre-wrap;}
@@ -411,22 +418,22 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .finish-card{background:rgba(255,255,255,.1);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:2rem 1.5rem;max-width:460px;width:100%;text-align:center;color:#fff;margin-bottom:1.5rem;position:relative;z-index:1;}
 .finish-emoji{font-size:3.5rem;display:block;margin-bottom:.8rem;animation:popIn .5s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-.finish-title{font-family:'Kaisei Decol',serif;font-size:1.8rem;font-weight:900;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#fbbf24 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.finish-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.8rem;font-weight:900;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#fbbf24 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .finish-sub{font-size:.9rem;opacity:.85;margin-bottom:1.5rem;line-height:1.8;}
 .finish-doc-wrap{background:rgba(255,255,255,.95);border-radius:20px;padding:1.5rem;color:#1a1a2e;margin-bottom:1.2rem;text-align:left;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:460px;width:100%;position:relative;z-index:1;}
-.finish-doc-title{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:#1a4a8a;margin-bottom:.8rem;text-align:center;}
+.finish-doc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;color:#1a4a8a;margin-bottom:.8rem;text-align:center;}
 .finish-doc-label{font-size:.66rem;color:#6b7280;font-weight:700;letter-spacing:.1em;margin-bottom:.3rem;}
 .finish-doc-value{font-size:.9rem;color:#1a1a2e;line-height:1.9;margin-bottom:.9rem;padding-left:.5rem;border-left:3px solid #fbbf24;white-space:pre-wrap;}
-.finish-thank{font-family:'Kaisei Decol',serif;font-size:1rem;margin-bottom:1.5rem;line-height:1.9;opacity:.95;text-align:center;position:relative;z-index:1;color:#fff;max-width:460px;}
+.finish-thank{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1rem;margin-bottom:1.5rem;line-height:1.9;opacity:.95;text-align:center;position:relative;z-index:1;color:#fff;max-width:460px;}
 .finish-actions{display:flex;flex-direction:column;gap:.8rem;width:100%;max-width:280px;position:relative;z-index:1;}
-.finish-btn-save{padding:.9rem;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50px;color:#fff;font-family:'Kaisei Decol',serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;}
+.finish-btn-save{padding:.9rem;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;}
 .finish-btn-save:hover{background:rgba(255,255,255,.35);}
 .finish-btn-restart{padding:.9rem;background:transparent;border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:rgba(255,255,255,.75);font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .25s;}
 .finish-btn-restart:hover{border-color:rgba(255,255,255,.7);color:#fff;}
 
 /* ── お問い合わせ ── */
 .contact-card{background:var(--white);border-radius:22px;padding:1.6rem;box-shadow:var(--shadow);}
-.contact-card h2{font-family:'Kaisei Decol',serif;font-size:1.2rem;margin-bottom:.35rem;}
+.contact-card h2{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.2rem;margin-bottom:.35rem;}
 .contact-card>p{font-size:.82rem;color:var(--soft);margin-bottom:1.2rem;line-height:1.7;}
 .confirm-row{display:flex;gap:.45rem;font-size:.82rem;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid #f0f0f0;}
 .confirm-label{font-weight:700;min-width:75px;color:var(--soft);}
@@ -511,7 +518,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 /* 生年月日からの分析（美しく整頓・バッジ分け） */
 .animal-result{border:3px solid var(--lav);background:linear-gradient(135deg,#fcf5ff,#f0f8ff);padding:1.5rem 1.2rem;}
 .animal-result .rc-reason-label{color:#fff;background:var(--lav);display:inline-block;padding:0.3rem 0.8rem;border-radius:20px;font-size:.75rem;text-align:center;margin-bottom:1rem;letter-spacing:.05em;}
-.animal-name-large{font-size:1.55rem;font-weight:900;color:var(--pta);margin-bottom:0.4rem;text-align:center;font-family:'Kaisei Decol',serif;}
+.animal-name-large{font-size:1.55rem;font-weight:900;color:var(--pta);margin-bottom:0.4rem;text-align:center;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;}
 .animal-group-badge{display:table;margin:0 auto 1.2rem;font-size:0.75rem;font-weight:700;color:var(--lav);background:#f3e8ff;padding:0.2rem 0.8rem;border-radius:30px;border:1px solid #d8b4fe;}
 .animal-prop-box{background:#fff;border-radius:12px;padding:1rem;margin-bottom:.6rem;box-shadow:0 4px 12px rgba(0,0,0,0.04);border-left:4px solid var(--lav);}
 .animal-prop-title{font-size:.75rem;color:var(--lav);font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem;}
@@ -525,7 +532,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 .dream-concept-card{background:linear-gradient(135deg,#0c4a6e,#1a4a8a,#312e81);border-radius:22px;padding:1.5rem;margin-bottom:.8rem;color:#fff;text-align:center;overflow:hidden;position:relative;}
 .concept-emoji-row{display:flex;align-items:center;justify-content:center;gap:.4rem;font-size:1.6rem;margin-bottom:.9rem;}
 .concept-arrow{font-size:.9rem;opacity:.6;}
-.concept-title{font-family:'Kaisei Decol',serif;font-size:1.15rem;margin-bottom:.55rem;}
+.concept-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.15rem;margin-bottom:.55rem;}
 .concept-body{font-size:.86rem;line-height:2;opacity:.95;}
 .concept-highlight{display:inline-block;background:rgba(251,191,36,.25);border:1px solid rgba(251,191,36,.55);border-radius:6px;padding:.05rem .4rem;color:#fbbf24;font-weight:700;}
 
@@ -543,7 +550,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 /* ガイドカード */
 .guide-card{background:linear-gradient(135deg,#fff7ed,#fef3c7);border-radius:18px;padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.8rem;border:2px solid var(--gold);}
 .guide-label{font-size:.75rem;color:#b45309;font-weight:700;margin-bottom:.5rem;}
-.guide-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
+.guide-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
 .guide-body{font-size:.88rem;line-height:2.1;color:var(--ink);}
 
 /* キャラクター（画面1用 旧スタイル） */
@@ -554,7 +561,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* 夢候補カード（ルートC）*/
 .dream-candidates{margin-bottom:.9rem;}
-.dc-title{font-family:'Kaisei Decol',serif;font-size:.95rem;color:var(--pta);margin-bottom:.6rem;}
+.dc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.95rem;color:var(--pta);margin-bottom:.6rem;}
 .dc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.5rem;}
 .dc-card{background:#fff;border-radius:14px;padding:.8rem .65rem;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:all .2s;border:2px solid transparent;}
 .dc-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12);}
@@ -585,7 +592,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* 偉人 */
 .hero-section{margin-bottom:.9rem;}
-.hero-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
+.hero-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.97rem;color:var(--pta);margin-bottom:.55rem;}
 .hero-grid{display:grid;gap:.65rem;}
 .hero-card{background:#fff;border-radius:18px;padding:1rem;box-shadow:var(--shadow);}
 .hero-name{font-weight:700;font-size:.92rem;margin-bottom:.18rem;display:flex;align-items:center;gap:.38rem;}
@@ -595,7 +602,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* 自分で書く */
 .writing-card{background:linear-gradient(135deg,#ecfeff,#f0fdf4);border:2px solid var(--mint);border-radius:22px;padding:1.4rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
-.writing-title{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:var(--pta);margin-bottom:.35rem;}
+.writing-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;color:var(--pta);margin-bottom:.35rem;}
 .writing-sub{font-size:.8rem;color:var(--soft);margin-bottom:.9rem;line-height:1.8;}
 .mode-tabs{display:none;} /* 不要なタブを非表示に */
 
@@ -609,7 +616,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* ── カード全体 ── */
 .writing-card{background:linear-gradient(160deg,#f0fdf4 0%,#ecfeff 50%,#f5f3ff 100%);border:2px solid var(--mint);border-radius:24px;padding:1.4rem 1.2rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
-.writing-title{font-family:'Kaisei Decol',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.2rem;}
+.writing-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.2rem;}
 .writing-sub{font-size:.78rem;color:var(--soft);margin-bottom:1rem;line-height:1.8;}
 
 /* ── 例文ボックス ── */
@@ -679,7 +686,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* 感想 */
 .kansou-card{background:#fff;border-radius:18px;padding:1.2rem;box-shadow:var(--shadow);margin-bottom:.9rem;}
-.kansou-title{font-family:'Kaisei Decol',serif;font-size:.97rem;color:var(--pta);margin-bottom:.4rem;}
+.kansou-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.97rem;color:var(--pta);margin-bottom:.4rem;}
 
 /* アクション */
 .result-actions{display:flex;flex-direction:column;gap:.65rem;margin-top:1rem;}
@@ -702,12 +709,12 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 .doc-bar-btn.secondary:hover{background:var(--pta);color:#fff;}
 .doc-paper{background:#fff;max-width:620px;margin:0 auto;padding:2.5rem 2.2rem;border-radius:4px;box-shadow:0 4px 24px rgba(0,0,0,.15);}
 .doc-header{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:3px double var(--pta);}
-.doc-title{font-family:'Kaisei Decol',serif;font-size:1.7rem;color:var(--pta);margin-bottom:.4rem;}
+.doc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.7rem;color:var(--pta);margin-bottom:.4rem;}
 .doc-sub{font-size:.78rem;color:var(--soft);margin-bottom:.4rem;}
 .doc-badge{display:inline-block;background:var(--pta);color:#fff;padding:.2rem .9rem;border-radius:20px;font-size:.7rem;}
 .doc-section{margin-bottom:1.4rem;}
 .doc-section-title{font-size:.68rem;font-weight:700;color:var(--soft);letter-spacing:.12em;margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid #e0e0e0;text-transform:uppercase;}
-.doc-career-name{font-family:'Kaisei Decol',serif;font-size:1.35rem;color:var(--pta);}
+.doc-career-name{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.35rem;color:var(--pta);}
 .doc-guide-box{background:#fffbeb;border-left:4px solid var(--gold);padding:.8rem 1rem;border-radius:0 10px 10px 0;font-size:.84rem;line-height:2;}
 .doc-dream-box{background:linear-gradient(135deg,#f0fdf4,#ecfeff);border:2px solid var(--mint);border-radius:12px;padding:1rem 1.2rem;font-size:.95rem;line-height:2.1;min-height:70px;white-space:pre-wrap;}
 .doc-kansou-box{background:#f8f9ff;border-radius:12px;padding:1rem 1.2rem;font-size:.87rem;line-height:2;min-height:60px;color:var(--soft);white-space:pre-wrap;}
@@ -723,7 +730,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 
 /* お問い合わせ */
 .contact-card{background:var(--white);border-radius:22px;padding:1.6rem;box-shadow:var(--shadow);}
-.contact-card h2{font-family:'Kaisei Decol',serif;font-size:1.2rem;margin-bottom:.35rem;}
+.contact-card h2{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.2rem;margin-bottom:.35rem;}
 .contact-card>p{font-size:.82rem;color:var(--soft);margin-bottom:1.2rem;line-height:1.7;}
 .confirm-row{display:flex;gap:.45rem;font-size:.82rem;margin-bottom:.45rem;padding-bottom:.45rem;border-bottom:1px solid #f0f0f0;}
 .confirm-label{font-weight:700;min-width:75px;color:var(--soft);}
@@ -754,21 +761,21 @@ footer a:hover{text-decoration:underline;}
 .finish-card{background:rgba(255,255,255,.1);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:28px;padding:2rem 1.5rem;max-width:460px;width:100%;text-align:center;color:#fff;margin-bottom:1.5rem;position:relative;z-index:1;}
 .finish-emoji{font-size:3.5rem;display:block;margin-bottom:.8rem;animation:popIn .5s ease;}
 @keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
-.finish-title{font-family:'Kaisei Decol',serif;font-size:1.8rem;font-weight:900;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#fbbf24 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.finish-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.8rem;font-weight:900;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#fbbf24 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .finish-sub{font-size:.9rem;opacity:.85;margin-bottom:1.5rem;line-height:1.8;}
 .finish-doc-wrap{background:rgba(255,255,255,.95);border-radius:20px;padding:1.5rem;color:#1a1a2e;margin-bottom:1.2rem;text-align:left;box-shadow:0 8px 32px rgba(0,0,0,.2);max-width:460px;width:100%;position:relative;z-index:1;}
-.finish-doc-title{font-family:'Kaisei Decol',serif;font-size:1.1rem;color:#1a4a8a;margin-bottom:.8rem;text-align:center;}
+.finish-doc-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;color:#1a4a8a;margin-bottom:.8rem;text-align:center;}
 .finish-doc-label{font-size:.66rem;color:#6b7280;font-weight:700;letter-spacing:.1em;margin-bottom:.3rem;}
 .finish-doc-value{font-size:.9rem;color:#1a1a2e;line-height:1.9;margin-bottom:.9rem;padding-left:.5rem;border-left:3px solid #fbbf24;white-space:pre-wrap;}
-.finish-thank{font-family:'Kaisei Decol',serif;font-size:1rem;margin-bottom:1.5rem;line-height:1.9;opacity:.95;text-align:center;position:relative;z-index:1;color:#fff;max-width:460px;}
+.finish-thank{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1rem;margin-bottom:1.5rem;line-height:1.9;opacity:.95;text-align:center;position:relative;z-index:1;color:#fff;max-width:460px;}
 .finish-actions{display:flex;flex-direction:column;gap:.8rem;width:100%;max-width:280px;position:relative;z-index:1;}
-.finish-btn-save{padding:.9rem;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50px;color:#fff;font-family:'Kaisei Decol',serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;}
+.finish-btn-save{padding:.9rem;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.6);border-radius:50px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .25s;}
 .finish-btn-save:hover{background:rgba(255,255,255,.35);}
 .finish-btn-restart{padding:.9rem;background:transparent;border:1.5px solid rgba(255,255,255,.35);border-radius:50px;color:rgba(255,255,255,.75);font-family:inherit;font-size:.85rem;cursor:pointer;transition:all .25s;}
 .finish-btn-restart:hover{border-color:rgba(255,255,255,.7);color:#fff;}
 
 /* 終わりボタン */
-.btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
+.btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
 .btn-finish:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(251,191,36,.5);}
 </style>
 </head>
@@ -1273,7 +1280,7 @@ footer a:hover{text-decoration:underline;}
 const GAS_URL='https://script.google.com/macros/s/AKfycbyGe-GLAYQvgLp24RhajYoOKk2laNhmfOM15au3ODfM1c2hYzaYQZj5beWQTUWqC8Lgmg/exec';
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v21';
+const APP_VERSION='v22';
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
 //   新方式の publishable key（sb_publishable_…）でも旧方式の anon public key（eyJ…）でも可。
@@ -1361,6 +1368,8 @@ async function initApp(){
     init.classList.remove('show');
     document.getElementById('scGrade').classList.add('active');
     updateProgress('scGrade');
+    const badge=document.getElementById('srcBadge');
+    if(badge)badge.textContent=`${APP_VERSION}・${DATA_SOURCE||'—'}`;
   }catch(err){
     const msg=(err&&err.message)||String(err);
     init.classList.add('show');
@@ -2689,5 +2698,6 @@ function fullReset(){
   show('scGrade');
 }
 </script>
+  <div id="srcBadge" style="position:fixed;right:6px;bottom:6px;font-size:.6rem;color:#94a3b8;background:rgba(255,255,255,.72);padding:2px 8px;border-radius:8px;z-index:40;pointer-events:none;letter-spacing:.02em"></div>
 </body>
 </html>
