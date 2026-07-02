@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夢プロジェクト｜小学5〜6年生</title>
+<meta name="description" content="交野市PTA協議会 夢プロジェクト">
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --deep:#0b1e3a;--deep2:#071528;--sky:#0ea5e9;--mint:#22d3ee;
+  --gold:#fcd34d;--gold-soft:#fde68a;--ink:#f8fafc;
+  --soft:rgba(248,250,252,.74);--mute:rgba(248,250,252,.46);
+  --line:rgba(255,255,255,.13);
+  --font-round:'Zen Maru Gothic','Hiragino Maru Gothic ProN','ヒラギノ丸ゴ ProN W4','BIZ UDGothic','Meiryo',sans-serif;
+  --font-serif:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:var(--font-round);background:var(--deep2);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;line-height:1.8;
+  text-wrap:pretty;word-break:normal;overflow-wrap:break-word;line-break:strict;}
+
+/* 夜空の背景（固定・全面・薄い星のみ。主役の星座はヒーロー内SVG） */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 130% 90% at 50% -10%,#14335c 0%,transparent 58%),radial-gradient(ellipse at bottom,#0b1e3a 0%,#050e1c 72%);}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;}
+.stars::before,.stars::after{content:'';position:absolute;inset:-10% 0;background-repeat:repeat;background-size:100% 100%;
+  background-image:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 27% 42%,rgba(255,255,255,.8),transparent),radial-gradient(1.5px 1.5px at 41% 12%,#fff,transparent),radial-gradient(1px 1px at 55% 62%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 68% 28%,#fff,transparent),radial-gradient(1.5px 1.5px at 79% 52%,rgba(255,255,255,.85),transparent),radial-gradient(1px 1px at 88% 76%,#fff,transparent),radial-gradient(1px 1px at 8% 68%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 33% 82%,#fff,transparent),radial-gradient(1.5px 1.5px at 61% 88%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 92% 34%,#fff,transparent),radial-gradient(1px 1px at 18% 92%,rgba(255,255,255,.65),transparent);}
+.stars::after{animation:twinkle 5s ease-in-out infinite alternate;opacity:.5;
+  background-image:radial-gradient(1px 1px at 22% 26%,#fff,transparent),radial-gradient(1px 1px at 48% 38%,rgba(255,255,255,.8),transparent),radial-gradient(1.5px 1.5px at 73% 20%,#fff,transparent),radial-gradient(1px 1px at 84% 64%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 15% 54%,#fff,transparent),radial-gradient(1px 1px at 58% 74%,rgba(255,255,255,.7),transparent);}
+@keyframes twinkle{from{opacity:.3;}to{opacity:.7;}}
+
+/* 流れ星（背景・固定レイヤー） */
+.meteor{position:fixed;width:2px;height:66px;border-radius:2px;z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.85));animation:meteor linear infinite;}
+.meteor:nth-child(1){left:16%;top:-66px;animation-duration:3.4s;animation-delay:.8s;}
+.meteor:nth-child(2){left:62%;top:-66px;animation-duration:4.6s;animation-delay:2.8s;}
+.meteor:nth-child(3){left:84%;top:-66px;animation-duration:3.9s;animation-delay:5.2s;}
+@keyframes meteor{from{transform:translateY(0) translateX(0) rotate(18deg);opacity:1;}to{transform:translateY(112vh) translateX(-38px) rotate(18deg);opacity:0;}}
+
+/* ページ本体の枠 */
+.wrap{position:relative;z-index:3;width:100%;max-width:680px;margin:0 auto;
+  padding:2.4rem 1.5rem 3rem;min-height:100vh;display:flex;flex-direction:column;}
+
+/* 星座ヒーロー（スクロールで一緒に流れる＝固定しない） */
+.polaris-single{width:100%;max-width:120px;margin:0 auto 1.4rem;display:block;}
+.polaris-core{fill:#fff;}
+.polaris-glow{fill:var(--gold);filter:drop-shadow(0 0 6px rgba(252,211,77,.9));}
+@keyframes polarisPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.85;transform:scale(1.18);}}
+.polaris-pulse{transform-box:fill-box;transform-origin:center;animation:polarisPulse 3.4s ease-in-out infinite;}
+
+.badge{display:inline-block;margin:0 auto 1.2rem;background:rgba(252,211,77,.12);border:1.5px solid rgba(252,211,77,.4);color:var(--gold-soft);font-size:.72rem;font-weight:700;padding:.35rem 1.05rem;border-radius:30px;letter-spacing:.08em;animation:fadeDown .8s ease both;}
+.serif{font-family:var(--font-serif);}
+.accent{background:linear-gradient(135deg,#fff 0%,var(--gold) 55%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+footer{position:relative;z-index:3;text-align:center;padding:1.6rem 1rem;font-size:.7rem;color:var(--mute);border-top:1px solid rgba(255,255,255,.08);}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@media(prefers-reduced-motion:reduce){.stars::after,.polaris-pulse,.meteor{animation:none!important;}[class*="fade"]{animation:none!important;}}
+
+/* 改行制御：br-spはスマホのみ改行、br-pcはタブレット以上のみ改行 */
+.br-sp{display:none;}
+.br-pc{display:inline;}
+@media(max-width:600px){
+  .br-sp{display:inline;}
+  .br-pc{display:none;}
+}
+
+
+.wrap{max-width:640px;}
+.back{align-self:flex-start;display:inline-flex;align-items:center;gap:.35rem;
+  color:var(--mute);font-size:.82rem;text-decoration:none;margin-bottom:1rem;
+  transition:color .2s;animation:fadeDown .6s ease both;}
+.back:hover,.back:focus-visible{color:var(--soft);outline:none;}
+.hero{text-align:center;margin-bottom:2rem;animation:fadeDown .8s .05s ease both;}
+.polaris-single{max-width:100px;margin:0 auto 1rem;}
+.kicker{font-size:clamp(.74rem,2.3vw,.82rem);color:var(--gold-soft);
+  letter-spacing:.1em;margin-bottom:.7rem;font-weight:700;}
+.hero h1{font-family:var(--font-serif);font-weight:900;line-height:1.45;
+  font-size:clamp(1.5rem,5.2vw,2.15rem);}
+.hero .sub{margin:.95rem auto 0;color:var(--soft);line-height:2;
+  font-size:clamp(.9rem,2.6vw,1.02rem);max-width:32ch;}
+
+.step{margin-bottom:1.7rem;animation:fadeUp .8s ease both;}
+.step.s1{animation-delay:.2s;}.step.s2{animation-delay:.4s;}
+.step-label{display:flex;align-items:center;gap:.6rem;margin:0 0 .85rem;
+  font-weight:700;font-size:clamp(1rem,2.9vw,1.08rem);line-height:1.5;}
+.step-num{display:inline-flex;align-items:center;justify-content:center;
+  width:1.85rem;height:1.85rem;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--sky),var(--mint));
+  color:#04121f;font-size:.95rem;font-weight:900;}
+.card{background:rgba(255,255,255,.055);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:20px;padding:1.3rem;}
+
+.video-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;
+  overflow:hidden;background:linear-gradient(135deg,#0c2038,#1a3a5c);
+  border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;transition:transform .2s;}
+.video-frame:hover{transform:scale(1.01);}
+.video-frame .play{width:60px;height:60px;border-radius:50%;background:rgba(252,211,77,.92);
+  display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(0,0,0,.4);transition:transform .2s;}
+.video-frame:hover .play{transform:scale(1.08);}
+.video-frame .play::after{content:'';border-style:solid;border-width:11px 0 11px 18px;
+  border-color:transparent transparent transparent #04121f;margin-left:4px;}
+.video-frame .ph-note{position:absolute;bottom:9px;left:0;right:0;text-align:center;
+  font-size:.72rem;color:rgba(255,255,255,.55);padding:0 .5rem;}
+.video-frame .badge-soon{position:absolute;top:9px;left:9px;background:rgba(0,0,0,.45);
+  color:var(--gold-soft);font-size:.66rem;padding:.2rem .55rem;border-radius:6px;letter-spacing:.05em;}
+.video-cap{margin-top:.85rem;font-size:.86rem;color:var(--soft);line-height:1.8;text-align:center;}
+.video-note{margin-top:.45rem;font-size:.76rem;color:var(--mute);line-height:1.7;text-align:center;}
+
+.go-navi{display:flex;align-items:center;justify-content:center;gap:.65rem;width:100%;
+  background:linear-gradient(135deg,var(--sky),var(--mint));color:#04121f;
+  font-family:var(--font-serif);font-weight:700;font-size:clamp(1.05rem,3.4vw,1.22rem);
+  padding:1.1rem 1rem;border:none;border-radius:16px;cursor:pointer;text-decoration:none;
+  box-shadow:0 8px 26px rgba(14,165,233,.35);transition:transform .2s,box-shadow .2s;line-height:1.4;}
+.go-navi:hover,.go-navi:focus-visible{transform:translateY(-3px);
+  box-shadow:0 12px 32px rgba(14,165,233,.5);outline:none;}
+.go-navi .ico{font-size:1.25rem;flex-shrink:0;}
+.skip-note{text-align:center;font-size:.8rem;color:var(--mute);
+  margin-top:.85rem;line-height:1.8;max-width:34ch;margin-left:auto;margin-right:auto;}
+
+ruby rt{font-size:.5em;color:var(--gold-soft);font-weight:400;letter-spacing:0;}
+
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars"></div>
+<div class="meteor"></div><div class="meteor"></div><div class="meteor"></div>
+<main class="wrap">
+  <a class="back" href="entry.html">← 学年を選びなおす</a>
+  <div class="hero">
+    <svg class="polaris-single" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="北極星">
+      <g class="polaris-pulse">
+        <circle class="polaris-glow" cx="50" cy="50" r="14" opacity=".3"/>
+        <circle class="polaris-glow" cx="50" cy="50" r="8"/>
+        <circle class="polaris-core" cx="50" cy="50" r="4"/>
+      </g>
+      <path d="M50,28 L50,72 M28,50 L72,50" stroke="rgba(253,230,138,.6)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+
+    <div class="kicker">🌿 小学５・６年生のみなさんへ</div>
+    <h1>夢の正体を、見つけにいこう。</h1>
+    <p class="sub">動画を見てから、夢ナビで自分の夢を探してみよう。「なりたい仕事」の、その先にある想いに気づけるかもしれません。</p>
+  </div>
+
+  <div class="step s1">
+    <div class="step-label"><span class="step-num">1</span>動画を見てみよう（10分）</div>
+    <div class="card">
+      <!-- ▼▼▼ 動画エリア（VIDEO_SRC を書き換えるだけで差し替わります。詳細は別紙手順書）▼▼▼ -->
+      <div class="video-frame" id="videoFrame">
+        <span class="badge-soon" id="soonBadge">準備中</span>
+        <span class="play" aria-hidden="true"></span>
+        <span class="ph-note">ここに動画が入ります</span>
+      </div>
+      <script>
+        /* ★動画差し替え：下の "" に動画ファイル名かURLを入れる。例）"video-low.mp4" */
+        const VIDEO_SRC = "";
+        (function(){
+          if(VIDEO_SRC){
+            var f=document.getElementById('videoFrame');
+            f.innerHTML='<video controls playsinline preload="metadata" '
+              +'style="width:100%;height:100%;object-fit:contain;background:#000" '
+              +'src="'+VIDEO_SRC+'"></video>';
+            f.style.cursor='default';
+          }
+        })();
+      </script>
+      <!-- ▲▲▲ 動画エリアここまで ▲▲▲ -->
+      <p class="video-cap">短い動画に、夢を考えるヒントが詰まっています。</p>
+      <p class="video-note">見られないときは、おうちの人に相談してね。</p>
+    </div>
+  </div>
+
+  <div class="step s2">
+    <div class="step-label"><span class="step-num">2</span>夢ナビをやってみよう</div>
+    <div class="card">
+      <a class="go-navi" href="yume-navi-v22.html?from=es"><span class="ico">🚀</span><span>夢ナビをはじめる</span></a>
+      <p class="skip-note">質問に答えていくと、あなたの夢の正体が見えてきます。</p>
+    </div>
+  </div>
+</main>
+<footer>交野市PTA協議会　夢プロジェクト実行委員会</footer>
+</body>
+</html>

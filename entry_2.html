@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>夢プロジェクト｜交野市PTA協議会</title>
+<meta name="description" content="交野市PTA協議会 夢プロジェクト。夢の正体を、一緒に探そう。">
+<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --deep:#0b1e3a;--deep2:#071528;--sky:#0ea5e9;--mint:#22d3ee;
+  --gold:#fcd34d;--gold-soft:#fde68a;--ink:#f8fafc;
+  --soft:rgba(248,250,252,.74);--mute:rgba(248,250,252,.46);
+  --line:rgba(255,255,255,.13);
+  --font-round:'Zen Maru Gothic','Hiragino Maru Gothic ProN','ヒラギノ丸ゴ ProN W4','BIZ UDGothic','Meiryo',sans-serif;
+  --font-serif:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{font-family:var(--font-round);background:var(--deep2);color:var(--ink);
+  min-height:100vh;overflow-x:hidden;line-height:1.8;
+  text-wrap:pretty;word-break:normal;overflow-wrap:break-word;line-break:strict;}
+
+/* 夜空の背景（固定・全面・薄い星のみ。主役の星座はヒーロー内SVG） */
+.sky{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 130% 90% at 50% -10%,#14335c 0%,transparent 58%),radial-gradient(ellipse at bottom,#0b1e3a 0%,#050e1c 72%);}
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7;}
+.stars::before,.stars::after{content:'';position:absolute;inset:-10% 0;background-repeat:repeat;background-size:100% 100%;
+  background-image:radial-gradient(1px 1px at 12% 18%,#fff,transparent),radial-gradient(1px 1px at 27% 42%,rgba(255,255,255,.8),transparent),radial-gradient(1.5px 1.5px at 41% 12%,#fff,transparent),radial-gradient(1px 1px at 55% 62%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 68% 28%,#fff,transparent),radial-gradient(1.5px 1.5px at 79% 52%,rgba(255,255,255,.85),transparent),radial-gradient(1px 1px at 88% 76%,#fff,transparent),radial-gradient(1px 1px at 8% 68%,rgba(255,255,255,.6),transparent),radial-gradient(1px 1px at 33% 82%,#fff,transparent),radial-gradient(1.5px 1.5px at 61% 88%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 92% 34%,#fff,transparent),radial-gradient(1px 1px at 18% 92%,rgba(255,255,255,.65),transparent);}
+.stars::after{animation:twinkle 5s ease-in-out infinite alternate;opacity:.5;
+  background-image:radial-gradient(1px 1px at 22% 26%,#fff,transparent),radial-gradient(1px 1px at 48% 38%,rgba(255,255,255,.8),transparent),radial-gradient(1.5px 1.5px at 73% 20%,#fff,transparent),radial-gradient(1px 1px at 84% 64%,rgba(255,255,255,.7),transparent),radial-gradient(1px 1px at 15% 54%,#fff,transparent),radial-gradient(1px 1px at 58% 74%,rgba(255,255,255,.7),transparent);}
+@keyframes twinkle{from{opacity:.3;}to{opacity:.7;}}
+
+/* 流れ星（背景・固定レイヤー） */
+.meteor{position:fixed;width:2px;height:66px;border-radius:2px;z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.85));animation:meteor linear infinite;}
+.meteor:nth-child(1){left:16%;top:-66px;animation-duration:3.4s;animation-delay:.8s;}
+.meteor:nth-child(2){left:62%;top:-66px;animation-duration:4.6s;animation-delay:2.8s;}
+.meteor:nth-child(3){left:84%;top:-66px;animation-duration:3.9s;animation-delay:5.2s;}
+@keyframes meteor{from{transform:translateY(0) translateX(0) rotate(18deg);opacity:1;}to{transform:translateY(112vh) translateX(-38px) rotate(18deg);opacity:0;}}
+
+/* ページ本体の枠 */
+.wrap{position:relative;z-index:3;width:100%;max-width:680px;margin:0 auto;
+  padding:2.4rem 1.5rem 3rem;min-height:100vh;display:flex;flex-direction:column;}
+
+/* 星座ヒーロー（スクロールで一緒に流れる＝固定しない） */
+.polaris-single{width:100%;max-width:120px;margin:0 auto 1.4rem;display:block;}
+.polaris-core{fill:#fff;}
+.polaris-glow{fill:var(--gold);filter:drop-shadow(0 0 6px rgba(252,211,77,.9));}
+@keyframes polarisPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.85;transform:scale(1.18);}}
+.polaris-pulse{transform-box:fill-box;transform-origin:center;animation:polarisPulse 3.4s ease-in-out infinite;}
+
+.badge{display:inline-block;margin:0 auto 1.2rem;background:rgba(252,211,77,.12);border:1.5px solid rgba(252,211,77,.4);color:var(--gold-soft);font-size:.72rem;font-weight:700;padding:.35rem 1.05rem;border-radius:30px;letter-spacing:.08em;animation:fadeDown .8s ease both;}
+.serif{font-family:var(--font-serif);}
+.accent{background:linear-gradient(135deg,#fff 0%,var(--gold) 55%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+footer{position:relative;z-index:3;text-align:center;padding:1.6rem 1rem;font-size:.7rem;color:var(--mute);border-top:1px solid rgba(255,255,255,.08);}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@media(prefers-reduced-motion:reduce){.stars::after,.polaris-pulse,.meteor{animation:none!important;}[class*="fade"]{animation:none!important;}}
+
+/* 改行制御：br-spはスマホのみ改行、br-pcはタブレット以上のみ改行 */
+.br-sp{display:none;}
+.br-pc{display:inline;}
+@media(max-width:600px){
+  .br-sp{display:inline;}
+  .br-pc{display:none;}
+}
+
+
+.hero{text-align:center;margin-bottom:.5rem;animation:fadeDown .8s ease both;}
+.entry-title{font-family:var(--font-serif);font-weight:900;
+  font-size:clamp(1.75rem,6vw,2.9rem);line-height:1.4;margin:.4rem 0 1rem;}
+.entry-lead{font-size:clamp(.92rem,2.6vw,1.1rem);color:var(--soft);
+  line-height:2;max-width:30ch;margin:0 auto .5rem;}
+.entry-org{font-size:.78rem;color:var(--mute);letter-spacing:.08em;margin-bottom:2.4rem;}
+.q{font-family:var(--font-serif);font-size:clamp(1rem,3vw,1.2rem);
+  color:var(--gold-soft);text-align:center;margin-bottom:1.3rem;animation:fadeUp .8s .3s ease both;}
+.grades{display:flex;flex-direction:column;gap:1rem;
+  max-width:460px;margin:0 auto;width:100%;animation:fadeUp .8s .4s ease both;}
+.grade-btn{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1rem;
+  width:100%;text-align:left;background:rgba(255,255,255,.055);backdrop-filter:blur(10px);
+  border:1px solid var(--line);border-radius:20px;padding:1.15rem 1.4rem;
+  cursor:pointer;text-decoration:none;color:var(--ink);min-height:74px;
+  transition:transform .2s,border-color .2s,background .2s;}
+.grade-btn:hover,.grade-btn:focus-visible{transform:translateY(-3px);
+  border-color:rgba(252,211,77,.55);background:rgba(255,255,255,.09);outline:none;}
+.grade-btn .emoji{font-size:1.9rem;width:2.4rem;text-align:center;}
+.grade-btn .main{display:block;font-size:clamp(1rem,2.8vw,1.14rem);font-weight:700;margin-bottom:.35rem;}
+.grade-btn .sub{display:block;font-size:clamp(.76rem,2.1vw,.85rem);color:var(--soft);line-height:1.7;}
+.grade-btn .arrow{font-size:1.15rem;color:var(--gold-soft);opacity:.7;transition:transform .2s;}
+.grade-btn:hover .arrow{transform:translateX(4px);opacity:1;}
+
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars"></div>
+<div class="meteor"></div><div class="meteor"></div><div class="meteor"></div>
+<main class="wrap">
+  <div class="hero">
+    <svg class="polaris-single" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="北極星">
+      <g class="polaris-pulse">
+        <circle class="polaris-glow" cx="50" cy="50" r="14" opacity=".3"/>
+        <circle class="polaris-glow" cx="50" cy="50" r="8"/>
+        <circle class="polaris-core" cx="50" cy="50" r="4"/>
+      </g>
+      <path d="M50,28 L50,72 M28,50 L72,50" stroke="rgba(253,230,138,.6)" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+
+    <span class="badge">🌟 2026年 夏休み 特別企画</span>
+    <h1 class="entry-title">夢の正体を、<br><span class="accent">一緒に探そう。</span></h1>
+    <p class="entry-lead">「なりたい仕事」の、その先にある想い。それが、あなたの夢の正体かもしれません。</p>
+    <p class="entry-org">交野市PTA協議会　夢プロジェクト</p>
+  </div>
+
+  <p class="q">まず、あなたのことを教えてください。</p>
+  <nav class="grades">
+    <a class="grade-btn" href="low.html">
+      <span class="emoji">🌱</span>
+      <span><span class="main">小学１・２・３・４年生</span><span class="sub">おうちの人と<br class="br-pc">いっしょに どうぞ</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="grade-btn" href="mid.html">
+      <span class="emoji">🌿</span>
+      <span><span class="main">小学５・６年生</span><span class="sub">じっくり自分と<br class="br-pc">向き合ってみよう</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="grade-btn" href="jh.html">
+      <span class="emoji">🌌</span>
+      <span><span class="main">中学生・大人</span><span class="sub">これからの自分を、<br class="br-pc">描いてみよう</span></span>
+      <span class="arrow">→</span>
+    </a>
+  </nav>
+</main>
+<footer>交野市PTA協議会　夢プロジェクト実行委員会</footer>
+</body>
+</html>
