@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <!-- ═══════════════════════════════════════════════════════
-  夢ナビ v22（2026-07-02）交野市PTA協議会 夢プロジェクト
+  夢ナビ v23（2026-07-02）交野市PTA協議会 夢プロジェクト
+  【v23 変更点】マスタv2.5.0対応＋夢の正体UI全面改修＋iPad保存対応。
+  1. 結合文テンプレ再設計: Q2＝『ありがとうの言葉』を言ってもらう構文（マスタguides優先・本ファイルはフォールバック）
+  2. プレビューを画面上部にsticky固定: 3つの質問のどれを書いていても結合文が見え、編集中スロットが黄色く光る
+  3. 入力が終わった質問は自動で折りたたみ（タップで再展開）
+  4. 自由編集はテキストエリアに一本化。手動編集後は自動上書きせず「つくり直す」で復帰
+  5. iPad対応の画像保存: 生成画像を大きく表示し「長押し→"写真"に追加」を案内（PCはダウンロードボタン）
+  ─ 以下 v22 情報 ─
   【v22 変更点】E2E全数テスト（全学年×全ルート×送信×フォールバック 44項目合格）後の仕上げ。
   1. 画面右下にデータ取得元バッジを実装（v19で設計・未実装だった機能）。
      「v22・master.json（静的）」等を小さく表示 → 学校iPadで読み込み経路を現場確認できる。
@@ -778,6 +785,36 @@ footer a:hover{text-decoration:underline;}
 .btn-finish{display:block;width:100%;max-width:280px;margin:1.5rem auto 0;padding:1rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:60px;color:#fff;font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.1rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(251,191,36,.4);transition:all .25s;}
 .btn-finish:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(251,191,36,.5);}
 </style>
+<style>
+/* ═══ v23: 夢の正体UI・画像保存オーバーレイ ═══ */
+.dream-preview-wrap.sticky-live{position:sticky;top:61px;z-index:40;background:linear-gradient(160deg,#f0fdf4 0%,#ecfeff 60%,#f0fdf4 100%);margin:0 -.4rem 1.1rem;padding:.55rem .4rem .8rem;border-top:none!important;border-bottom:2px dashed #cbd5e1;border-radius:0 0 14px 14px;}
+.dream-preview-bubble{cursor:default;}
+.dream-preview-slot.active{background:#fef3c7!important;color:#b45309!important;box-shadow:0 0 0 2px #f59e0b;animation:slotPulse 1.6s ease-in-out infinite;}
+@keyframes slotPulse{0%,100%{box-shadow:0 0 0 2px #f59e0b;}50%{box-shadow:0 0 0 4px rgba(245,158,11,.3);}}
+.dream-step.collapsed{padding:.5rem .9rem .55rem;background:#f8fafc;cursor:pointer;border-color:#d7e3f2;}
+.dream-step.collapsed .dream-step-input,.dream-step.collapsed .dream-hint-area{display:none;}
+.dream-step-ans{margin:.15rem 0 .05rem 2.35rem;font-size:.83rem;color:#065f46;font-weight:700;line-height:1.55;}
+.dream-step.collapsed .dream-step-head{margin-bottom:0;}
+.dream-edit-reset{display:none;margin-top:.45rem;font-size:.74rem;color:var(--ocean);cursor:pointer;text-decoration:underline;}
+.dream-edit-reset.show{display:inline-block;}
+#imgSaveOverlay{position:fixed;inset:0;z-index:9999;background:rgba(10,25,50,.78);display:none;overflow:auto;padding:1rem;-webkit-overflow-scrolling:touch;}
+#imgSaveOverlay.show{display:block;}
+#imgSaveOverlay .sheet{max-width:720px;margin:1.2rem auto 2rem;background:#fff;border-radius:18px;padding:1rem 1rem 1.3rem;}
+#imgSaveOverlay .bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.6rem;}
+#imgSaveOverlay .bar b{font-size:1rem;color:var(--ink);}
+#imgSaveOverlay .close{border:none;background:#eef2f7;border-radius:10px;padding:.45rem .85rem;font-size:.9rem;cursor:pointer;color:var(--ink);}
+#imgSaveOverlay img{width:100%;border:1px solid #dbe3ee;border-radius:10px;display:block;}
+#imgSaveOverlay .howto{margin:.75rem 0 .2rem;background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:.7rem .9rem;font-size:.86rem;line-height:1.85;color:#78350f;}
+#imgSaveOverlay .dl{display:inline-block;margin-top:.6rem;background:var(--ocean);color:#fff;border:none;border-radius:12px;padding:.6rem 1.15rem;font-size:.9rem;cursor:pointer;font-family:inherit;}
+/* v23: 入力欄へスクロールした時、sticky化したプレビューの下に収まるように */
+.dream-step,.dream-step-input{scroll-margin-top:230px;}
+@media(max-width:480px){
+  .dream-preview-wrap.sticky-live{padding:.4rem .3rem .55rem;}
+  .dream-preview-bubble{font-size:.76rem;line-height:1.7;padding:.65rem .75rem;min-height:2.6rem;}
+  .dream-preview-label{font-size:.7rem;}
+  .dream-step,.dream-step-input{scroll-margin-top:200px;}
+}
+</style>
 </head>
 <body>
 
@@ -1133,14 +1170,12 @@ footer a:hover{text-decoration:underline;}
       </div>
 
       <!-- ★ プレビューを先頭に配置 -->
-      <div class="dream-preview-wrap" style="margin-top:0;border-top:none;padding-top:0;margin-bottom:1.2rem;">
+      <div class="dream-preview-wrap sticky-live">
         <div class="dream-preview-label">🌟 あなたの夢の正体を書いてみよう
           <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選んでから書き換えてみてもいいよ！）</span>
         </div>
-        <div class="dream-preview-bubble" id="dreamPreviewBubble" contenteditable="true" oninput="syncOutputFromBubble()"></div>
-        <div class="dream-edit-toggle" onclick="toggleDreamEdit()">
-          <span id="dreamEditToggleIcon">▼</span> 自分で自由に書き直す
-        </div>
+        <div class="dream-preview-bubble" id="dreamPreviewBubble"></div>
+        <!-- v23.1: 自由編集トグルは撤去（dreamOutputは提出同期用に非表示で残す） -->
         <div class="dream-edit-area-wrap" id="dreamEditAreaWrap">
           <textarea class="full-edit-area" id="dreamOutput" placeholder="ここに自由に書けます" style="min-height:100px" oninput="syncPreviewFromOutput()"></textarea>
         </div>
@@ -1156,13 +1191,14 @@ footer a:hover{text-decoration:underline;}
       </div>
 
       <!-- Q1 -->
-      <div class="dream-step" id="dreamStep1">
+      <div class="dream-step" id="dreamStep1" onclick="dreamStepClick(1,event)">
         <div class="dream-step-head">
           <div class="dream-step-badge q1" id="dreamBadge1">1</div>
           <div class="dream-step-question" id="dreamQ1Label">だれをえがおにしたい？</div>
           <div class="dream-step-check" id="dreamCheck1">✅</div>
         </div>
-        <input type="text" class="dream-step-input" id="blank1" placeholder="例：びょうきのひと" oninput="onDreamInput(1)">
+        <div class="dream-step-ans" id="dreamAns1"></div>
+        <input type="text" class="dream-step-input" id="blank1" placeholder="例：びょうきのひと" oninput="onDreamInput(1)" onfocus="dreamFocus(1)">
         <div class="dream-hint-area">
           <div class="dream-hint-label">💡 タップして入れられるヒント</div>
           <div class="dream-hint-chips" id="hintChipsQ1"></div>
@@ -1170,13 +1206,14 @@ footer a:hover{text-decoration:underline;}
       </div>
 
       <!-- Q2 -->
-      <div class="dream-step" id="dreamStep2">
+      <div class="dream-step" id="dreamStep2" onclick="dreamStepClick(2,event)">
         <div class="dream-step-head">
           <div class="dream-step-badge q2" id="dreamBadge2">2</div>
-          <div class="dream-step-question" id="dreamQ2Label">どんなうれしいことを届けたい？</div>
+          <div class="dream-step-question" id="dreamQ2Label">その人に何を届けたい？</div>
           <div class="dream-step-check" id="dreamCheck2">✅</div>
         </div>
-        <input type="text" class="dream-step-input" id="blank2" placeholder="例：元気" oninput="onDreamInput(2)">
+        <div class="dream-step-ans" id="dreamAns2"></div>
+        <input type="text" class="dream-step-input" id="blank2" placeholder="例：元気" oninput="onDreamInput(2)" onfocus="dreamFocus(2)">
         <div class="dream-hint-area">
           <div class="dream-hint-label">💡 タップして入れられるヒント</div>
           <div class="dream-hint-chips" id="hintChipsQ2"></div>
@@ -1184,13 +1221,14 @@ footer a:hover{text-decoration:underline;}
       </div>
 
       <!-- Q3（「仕事を通して」を使わない表現に） -->
-      <div class="dream-step" id="dreamStep3">
+      <div class="dream-step" id="dreamStep3" onclick="dreamStepClick(3,event)">
         <div class="dream-step-head">
           <div class="dream-step-badge q3" id="dreamBadge3">3</div>
-          <div class="dream-step-question" id="dreamQ3Label">どんな社会になってほしい？</div>
+          <div class="dream-step-question" id="dreamQ3Label">どんな世界をつくりたい？</div>
           <div class="dream-step-check" id="dreamCheck3">✅</div>
         </div>
-        <input type="text" class="dream-step-input" id="blank3" placeholder="例：みんなが健康でしあわせな世界" oninput="onDreamInput(3)">
+        <div class="dream-step-ans" id="dreamAns3"></div>
+        <input type="text" class="dream-step-input" id="blank3" placeholder="例：みんなが健康でしあわせな世界" oninput="onDreamInput(3)" onfocus="dreamFocus(3)">
         <div class="dream-hint-area">
           <div class="dream-hint-label">💡 タップして入れられるヒント</div>
           <div class="dream-hint-chips" id="hintChipsQ3"></div>
@@ -1280,7 +1318,8 @@ footer a:hover{text-decoration:underline;}
 const GAS_URL='https://script.google.com/macros/s/AKfycbyGe-GLAYQvgLp24RhajYoOKk2laNhmfOM15au3ODfM1c2hYzaYQZj5beWQTUWqC8Lgmg/exec';
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v22';
+const APP_VERSION='v23';
+// v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
 //   新方式の publishable key（sb_publishable_…）でも旧方式の anon public key（eyJ…）でも可。
@@ -1638,7 +1677,7 @@ function pickRoute(r){
 /* ── ルートA ── */
 function buildRouteA(){
   const g=GRADES.find(x=>x.id===grade);
-  rankingAllList=[...MASTER.careers].filter(c=>c['職業ID']&&c['職業ID']!=='J00200').sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  rankingAllList=[...MASTER.careers].filter(c=>c['職業ID']&&c['職業ID']!=='J00200').sort((a,b)=>(parseInt(b[g.popKey])||0)-(parseInt(a[g.popKey])||0));
   rankingShown=10;renderRanking();
   const ce=document.getElementById('catChips');ce.innerHTML='';catSelected=[];
   MASTER.categories.forEach((c,i)=>{if(!c['カテゴリID']||c['カテゴリID']==='C00099')return;
@@ -1675,8 +1714,8 @@ function toggleCategory(catId,btn){
 }
 function updateCatResults(){
   const g=GRADES.find(x=>x.id===grade);
-  const m=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
-  const r=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&!catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  const m=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(b[g.popKey])||0)-(parseInt(a[g.popKey])||0));
+  const r=MASTER.careers.filter(c=>c['カテゴリID']&&c['職業ID']!=='J00200'&&!catSelected.includes(c['カテゴリID'])).sort((a,b)=>(parseInt(b[g.popKey])||0)-(parseInt(a[g.popKey])||0));
   catResultList=[...m,...r];catResultShown=10;renderCatResult();
 }
 function renderCatResult(){
@@ -1739,9 +1778,9 @@ function toggleValue(vid,btn){
 function updateB2Results(){
   const g=GRADES.find(x=>x.id===grade);const sc={};
   selectedValueIds.forEach(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);if(!v)return;(v['関連職業IDs']||'').split('|').filter(Boolean).forEach(cid=>{sc[cid]=(sc[cid]||0)+1;});});
-  b2List=MASTER.careers.filter(c=>sc[c['職業ID']]).sort((a,b)=>{const sa=sc[a['職業ID']]||0,sb=sc[b['職業ID']]||0;if(sb!==sa)return sb-sa;return(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999);});
+  b2List=MASTER.careers.filter(c=>sc[c['職業ID']]).sort((a,b)=>{const sa=sc[a['職業ID']]||0,sb=sc[b['職業ID']]||0;if(sb!==sa)return sb-sa;return(parseInt(b[g.popKey])||0)-(parseInt(a[g.popKey])||0);});
   const mid=b2List.map(c=>c['職業ID']);
-  const rest=MASTER.careers.filter(c=>c['職業ID']&&c['職業ID']!=='J00200'&&!mid.includes(c['職業ID'])).sort((a,b)=>(parseInt(a[g.popKey])||999)-(parseInt(b[g.popKey])||999));
+  const rest=MASTER.careers.filter(c=>c['職業ID']&&c['職業ID']!=='J00200'&&!mid.includes(c['職業ID'])).sort((a,b)=>(parseInt(b[g.popKey])||0)-(parseInt(a[g.popKey])||0));
   b2List=[...b2List,...rest];b2Shown=10;renderB2List();
 }
 function renderB2List(){
@@ -2167,34 +2206,36 @@ function toggleAcc(id){
    全学年共通の「名詞句契約」：Q1=人（名詞）／Q2=届けるもの（名詞）／Q3=〜社会・世界（名詞句）
    ※マスタ「夢の正体ガイド」の文型テンプレが優先。以下は同一内容のフォールバック。 */
 const DREAM_TEMPLATES = {
-  s1: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}に なることを もくひょうに しています。',
-  s2: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}に なることを もくひょうに しています。',
-  s3: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}になることを目標にしています。',
-  s4: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}になることを目標にしています。',
-  s5: '私の夢は、{Q1}に{Q2}を届けて、{Q3}の実現に貢献することです！！\nその夢のために、今は{職業}として活躍することを目標にしています。',
-  s6: '私の夢は、{Q1}に{Q2}を届けて、{Q3}の実現に貢献することです！！\nその夢のために、今は{職業}として活躍することを目標にしています。',
-  m1: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標にしています。',
-  m2: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献することです！！\nその夢に近づくために、今は{職業}として活躍することを一つの目標にしています。',
-  m3: '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献していくことです！！\nその夢に向かう手段として、今は{職業}という仕事に就くことを目標の一つにしています。',
-  g:  '私の夢は、{Q1}に{Q2}を届け、{Q3}の実現に貢献していくことです！！\nその夢の実現に向けた手段として、{職業}という仕事を選び、この道を歩んでいきます。',
+  /* 案X: 夢の本体＝「誰かに喜び・変化を届けて笑顔にする」（企画書P3の2段階表現）。繋ぎ文字は結合時のみ付与 */
+  s1: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、えがおに することです！！\nそのために、いまは {職業}を めざしています。',
+  s2: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、えがおに することです！！\nそのために、いまは {職業}を めざしています。',
+  s3: '私の夢は、{Q1}に {Q2}を届けて、笑顔にすることです！！\nそのために、今は {職業}を目指しています。',
+  s4: '私の夢は、{Q1}に {Q2}を届けて、笑顔にすることです！！\nそのために、今は {職業}を目指しています。',
+  s5: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために今は、{職業}を目指しています。',
+  s6: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために今は、{職業}を目指しています。',
+  m1: '私の夢は、{Q1}に {Q2}を届け、{Q3}をつくることです。\nその夢に近づく手段として、今は{職業}を目指しています。',
+  m2: '私の夢は、{Q1}に {Q2}を届け、{Q3}をつくることです。\nその夢に近づく手段として、今は{職業}を目指しています。',
+  m3: '私の夢は、{Q1}に {Q2}を届け、{Q3}をつくることです。\nその夢に向かう手段の一つとして、今は{職業}という道を考えています。',
+  g:  '私の夢は、{Q1}に {Q2}を届け、{Q3}をつくっていくことです。\nその実現に向けた手段として、{職業}という道を歩んでいきます。',
 };
 
 const DREAM_QUESTIONS = {
-  es_low:{ q1:'だれを えがおに したい？', q2:'どんな うれしいことを とどけたい？', q3:'どんな せかいに なって ほしい？',
-           p1:'例：びょうきの ひと', p2:'例：げんき', p3:'例：みんなが えがおの せかい',
-           d1:'（だれ）', d2:'（とどけたいもの）', d3:'（どんな せかい）' },
-  es_mid:{ q1:'誰を笑顔にしたい？', q2:'どんなうれしいことを届けたい？', q3:'どんな世界になってほしい？',
-           p1:'例：病気でこまっている人', p2:'例：元気', p3:'例：みんなが安心してくらせる世界',
-           d1:'（だれ）', d2:'（届けたいもの）', d3:'（どんな世界）' },
-  es_high:{ q1:'誰を笑顔にしたい？', q2:'どんな喜びを届けたい？', q3:'どんな社会になってほしい？',
-            p1:'例：病気で苦しむ人たち', p2:'例：元気と希望', p3:'例：誰もが健康に生きられる社会',
-            d1:'（誰に）', d2:'（どんな喜び）', d3:'（どんな社会）' },
-  jh:    { q1:'誰の力になりたい？', q2:'どんな価値・喜びを届けたい？', q3:'どんな社会・未来になってほしい？',
-           p1:'例：病気で苦しむ人・スポーツが好きな人', p2:'例：安心できる治療・心が動く感動', p3:'例：誰もが安心して挑戦できる社会',
-           d1:'（誰に）', d2:'（どんな価値・喜び）', d3:'（どんな社会・未来）' },
-  adult: { q1:'誰の力になりたい？', q2:'どんな価値・変化を届けたい？', q3:'どんな社会・未来を実現したい？',
-           p1:'例：医療にアクセスしづらい人々', p2:'例：質の高い医療・生活の安心', p3:'例：誰もが尊厳を持って生きられる社会',
-           d1:'（誰に）', d2:'（どんな価値・変化）', d3:'（どんな社会・未来）' },
+  /* 案X: Q2＝相手に届けたい喜び・変化（自分→他者）。企画書の「誰かを笑顔にしたい」に一致 */
+  es_low:{ q1:'だれを えがおに したい？', q2:'その人に なにを とどけたい？', q3:'どんな せかいを つくりたい？',
+           p1:'例：びょうきの ひと', p2:'例：げんきと あんしん', p3:'例：みんなが えがおの せかい',
+           d1:'（だれ）', d2:'（とどけたいもの）', d3:'（つくりたい せかい）' },
+  es_mid:{ q1:'誰を笑顔にしたい？', q2:'その人に何を届けたい？', q3:'どんな世界をつくりたい？',
+           p1:'例：病気でこまっている人', p2:'例：元気と安心', p3:'例：みんなが安心してくらせる世界',
+           d1:'（だれ）', d2:'（届けたいもの）', d3:'（つくりたい世界）' },
+  es_high:{ q1:'誰を笑顔にしたい？', q2:'その人にどんな喜び・変化を届けたい？', q3:'どんな社会をつくりたい？',
+            p1:'例：病気で苦しむ人たち', p2:'例：また前を向ける力', p3:'例：誰もが健康に生きられる社会',
+            d1:'（誰に）', d2:'（届けたい喜び・変化）', d3:'（つくりたい社会）' },
+  jh:    { q1:'誰の力になりたい？', q2:'その人にどんな価値・変化を届けたい？', q3:'どんな社会・未来をつくりたい？',
+           p1:'例：病気で苦しむ人・スポーツが好きな人', p2:'例：もう一度挑戦する勇気', p3:'例：誰もが安心して挑戦できる社会',
+           d1:'（誰に）', d2:'（届けたい価値・変化）', d3:'（つくりたい社会・未来）' },
+  adult: { q1:'誰の力になりたい？', q2:'その人にどんな価値・変化を届けたい？', q3:'どんな社会・未来をつくりたい？',
+           p1:'例：医療にアクセスしづらい人々', p2:'例：質の高い医療と生活の安心', p3:'例：誰もが尊厳を持って生きられる社会',
+           d1:'（誰に）', d2:'（届けたい価値・変化）', d3:'（つくりたい社会・未来）' },
 };
 
 function getDreamQKey(){
@@ -2210,22 +2251,57 @@ function getDreamTemplate(){
   if(guide&&guide['文型テンプレ']) return guide['文型テンプレ'];
   return DREAM_TEMPLATES[grade]||DREAM_TEMPLATES.m3;
 }
+/* v23: Q2の外側カギ括弧・末尾句点を除去（テンプレ側が『』を付けるため二重括弧を防ぐ） */
+function normalizeQ2(s){
+  s=(s||'').trim();
+  if(s.length>=2&&'「『'.includes(s[0])&&'」』'.includes(s[s.length-1])) s=s.slice(1,-1).trim();
+  return s.replace(/。+$/,'').trim();
+}
+function escHTML(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function buildDreamText(b1,b2,b3){
   const career=selectedCareerName||'（職業名）';
   const dq=DREAM_QUESTIONS[getDreamQKey()];
-  return getDreamTemplate().replace('{職業}',career).replace('{Q1}',b1||dq.d1).replace('{Q2}',b2||dq.d2).replace('{Q3}',b3||dq.d3);
+  return getDreamTemplate().replace('{職業}',career).replace('{Q1}',b1||dq.d1).replace('{Q2}',normalizeQ2(b2)||dq.d2).replace('{Q3}',b3||dq.d3);
 }
-function buildDreamHTML(b1,b2,b3){
+function buildDreamHTML(b1,b2,b3,activeQ){
   const career=selectedCareerName||'（職業名）';
   const dq=DREAM_QUESTIONS[getDreamQKey()];
-  const slot=(val,def,extra)=>`<span class="dream-preview-slot ${val?'filled':''} ${extra||''}">${val||def}</span>`;
-  return getDreamTemplate()
-    .replace('{職業}',slot(career,'（職業名）','career'))
-    .replace('{Q1}',slot(b1,dq.d1,''))
-    .replace('{Q2}',slot(b2,dq.d2,''))
-    .replace('{Q3}',slot(b3,dq.d3,''));
+  const slot=(val,def,extra,qn)=>`<span class="dream-preview-slot ${val?'filled':''} ${extra||''} ${qn&&qn===activeQ?'active':''}">${escHTML(val)||def}</span>`;
+  return escHTML(getDreamTemplate())
+    .replace('{職業}',slot(career,'（職業名）','career',0))
+    .replace('{Q1}',slot(b1,dq.d1,'',1))
+    .replace('{Q2}',slot(normalizeQ2(b2),dq.d2,'',2))
+    .replace('{Q3}',slot(b3,dq.d3,'',3));
+}
+let dreamManualEdit=false;   // v23: 自由編集後は自動上書きしない
+let dreamActiveQ=0;          // v23: いま書いている質問番号（スロット強調用）
+function dreamFocus(n){dreamActiveQ=n;onDreamInput(n);}
+function dreamStepClick(n,ev){
+  const step=document.getElementById(`dreamStep${n}`);
+  if(step&&step.classList.contains('collapsed')){
+    dreamActiveQ=n;onDreamInput(n);
+    const inp=document.getElementById(`blank${n}`);
+    if(inp) setTimeout(()=>inp.focus(),50);
+  }
+}
+function refreshDreamSteps(){
+  [1,2,3].forEach(n=>{
+    const v=document.getElementById(`blank${n}`).value.trim();
+    const step=document.getElementById(`dreamStep${n}`);
+    const ans=document.getElementById(`dreamAns${n}`);
+    if(!step) return;
+    const collapsed=!!v&&dreamActiveQ!==n;
+    step.classList.toggle('collapsed',collapsed);
+    if(ans){ans.textContent=v?`「${v}」`:'';ans.style.display=collapsed?'block':'none';}
+  });
+}
+function resetDreamManual(){
+  dreamManualEdit=false;
+  const r=document.getElementById('dreamEditReset');if(r)r.classList.remove('show');
+  onDreamInput(dreamActiveQ);
 }
 function onDreamInput(qNum){
+  if(qNum)dreamActiveQ=qNum;
   const b1=document.getElementById('blank1').value.trim();
   const b2=document.getElementById('blank2').value.trim();
   const b3=document.getElementById('blank3').value.trim();
@@ -2248,17 +2324,24 @@ function onDreamInput(qNum){
   const pf=document.getElementById('dreamProgressFill');
   if(pc) pc.textContent=`${filled} / 3`;
   if(pf) pf.style.width=`${Math.round(filled/3*100)}%`;
+  refreshDreamSteps();
   updateDreamPreview(b1,b2,b3);
 }
 function updateDreamPreview(b1,b2,b3){
   const bub=document.getElementById('dreamPreviewBubble');
-  const text=buildDreamText(b1,b2,b3);
-  if(bub) bub.innerText=text;  // innerText で改行保持・スロットスパン不要（編集可能なのでプレーンテキスト）
   const out=document.getElementById('dreamOutput');
+  if(dreamManualEdit){ // 手動編集を尊重（bubbleはその内容を表示）
+    if(bub&&out) bub.innerText=out.value;
+    return;
+  }
+  const text=buildDreamText(b1,b2,b3);
+  if(bub) bub.innerHTML=buildDreamHTML(b1,b2,b3,dreamActiveQ).replace(/\n/g,'<br>');
   if(out) out.value=text;
 }
 function syncPreviewFromOutput(){
-  // textarea → bubble 同期（自由編集モード）
+  // textarea → bubble 同期（自由編集モード）。v23: 手動編集フラグを立て自動上書きを停止
+  dreamManualEdit=true;
+  const r=document.getElementById('dreamEditReset');if(r)r.classList.add('show');
   const v=document.getElementById('dreamOutput').value;
   const bub=document.getElementById('dreamPreviewBubble');
   if(bub) bub.innerText=v;
@@ -2276,7 +2359,7 @@ function toggleDreamEdit(){
   const isOpen=wrap.classList.contains('open');
   wrap.classList.toggle('open',!isOpen);
   icon.textContent=isOpen?'▼':'▲';
-  if(!isOpen) document.getElementById('dreamOutput').value=buildDreamText(
+  if(!isOpen&&!dreamManualEdit) document.getElementById('dreamOutput').value=buildDreamText(
     document.getElementById('blank1').value.trim(),
     document.getElementById('blank2').value.trim(),
     document.getElementById('blank3').value.trim());
@@ -2310,13 +2393,13 @@ function populateTemplatesAndHints(){
   const ex1=document.getElementById('tplExample1');
   if(ex1){
     if(isSmall){
-      ex1.textContent='「わたしの ゆめは、びょうきの ひとに げんきを とどけて、みんなが えがおの せかいを つくることです！！\nそのために、いまは おいしゃさんに なることを もくひょうに しています。」';
+      ex1.textContent='「わたしの ゆめは、びょうきの ひとに げんきと あんしんを とどけて、えがおに することです！！\nそのために、いまは おいしゃさんを めざしています。」';
     }else if(['s3','s4'].includes(grade)){
-      ex1.textContent='「私の夢は、病気でこまっている人に 元気を届けて、みんなが安心してくらせる世界をつくることです！！\nそのために、今は お医者さんになることを目標にしています。」';
+      ex1.textContent='「私の夢は、病気でこまっている人に元気と安心を届けて、笑顔にすることです！！\nそのために、今は お医者さんを目指しています。」';
     }else if(['s5','s6'].includes(grade)){
-      ex1.textContent='「私の夢は、病気で苦しむ人に元気と希望を届けて、誰もが健康に生きられる社会の実現に貢献することです！！\nその夢のために、今はお医者さんとして活躍することを目標にしています。」';
+      ex1.textContent='「私の夢は、病気で苦しむ人に、また前を向ける力を届けて、誰もが健康に生きられる社会をつくることです！！\nそのために今は、お医者さんを目指しています。」';
     }else{
-      ex1.textContent='「私の夢は、病気で苦しむ人に最善の医療を届け、誰もが尊厳を持って生きられる社会の実現に貢献していくことです！！\nその夢に向かう手段として、今は医師という仕事に就くことを目標の一つにしています。」';
+      ex1.textContent='「私の夢は、病気で苦しむ人に、もう一度前を向く力を届け、誰もが尊厳を持って生きられる社会をつくることです。\nその夢に近づく手段として、今は医師を目指しています。」';
     }
     if(useRuby) ex1.innerHTML=addFurigana(ex1.textContent);
   }
@@ -2350,7 +2433,7 @@ function renderQuestionChips(elementId, cid, type, grp, targetInputId, chipClass
       chip.onclick=()=>{
         const inp=document.getElementById(targetInputId);
         if(inp){
-          inp.value=v;
+          inp.value=(targetInputId==='blank2')?normalizeQ2(v):v;
           // 同じグループ内の他チップの used を外してから自分に付ける
           el.querySelectorAll('.dream-hint-chip').forEach(c=>c.classList.remove('used'));
           chip.classList.add('used');
@@ -2646,9 +2729,32 @@ async function saveDocAsImage(){
   if(!window.html2canvas){await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
   try{
     const canvas=await html2canvas(document.getElementById('docPaper'),{scale:2,useCORS:true,backgroundColor:'#ffffff'});
-    const link=document.createElement('a');link.download=`夢の正体_${selectedCareerName||'result'}.png`;link.href=canvas.toDataURL('image/png');link.click();
+    showImageOverlay(canvas.toDataURL('image/png'));
   }catch{alert('画像生成に失敗しました。「印刷・PDFで保存」をお試しください。');}
 }
+/* v23: iPad/iPhoneはダウンロードだと写真アプリに入らないため、
+   画像を大きく表示して「長押し→"写真"に追加」を案内する。PCはダウンロードボタン。 */
+function showImageOverlay(dataUrl){
+  let ov=document.getElementById('imgSaveOverlay');
+  if(!ov){
+    ov=document.createElement('div');ov.id='imgSaveOverlay';
+    ov.innerHTML=`<div class="sheet">
+      <div class="bar"><b>🖼 画像ができました</b><button class="close" onclick="closeImageOverlay()">✕ とじる</button></div>
+      <img id="imgSaveTarget" alt="夢の正体の画像">
+      <div class="howto">📱 <b>iPad・スマホの人：</b>上の画像を<b>ゆびで長押し</b>して、「<b>"写真"に追加</b>」をえらぶと、写真アプリに保存できるよ。</div>
+      <button class="dl" id="imgSaveDl">⬇ パソコンの人はこちら（ダウンロード）</button>
+    </div>`;
+    ov.addEventListener('click',e=>{if(e.target===ov)closeImageOverlay();});
+    document.body.appendChild(ov);
+  }
+  document.getElementById('imgSaveTarget').src=dataUrl;
+  document.getElementById('imgSaveDl').onclick=()=>{
+    const link=document.createElement('a');
+    link.download=`夢の正体_${selectedCareerName||'result'}.png`;link.href=dataUrl;link.click();
+  };
+  ov.classList.add('show');
+}
+function closeImageOverlay(){const ov=document.getElementById('imgSaveOverlay');if(ov)ov.classList.remove('show');}
 
 function showContact(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='none';syncRadioLabels();show('scContact');}
 function showContactConfirm(){
