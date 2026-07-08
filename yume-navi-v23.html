@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <!-- ═══════════════════════════════════════════════════════
-  夢ナビ v23（2026-07-02）交野市PTA協議会 夢プロジェクト
+  夢ナビ v24（2026-07-08）交野市PTA協議会 夢プロジェクト
+  【v24 変更点】Google（GAS）／スプレッドシート連携を全撤去。収集先は Supabase のみに一本化。
+  1. マスタ読み込みを master.json 単一ソース化：GASフォールバック撤去・localStorageキャッシュ撤去。
+     起動時に旧キャッシュを毎回削除し、?v=時刻でブラウザキャッシュも回避＝常に最新の master.json を読む。
+  2. 学校を確定（「ルートを選ぶ→」）したタイミングで master.json を取り直し、最新の人気ランキング等で進む。
+     取得失敗時は起動時のデータのまま止めずに続行。
+  3. 回答データ・お問い合わせの送信は Supabase のみ（GASのPOST・メール通知経路は撤去）。
+  ※メール通知は従来 GAS（Google）依存だったため本版で停止。Supabaseネイティブで復活させる場合は
+     Edge Function＋メール送信API（Resend等）またはDB Webhookが必要（別途セットアップ）。
+  ─ 以下 v23 情報 ─
   【v23 変更点】マスタv2.5.0対応＋夢の正体UI全面改修＋iPad保存対応。
   1. 結合文テンプレ再設計: Q2＝『ありがとうの言葉』を言ってもらう構文（マスタguides優先・本ファイルはフォールバック）
   2. プレビューを画面上部にsticky固定: 3つの質問のどれを書いていても結合文が見え、編集中スロットが黄色く光る
@@ -921,7 +930,7 @@ footer a:hover{text-decoration:underline;}
       <!-- v17: 氏名入力は廃止（個人情報配慮）。送信の仕組みは温存するため hidden で残す -->
       <input type="hidden" id="pName" value="">
       <p class="err-msg" id="profileErr">学校名を選んでください！</p>
-      <button class="btn-go" onclick="goRoute()">ルートを選ぶ →</button>
+      <button class="btn-go" onclick="goRoute(event)">ルートを選ぶ →</button>
     </div>
   </div>
 
@@ -1315,10 +1324,10 @@ footer a:hover{text-decoration:underline;}
 <div id="verBadge" class="ver-badge">読込中…</div>
 
 <script>
-const GAS_URL='https://script.google.com/macros/s/AKfycbyGe-GLAYQvgLp24RhajYoOKk2laNhmfOM15au3ODfM1c2hYzaYQZj5beWQTUWqC8Lgmg/exec';
+// v24: GAS（Google Apps Script）／スプレッドシート連携は撤去。収集先は Supabase のみ。
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v23';
+const APP_VERSION='v24';
 // v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
@@ -1415,7 +1424,7 @@ async function initApp(){
     init.innerHTML=
       '<div style="font-size:2.5rem">⚠️</div>'+
       '<div class="init-text">うまく読み込めませんでした。<br>下の「もう一度読み込む」を押してみてください。<br>'+
-      '<span style="font-size:.8rem;color:var(--soft)">何度も出る場合は、校内ネットワークの制限で<br>データの取得（Google）が止められている可能性があります。<br>学校のタブレット担当の先生にご相談ください。</span></div>'+
+      '<span style="font-size:.8rem;color:var(--soft)">何度も出る場合は、校内ネットワークの制限で<br>master.json の取得が止められている可能性があります。<br>学校のタブレット担当の先生にご相談ください。</span></div>'+
       '<button class="btn-go" style="max-width:260px;margin:.4rem auto 0" onclick="retryLoad()">🔄 もう一度読み込む</button>'+
       '<div class="init-err">'+msg+'</div>';
   }
@@ -1453,52 +1462,26 @@ async function fetchJSON(url,timeoutMs){
   }finally{ if(timer)clearTimeout(timer); }
 }
 
-/* ── v18: マスタ読み込み（堅牢版）───────────────────────────
-   基本方針＝「通信でデータが取れたら、保存に失敗しても必ず起動する」
-   ・約4.2MBのマスタを localStorage 保存できない端末でも動く
-   ・version一致なら重い本体(約4MB)を再取得しない（学校回線の負荷軽減）
+/* ── v24: マスタ読み込み（master.json 単一ソース）───────────
+   方針＝「master.json だけを正とする」。
+   ・GAS（スプレッドシート）フォールバックは撤去（古いデータで起動させない）
+   ・localStorage キャッシュも撤去（前回データで誤起動させない）
+   ・過去に保存された古いキャッシュは念のため毎回削除する
+   ・master.json が読めなければ、黙って古いデータを出さずにエラー表示する
 ──────────────────────────────────────────────────────────*/
 async function loadMaster(){
-  const cached=lsGet(STORAGE_KEY), cachedVer=lsGet(STORAGE_VERSION_KEY);
+  // 旧バージョンが端末に残したキャッシュを掃除（もう使わない）
+  lsDel(STORAGE_KEY); lsDel(STORAGE_VERSION_KEY);
 
-  // ── v19: ① 最優先＝同一ドメインの静的ファイル master.json（i-FILTERを確実に通る）──
-  //   キャッシュ回避のため軽くバージョン札を付ける（内容更新時にブラウザ古いのを掴まない）
-  try{
-    const j=await fetchJSON(`${MASTER_JSON_URL}?v=${Date.now()}`,30000);
-    const data=j&&(j.data||j);           // {version,data:{...}} 形式 / 素の{...} 形式 両対応
-    const ver=(j&&j.version)||'static';
-    if(data&&data.careers){
-      MASTER=data; DATA_SOURCE='master.json（静的）';
-      if(lsSet(STORAGE_KEY,JSON.stringify(MASTER))) lsSet(STORAGE_VERSION_KEY,ver);
-      return;                            // ★ここで起動確定（Google一切不要）
-    }
-  }catch(e){ /* master.json が無い/読めない → 次のGASフォールバックへ */ }
-
-  // ── ② フォールバック：GAS（Googleが通る環境用。学校外・自宅の非管理端末など）──
-  if(GAS_URL && GAS_URL!=='YOUR_GAS_WEB_APP_URL_HERE'){
-    try{
-      const vd=await fetchJSON(`${GAS_URL}?action=version`,15000);
-      const ver=vd&&vd.version;
-      if(cached&&cachedVer&&cachedVer===ver){MASTER=JSON.parse(cached);DATA_SOURCE='キャッシュ（版一致）';return;}
-      let data=null;
-      for(let attempt=0;attempt<2;attempt++){
-        try{
-          const jj=await fetchJSON(`${GAS_URL}?action=master`,30000);
-          data=jj&&jj.data; if(data)break;
-        }catch(_){}
-      }
-      if(data){
-        MASTER=data; DATA_SOURCE='GAS（Sheets）';
-        if(lsSet(STORAGE_KEY,JSON.stringify(MASTER)) && ver) lsSet(STORAGE_VERSION_KEY,ver);
-        return;
-      }
-    }catch(e){ /* GASも不通 → 次のキャッシュへ */ }
+  // 同一ドメインの静的ファイル master.json のみを読み込む
+  //   末尾にバージョン札を付け、ブラウザが古い版をキャッシュから掴まないようにする
+  const j=await fetchJSON(`${MASTER_JSON_URL}?v=${Date.now()}`,30000);
+  const data=j&&(j.data||j);             // {version,data:{...}} 形式 / 素の{...} 形式 両対応
+  if(data&&data.careers){
+    MASTER=data; DATA_SOURCE='master.json（静的）';
+    return;                              // ★master.json だけで起動確定
   }
-
-  // ── ③ 最後の砦：前回キャッシュ（オフライン/全遮断でも前回データで起動）──
-  if(cached){MASTER=JSON.parse(cached);DATA_SOURCE='キャッシュ（前回）';return;}
-
-  throw new Error('データを読み込めませんでした。master.json が index.html と同じ場所に置かれているかご確認ください。');
+  throw new Error('master.json を読み込めませんでした。index.html と同じ場所に master.json が置かれているかご確認ください。');
 }
 
 function toggleTestMode(){
@@ -1643,7 +1626,7 @@ function goProfile(){
   }
   show('scProfile');
 }
-function goRoute(){
+async function goRoute(ev){
   const sel=document.getElementById('pSchool');
   const isAdult=grade==='g';
   const err=document.getElementById('profileErr');
@@ -1657,6 +1640,16 @@ function goRoute(){
     customSchool='';
   }
   err.classList.remove('show');
+  // v24: 学校を確定したこのタイミングで master.json を取り直し、常に最新のマスタで進む。
+  //   キャッシュは使わない（loadMaster内で毎回キャッシュ削除＋?v=時刻でブラウザキャッシュも回避）。
+  //   取得に失敗しても、起動時に読み込んだ MASTER のまま止めずに進める。
+  const btn=(ev&&ev.currentTarget)||document.querySelector('#scProfile .btn-go');
+  const prev=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='最新データを確認中…';}
+  try{ await loadMaster(); }catch(_){ /* オフライン等：起動時のMASTERで続行 */ }
+  if(btn){btn.disabled=false;btn.textContent=prev;}
+  const badge=document.getElementById('srcBadge');
+  if(badge)badge.textContent=`${APP_VERSION}・${DATA_SOURCE||'—'}`;
   show('scRoute');
 }
 /* v17: 送信・ドキュメント用の学校名取得（その他入力に対応） */
@@ -2678,16 +2671,15 @@ async function saveResult(){
   const dreamIdentity=getDreamIdentity(),kansou=document.getElementById('kansouInput').value.trim();
   const btn=document.getElementById('submitBtn'),status=document.getElementById('saveStatus');
   btn.disabled=true;btn.textContent='送信中...';status.style.display='none';
-  if(!supabaseEnabled() && GAS_URL==='YOUR_GAS_WEB_APP_URL_HERE'){
+  if(!supabaseEnabled()){
     status.className='save-status err';status.textContent='⚠️ 送信先が未設定です。セットアップ手順書をご確認ください。';
     status.style.display='block';btn.disabled=false;btn.textContent='📤 宿題を提出する';return;
   }
   const g=GRADES.find(x=>x.id===grade);
   const valuesText=[...selectedValueIds,...selectedLikeChips,...selectedTokiChips].map(vid=>{const v=MASTER.values.find(x=>x['価値観ID']===vid);return v?(v[g.col]||v['価値観名（正式）']):'';}).filter(Boolean).join('・');
   const animalCharTxt=animalCharResult?(animalCharResult['本質キャラクター']||animalCharResult['キャラ名']||''):'';
-  const ts=new Date().toISOString();
   const school=getSchoolValue(), name=document.getElementById('pName').value.trim()||'（匿名）';
-  // v20: まず Supabase（GAS不要）。テーブル answers の列に合わせたキーで送る。
+  // v24: 収集先は Supabase のみ（Google/GAS/スプレッドシートは撤去）。
   let ok=false;
   if(supabaseEnabled()){
     ok=await saveToSupabase(SB_TABLE_ANSWERS,{
@@ -2696,11 +2688,6 @@ async function saveResult(){
       values_text:valuesText, animal_char:animalCharTxt,
       dream_identity:dreamIdentity, kansou, template_used:'ステップ穴埋め'
     });
-  }
-  // v20: Supabase未設定/失敗時は従来のGAS（Googleが通る環境用）にフォールバック
-  if(!ok && GAS_URL!=='YOUR_GAS_WEB_APP_URL_HERE'){
-    const payload={timestamp:ts,isTest:isTestMode,school,name,grade:g.label,route,careerId:selectedCareerId,careerName:selectedCareerName,values:valuesText,animalChar:animalCharTxt,dreamIdentity,kansou,templateUsed:'ステップ穴埋め',sheet:'回答データ'};
-    try{ await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain;charset=utf-8'}}); ok=true; }catch(e){ ok=false; }
   }
   if(ok){
     status.className='save-status ok';status.textContent='✅ 宿題を提出しました！ありがとう！';
@@ -2767,21 +2754,14 @@ function showContactConfirm(){
 }
 function backContactForm(){document.getElementById('contactForm').style.display='block';document.getElementById('contactConfirm').style.display='none';}
 async function sendContact(){
-  const ts=new Date().toISOString();
   const name=document.getElementById('cName').value.trim();
   const email=document.getElementById('cEmail').value.trim();
   const category=document.getElementById('cCategory').value;
   const reply=document.querySelector('input[name="cReply"]:checked')?.value||'不要';
   const body=document.getElementById('cBody').value.trim();
-  // v20: まず Supabase（GAS不要）。テーブル contacts の列に合わせて送る。
-  let ok=false;
+  // v24: お問い合わせの収集先も Supabase のみ（Google/GAS/スプレッドシートは撤去）。
   if(supabaseEnabled()){
-    ok=await saveToSupabase(SB_TABLE_CONTACTS,{name,email,category,reply,body});
-  }
-  // v20: 未設定/失敗時は従来のGAS（メール通知つき）にフォールバック
-  if(!ok && GAS_URL!=='YOUR_GAS_WEB_APP_URL_HERE'){
-    const payload={timestamp:ts,name,email,category,reply,body,sheet:'お問い合わせ'};
-    try{await fetch(GAS_URL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload),headers:{'Content-Type':'text/plain;charset=utf-8'}});}catch{}
+    try{ await saveToSupabase(SB_TABLE_CONTACTS,{name,email,category,reply,body}); }catch(_){}
   }
   document.getElementById('contactConfirm').style.display='none';document.getElementById('contactSent').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
 }
