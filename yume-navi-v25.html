@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25.7(2026-07-14): 編集欄をsticky外の通常textareaに分離(iOSでsticky内は入力不可のため)＋ヒント選択で即クローズ＋版数を起動直後から右下に常時表示。
+<!-- v25.8(2026-07-14): 編集方式をv25.6のcontenteditable吹き出し（実機で編集できた方式）に復帰。分離textareaは撤去。選択で即クローズ・版数即時表示は維持。
+     v25.7(2026-07-14): 編集欄をsticky外の通常textareaに分離(iOSでsticky内は入力不可のため)＋ヒント選択で即クローズ＋版数を起動直後から右下に常時表示。
      v25.6(2026-07-14): 結合文を上部固定(sticky)に復元＋吹き出し自体をcontenteditableでその場編集可能に。二重の編集欄を撤去。
      v25.5(2026-07-14): sticky撤去で表示を確実化＋版数を画面右下バッジに明示(v25.5)。記入欄ロジックはDOM模擬テストで結合文生成を確認済み。
      v25.4(2026-07-14): 記入欄を確実化＝テンプレ表示(吹き出し)を復活＋編集欄をsticky外に出しiPadで入力可＋dreamManualEdit毎回初期化。
@@ -812,7 +813,7 @@ footer a:hover{text-decoration:underline;}
 <style>
 /* ═══ v23: 夢の正体UI・画像保存オーバーレイ ═══ */
 .dream-preview-wrap.sticky-live{position:sticky;top:61px;z-index:40;background:linear-gradient(160deg,#f0fdf4 0%,#ecfeff 60%,#f0fdf4 100%);margin:0 -.4rem 1.1rem;padding:.55rem .4rem .8rem;border-top:none!important;border-bottom:2px dashed #cbd5e1;border-radius:0 0 14px 14px;}
-.dream-preview-bubble{cursor:default;min-height:3.5rem;}
+.dream-preview-bubble{cursor:text;min-height:4.4rem;-webkit-user-select:text;user-select:text;}
 .dream-preview-slot.active{background:#fef3c7!important;color:#b45309!important;box-shadow:0 0 0 2px #f59e0b;animation:slotPulse 1.6s ease-in-out infinite;}
 @keyframes slotPulse{0%,100%{box-shadow:0 0 0 2px #f59e0b;}50%{box-shadow:0 0 0 4px rgba(245,158,11,.3);}}
 .dream-step.collapsed{padding:.5rem .9rem .55rem;background:#f8fafc;cursor:pointer;border-color:#d7e3f2;}
@@ -1194,17 +1195,14 @@ footer a:hover{text-decoration:underline;}
         <div class="example-item" id="tplExample1"></div>
       </div>
 
-      <!-- ★ 夢の正体プレビュー：上部に固定表示（読み取り専用）。ヒントや下の編集で自動更新 -->
+      <!-- ★ 夢の正体プレビュー：上部に固定表示。この文を直接タップして書き直せる（v25.6の編集方式に復帰） -->
       <div class="dream-preview-wrap sticky-live">
-        <div class="dream-preview-label">🌟 あなたの夢の正体（いまの文）</div>
-        <div class="dream-preview-bubble" id="dreamPreviewBubble"></div>
-      </div>
-
-      <!-- 自由記述欄：ここで自由に書き直せる（stickyの外＝iPad Safariでも確実に入力できる） -->
-      <div class="dream-edit-block">
-        <div class="dream-edit-label">✏️ ここで自由に書き直せます（上の文と同じものが入っています）</div>
-        <textarea class="full-edit-area" id="dreamOutput" oninput="syncPreviewFromOutput()" placeholder="ここに自由に書いてね" autocapitalize="sentences" autocorrect="on" spellcheck="false" enterkeyhint="done"></textarea>
+        <div class="dream-preview-label">🌟 あなたの夢の正体
+          <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選ぶと文ができます。この文を直接タップして書き直せます✏️）</span>
+        </div>
+        <div class="dream-preview-bubble" id="dreamPreviewBubble" contenteditable="true" oninput="syncOutputFromBubble()"></div>
         <span class="dream-edit-reset" id="dreamEditReset" onclick="resetDreamManual()">🔄 ヒントからもう一度つくる</span>
+        <textarea id="dreamOutput" style="display:none" aria-hidden="true"></textarea>
       </div>
 
       <!-- 進捗バー -->
@@ -1344,7 +1342,7 @@ footer a:hover{text-decoration:underline;}
 // v24: GAS（Google Apps Script）／スプレッドシート連携は撤去。収集先は Supabase のみ。
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v25.7';
+const APP_VERSION='v25.8';
 // v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
@@ -2438,7 +2436,7 @@ function renderQuestionChips(elementId, cid, type, grp, targetInputId, chipClass
           // 選択したら、その質問は閉じて次へ進む（＝スクロール量を減らす）
           dreamActiveQ=(qNum<3)?qNum+1:0;
           refreshDreamSteps();
-          const nextEl=(qNum<3)?document.getElementById('dreamStep'+(qNum+1)):document.getElementById('dreamOutput');
+          const nextEl=(qNum<3)?document.getElementById('dreamStep'+(qNum+1)):document.getElementById('dreamPreviewBubble');
           if(nextEl) setTimeout(()=>nextEl.scrollIntoView({behavior:'smooth',block:'center'}),140);
         }
       };
