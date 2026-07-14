@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25.1(2026-07-14): 「あなたへのメッセージ」撤去 / 文型テンプレのリテラル\n修正 / 仕切りバナーをボタン化＋タップ演出 / ルートC職業提案を1リスト単一選択に統合。
+<!-- v25.2(2026-07-14): 結合文テンプレ(小1-4)に{Q3}追加＋自由記述欄を常時表示（必ず書ける）。
+     v25.1(2026-07-14): 「あなたへのメッセージ」撤去 / 文型テンプレのリテラル\n修正 / 仕切りバナーをボタン化＋タップ演出 / ルートC職業提案を1リスト単一選択に統合。
      v25(2026-07-14): 小学生向けルビ機能。静的枠組み全体へ<ruby>付与(rubifyStaticUI)。中学生以上・大人はbody.no-rubyでルビ非表示。マスタ由来テキストは誤読防止のため対象外。 -->
 <!-- ═══════════════════════════════════════════════════════
   夢ナビ v24（2026-07-08）交野市PTA協議会 夢プロジェクト
@@ -370,7 +371,7 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 #dreamOutput{display:none;}
 .dream-edit-toggle{display:flex;align-items:center;gap:.35rem;font-size:.73rem;color:var(--soft);cursor:pointer;margin-top:.65rem;user-select:none;width:fit-content;}
 .dream-edit-toggle:hover{color:var(--ocean);}
-.dream-edit-area-wrap{display:none;margin-top:.5rem;}
+.dream-edit-area-wrap{display:block;margin-top:.7rem;}
 .dream-edit-area-wrap.open{display:block;animation:fadeUp .2s ease;}
 .full-edit-area{width:100%;padding:.75rem 1rem;border:2px solid var(--ocean);border-radius:var(--radius-sm);font-family:inherit;font-size:.9rem;line-height:1.85;min-height:100px;color:var(--ink);background:#fff;resize:vertical;transition:border-color .2s;}
 .full-edit-area:focus{outline:none;border-color:#1d4ed8;}
@@ -704,7 +705,7 @@ ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
 /* 自由編集エリア（展開式） */
 .dream-edit-toggle{display:flex;align-items:center;gap:.35rem;font-size:.73rem;color:var(--soft);cursor:pointer;margin-top:.65rem;user-select:none;width:fit-content;}
 .dream-edit-toggle:hover{color:var(--ocean);}
-.dream-edit-area-wrap{display:none;margin-top:.5rem;}
+.dream-edit-area-wrap{display:block;margin-top:.7rem;}
 .dream-edit-area-wrap.open{display:block;animation:fadeUp .2s ease;}
 .full-edit-area{width:100%;padding:.75rem 1rem;border:2px solid var(--ocean);border-radius:12px;font-family:inherit;font-size:.9rem;line-height:1.85;min-height:100px;color:var(--ink);background:#fff;resize:vertical;transition:border-color .2s;}
 .full-edit-area:focus{outline:none;border-color:#1d4ed8;}
@@ -813,6 +814,7 @@ footer a:hover{text-decoration:underline;}
 .dream-step.collapsed .dream-step-input,.dream-step.collapsed .dream-hint-area{display:none;}
 .dream-step-ans{margin:.15rem 0 .05rem 2.35rem;font-size:.83rem;color:#065f46;font-weight:700;line-height:1.55;}
 .dream-step.collapsed .dream-step-head{margin-bottom:0;}
+.dream-edit-label{font-size:.78rem;font-weight:700;color:var(--pta);margin-bottom:.4rem;}
 .dream-edit-reset{display:none;margin-top:.45rem;font-size:.74rem;color:var(--ocean);cursor:pointer;text-decoration:underline;}
 .dream-edit-reset.show{display:inline-block;}
 #imgSaveOverlay{position:fixed;inset:0;z-index:9999;background:rgba(10,25,50,.78);display:none;overflow:auto;padding:1rem;-webkit-overflow-scrolling:touch;}
@@ -1187,9 +1189,11 @@ footer a:hover{text-decoration:underline;}
           <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選んでから書き換えてみてもいいよ！）</span>
         </div>
         <div class="dream-preview-bubble" id="dreamPreviewBubble"></div>
-        <!-- v23.1: 自由編集トグルは撤去（dreamOutputは提出同期用に非表示で残す） -->
+        <!-- v25.2: 自由記述欄を常時表示（自由に書くのが基本）。上の文をそのまま直接編集できる。 -->
         <div class="dream-edit-area-wrap" id="dreamEditAreaWrap">
-          <textarea class="full-edit-area" id="dreamOutput" placeholder="ここに自由に書けます" style="min-height:100px" oninput="syncPreviewFromOutput()"></textarea>
+          <div class="dream-edit-label">✏️ ここに自由に書けます（上の文をそのまま直してもOK）</div>
+          <textarea class="full-edit-area" id="dreamOutput" placeholder="ここに自由に書いてね" style="min-height:120px" oninput="syncPreviewFromOutput()"></textarea>
+          <span class="dream-edit-reset" id="dreamEditReset" onclick="resetDreamManual()">🔄 ヒントから作り直す</span>
         </div>
       </div>
 
@@ -2179,10 +2183,10 @@ function toggleAcc(id){
    ※マスタ「夢の正体ガイド」の文型テンプレが優先。以下は同一内容のフォールバック。 */
 const DREAM_TEMPLATES = {
   /* 案X: 夢の本体＝「誰かに喜び・変化を届けて笑顔にする」（企画書P3の2段階表現）。繋ぎ文字は結合時のみ付与 */
-  s1: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、えがおに することです！！\nそのために、いまは {職業}を めざしています。',
-  s2: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、えがおに することです！！\nそのために、いまは {職業}を めざしています。',
-  s3: '私の夢は、{Q1}に {Q2}を届けて、笑顔にすることです！！\nそのために、今は {職業}を目指しています。',
-  s4: '私の夢は、{Q1}に {Q2}を届けて、笑顔にすることです！！\nそのために、今は {職業}を目指しています。',
+  s1: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}を めざしています。',
+  s2: 'わたしの ゆめは、{Q1}に {Q2}を とどけて、{Q3}を つくることです！！\nそのために、いまは {職業}を めざしています。',
+  s3: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}を目指しています。',
+  s4: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために、今は {職業}を目指しています。',
   s5: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために今は、{職業}を目指しています。',
   s6: '私の夢は、{Q1}に {Q2}を届けて、{Q3}をつくることです！！\nそのために今は、{職業}を目指しています。',
   m1: '私の夢は、{Q1}に {Q2}を届け、{Q3}をつくることです。\nその夢に近づく手段として、今は{職業}を目指しています。',
@@ -2220,7 +2224,10 @@ function getDreamQKey(){
 function getDreamTemplate(){
   const g=GRADES.find(x=>x.id===grade);
   const guide=MASTER.guides&&MASTER.guides.find(x=>x['学年']===g.col);
-  const tpl=(guide&&guide['文型テンプレ'])?guide['文型テンプレ']:(DREAM_TEMPLATES[grade]||DREAM_TEMPLATES.m3);
+  const jsTpl=DREAM_TEMPLATES[grade]||DREAM_TEMPLATES.m3;
+  let tpl=(guide&&guide['文型テンプレ'])?guide['文型テンプレ']:jsTpl;
+  // Q3（どんな世界）に入力・ヒントがあるのに結合文へ反映されない不整合を防ぐ：マスタに{Q3}が無ければJS既定を使用
+  if(tpl.indexOf('{Q3}')<0 && jsTpl.indexOf('{Q3}')>=0) tpl=jsTpl;
   return tpl.replace(/\\n/g,'\n');
 }
 /* v23: Q2の外側カギ括弧・末尾句点を除去（テンプレ側が『』を付けるため二重括弧を防ぐ） */
