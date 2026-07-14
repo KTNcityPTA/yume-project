@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25(2026-07-14): 小学生向けルビ機能。静的枠組み全体へ<ruby>付与(rubifyStaticUI)。中学生以上・大人はbody.no-rubyでルビ非表示。マスタ由来テキストは誤読防止のため対象外。 -->
+<!-- v25.1(2026-07-14): 「あなたへのメッセージ」撤去 / 文型テンプレのリテラル\n修正 / 仕切りバナーをボタン化＋タップ演出 / ルートC職業提案を1リスト単一選択に統合。
+     v25(2026-07-14): 小学生向けルビ機能。静的枠組み全体へ<ruby>付与(rubifyStaticUI)。中学生以上・大人はbody.no-rubyでルビ非表示。マスタ由来テキストは誤読防止のため対象外。 -->
 <!-- ═══════════════════════════════════════════════════════
   夢ナビ v24（2026-07-08）交野市PTA協議会 夢プロジェクト
   【v24 変更点】Google（GAS）／スプレッドシート連携を全撤去。収集先は Supabase のみに一本化。
@@ -301,7 +302,12 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .guide-title{font-family:'Kaisei Decol','Hiragino Mincho ProN','ヒラギノ明朝 ProN W6','Yu Mincho',serif;font-size:1.05rem;color:var(--pta);margin-bottom:.6rem;}
 .guide-body{font-size:.88rem;line-height:2.1;color:var(--ink);}
 /* ── 仕切りバナー（大型・目立つ版）── */
-.divider-banner{border-radius:var(--radius);padding:1.7rem 1.5rem 1.8rem;margin:1.5rem 0;text-align:center;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,.35);}
+.divider-banner{border-radius:var(--radius);padding:1.7rem 1.5rem 1.8rem;margin:1.5rem 0;text-align:center;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(124,58,237,.35);cursor:pointer;transition:transform .12s ease,box-shadow .2s ease;animation:bannerAttention 2.2s ease-in-out infinite;}
+.divider-banner:hover{transform:translateY(-2px);}
+.divider-banner:active{transform:scale(.97);}
+@keyframes bannerAttention{0%,100%{box-shadow:0 8px 32px rgba(124,58,237,.35),0 0 0 0 rgba(255,255,255,.5);}50%{box-shadow:0 10px 34px rgba(124,58,237,.5),0 0 0 12px rgba(255,255,255,0);}}
+.divider-banner-cta{display:inline-flex;align-items:center;gap:.45rem;margin-top:1rem;position:relative;z-index:1;background:rgba(255,255,255,.24);border:2px solid rgba(255,255,255,.9);border-radius:50px;padding:.55rem 1.25rem;font-size:.92rem;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 14px rgba(0,0,0,.2);animation:ctaBounce 1.5s ease-in-out infinite;}
+@keyframes ctaBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(3px);}}
 .divider-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#7c3aed,#0ea5e9,#059669);background-size:200% 200%;animation:gradShift 4s ease infinite;}
 @keyframes gradShift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
 .divider-banner-label{font-size:.75rem;letter-spacing:.2em;opacity:.88;margin-bottom:.55rem;position:relative;z-index:1;text-transform:uppercase;font-weight:700;}
@@ -1100,16 +1106,10 @@ footer a:hover{text-decoration:underline;}
         👇 下のお仕事から、あなたが一番気になるものを<br><strong>【1つだけ】選んでタップ</strong>してみてね！🌟
       </div>
 
-      <!-- ブロックA：生年月日（動物キャラ）から -->
-      <div id="rcBlockAnimal" style="margin-bottom:1rem">
-        <div class="rc-block-label">🌙 生年月日から向いていると思われる仕事</div>
-        <div class="dc-grid" id="dcGridAnimal"></div>
-      </div>
-
-      <!-- ブロックB：好き・得意から -->
-      <div id="rcBlockValue">
-        <div class="rc-block-label">🎵 好き・得意から向いていると思われる仕事</div>
-        <div class="dc-grid" id="dcGridValue"></div>
+      <!-- 統合ブロック：生年月日＋好き・得意を1リスト・単一選択に -->
+      <div id="rcBlockAll">
+        <div class="rc-block-label">🌟 生年月日や好き・得意から提案するお仕事</div>
+        <div class="dc-grid" id="dcGridAll"></div>
       </div>
 
       <button class="more-btn" id="dcMoreBtnC" onclick="loadMoreCandidatesC()" style="margin:.8rem auto 0;display:flex;">＋ もっと見る</button>
@@ -1161,7 +1161,7 @@ footer a:hover{text-decoration:underline;}
       <span class="divider-banner-emoji">🌟</span>
       <div class="divider-banner-label">さあ、ここからが本番！</div>
       <div class="divider-banner-text" id="dividerBannerText">では、実際にあなたの夢の正体を考えてみよう！</div>
-      <div style="margin-top:.9rem;position:relative;z-index:1;font-size:.88rem;font-weight:700;letter-spacing:.05em;opacity:.92;">→ タップして夢の正体を明らかにしよう</div>
+      <div class="divider-banner-cta">👆 タップして夢の正体を明らかにしよう</div>
     </div>
   </div>
 
@@ -1955,7 +1955,8 @@ function generateRouteC(){
     .map(x=>x.career);
   window._cValueList=valueAllList;
 
-  /* ── 初期表示数セット ── */
+  /* ── 初期表示数セット（統合リスト） ── */
+  window._cAllShown=8;
   window._cAnimalShown=5;
   window._cValueShown=5;
 
@@ -2082,37 +2083,14 @@ function showResultC(){
 function renderCandidatesC(){
   const animalList=window._cAnimalList||[];
   const valueList=window._cValueList||[];
-  const animalShown=window._cAnimalShown||5;
-  const valueShown=window._cValueShown||5;
-
-  /* ── 動物ブロック ── */
-  const gridA=document.getElementById('dcGridAnimal');gridA.innerHTML='';
-  const blockA=document.getElementById('rcBlockAnimal');
-  if(animalList.length>0){
-    blockA.style.display='block';
-    animalList.slice(0,animalShown).forEach(c=>{
-      gridA.appendChild(makeDcCard(c,[gridA,document.getElementById('dcGridValue')]));
-    });
-  }else{
-    blockA.style.display='none';
-  }
-
-  /* ── 価値観ブロック ── */
-  const gridV=document.getElementById('dcGridValue');gridV.innerHTML='';
-  const blockV=document.getElementById('rcBlockValue');
-  if(valueList.length>0){
-    blockV.style.display='block';
-    valueList.slice(0,valueShown).forEach(c=>{
-      gridV.appendChild(makeDcCard(c,[gridA,document.getElementById('dcGridValue')]));
-    });
-  }else{
-    blockV.style.display='none';
-  }
-
-  /* 「もっと見る」表示判定 */
-  const animalHasMore=animalList.length>animalShown;
-  const valueHasMore=valueList.length>valueShown;
-  document.getElementById('dcMoreBtnC').style.display=(animalHasMore||valueHasMore)?'flex':'none';
+  const shown=window._cAllShown||8;
+  // 生年月日と好き・得意の候補を1本化（重複除去。動物→好き・得意の順で優先）
+  const seen={},combined=[];
+  animalList.concat(valueList).forEach(c=>{const id=c&&c['職業ID'];if(id&&!seen[id]){seen[id]=1;combined.push(c);}});
+  const grid=document.getElementById('dcGridAll');if(!grid)return;grid.innerHTML='';
+  combined.slice(0,shown).forEach(c=>{grid.appendChild(makeDcCard(c,[grid]));});
+  const more=document.getElementById('dcMoreBtnC');
+  if(more) more.style.display=(combined.length>shown)?'flex':'none';
 }
 
 /* カード生成ヘルパー（両グリッドの選択解除を受け取る） */
@@ -2138,15 +2116,7 @@ function makeDcCard(c,allGrids){
    　動物枯渇後：動物ブロックは増やさず、価値観+5のみ
 */
 function loadMoreCandidatesC(){
-  const animalList=window._cAnimalList||[];
-  const animalShown=window._cAnimalShown||5;
-  const valueShown=window._cValueShown||5;
-
-  const animalHasMore=animalList.length>animalShown;
-  if(animalHasMore){
-    window._cAnimalShown=animalShown+5;
-  }
-  window._cValueShown=valueShown+5;
+  window._cAllShown=(window._cAllShown||8)+8;
   renderCandidatesC();
 }
 
@@ -2194,25 +2164,9 @@ function showResult(){
 }
 
 function renderKatarikake(){
-  const g=GRADES.find(x=>x.id===grade);
-  const isSmall=['s1','s2'].includes(grade);
-  const body=document.getElementById('katarikakeBody');
+  /* v25.1: 「あなたへのメッセージ」欄は撤去（「夢の正体とは？」→次ページで十分伝わるため）。常に非表示。 */
   const section=document.getElementById('katarikakeSection');
-  if(!body)return;
-  if(MASTER.katarikake&&MASTER.katarikake.length>0){
-    const row=MASTER.katarikake.find(r=>r['職業ID']===selectedCareerId&&r['学年']===g.col);
-    if(row&&row['語りかけ本文']){
-      body.textContent=row['語りかけ本文'];
-      body.className='katarikake-body'+(isSmall?' small-grade':'');
-      section.style.display='block';return;
-    }
-  }
-  const guide=MASTER.guides.find(x=>x['学年']===g.col);
-  if(guide&&guide['ガイド本文']){
-    body.textContent=guide['ガイド本文'].slice(0,120)+(guide['ガイド本文'].length>120?'…':'');
-    body.className='katarikake-body'+(isSmall?' small-grade':'');
-    section.style.display='block';
-  }else{section.style.display='none';}
+  if(section) section.style.display='none';
 }
 
 function toggleAcc(id){
@@ -2266,8 +2220,8 @@ function getDreamQKey(){
 function getDreamTemplate(){
   const g=GRADES.find(x=>x.id===grade);
   const guide=MASTER.guides&&MASTER.guides.find(x=>x['学年']===g.col);
-  if(guide&&guide['文型テンプレ']) return guide['文型テンプレ'];
-  return DREAM_TEMPLATES[grade]||DREAM_TEMPLATES.m3;
+  const tpl=(guide&&guide['文型テンプレ'])?guide['文型テンプレ']:(DREAM_TEMPLATES[grade]||DREAM_TEMPLATES.m3);
+  return tpl.replace(/\\n/g,'\n');
 }
 /* v23: Q2の外側カギ括弧・末尾句点を除去（テンプレ側が『』を付けるため二重括弧を防ぐ） */
 function normalizeQ2(s){
