@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25.6(2026-07-14): 結合文を上部固定(sticky)に復元＋吹き出し自体をcontenteditableでその場編集可能に。二重の編集欄を撤去。
+<!-- v25.7(2026-07-14): 編集欄をsticky外の通常textareaに分離(iOSでsticky内は入力不可のため)＋ヒント選択で即クローズ＋版数を起動直後から右下に常時表示。
+     v25.6(2026-07-14): 結合文を上部固定(sticky)に復元＋吹き出し自体をcontenteditableでその場編集可能に。二重の編集欄を撤去。
      v25.5(2026-07-14): sticky撤去で表示を確実化＋版数を画面右下バッジに明示(v25.5)。記入欄ロジックはDOM模擬テストで結合文生成を確認済み。
      v25.4(2026-07-14): 記入欄を確実化＝テンプレ表示(吹き出し)を復活＋編集欄をsticky外に出しiPadで入力可＋dreamManualEdit毎回初期化。
      v25.3(2026-07-14): 夢の正体欄を「編集できる1つのテキスト欄」に統合（吹き出しと下部編集欄の二重構造を解消＝必ず書き直せる）。
@@ -811,7 +812,7 @@ footer a:hover{text-decoration:underline;}
 <style>
 /* ═══ v23: 夢の正体UI・画像保存オーバーレイ ═══ */
 .dream-preview-wrap.sticky-live{position:sticky;top:61px;z-index:40;background:linear-gradient(160deg,#f0fdf4 0%,#ecfeff 60%,#f0fdf4 100%);margin:0 -.4rem 1.1rem;padding:.55rem .4rem .8rem;border-top:none!important;border-bottom:2px dashed #cbd5e1;border-radius:0 0 14px 14px;}
-.dream-preview-bubble{cursor:text;min-height:4.4rem;-webkit-user-select:text;user-select:text;}
+.dream-preview-bubble{cursor:default;min-height:3.5rem;}
 .dream-preview-slot.active{background:#fef3c7!important;color:#b45309!important;box-shadow:0 0 0 2px #f59e0b;animation:slotPulse 1.6s ease-in-out infinite;}
 @keyframes slotPulse{0%,100%{box-shadow:0 0 0 2px #f59e0b;}50%{box-shadow:0 0 0 4px rgba(245,158,11,.3);}}
 .dream-step.collapsed{padding:.5rem .9rem .55rem;background:#f8fafc;cursor:pointer;border-color:#d7e3f2;}
@@ -822,6 +823,8 @@ footer a:hover{text-decoration:underline;}
 .dream-edit-block{margin:.3rem 0 1rem;}
 .dream-edit-reset{display:none;margin-top:.45rem;font-size:.74rem;color:var(--ocean);cursor:pointer;text-decoration:underline;}
 .dream-edit-reset.show{display:inline-block;}
+.dream-edit-block{margin:.5rem 0 1rem;scroll-margin-top:250px;}
+.full-edit-area{scroll-margin-top:250px;}
 .dream-preview-edit{width:100%;background:#fff;border:2px solid var(--ocean);border-radius:16px;padding:.85rem 1rem;font-family:inherit;font-size:.95rem;line-height:1.9;color:var(--ink);min-height:135px;resize:vertical;box-shadow:0 0 0 3px rgba(59,130,246,.06);}
 .dream-preview-edit:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(59,130,246,.2);}
 .dream-preview-edit::placeholder{color:#9aa4b2;}
@@ -1191,14 +1194,17 @@ footer a:hover{text-decoration:underline;}
         <div class="example-item" id="tplExample1"></div>
       </div>
 
-      <!-- ★ 夢の正体プレビュー（v25.6：上部に固定表示＝結合文が常に見える。この文を直接タップして書き直せる） -->
+      <!-- ★ 夢の正体プレビュー：上部に固定表示（読み取り専用）。ヒントや下の編集で自動更新 -->
       <div class="dream-preview-wrap sticky-live">
-        <div class="dream-preview-label">🌟 あなたの夢の正体
-          <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選ぶと文ができます。この文を直接タップして書き直せます✏️）</span>
-        </div>
-        <div class="dream-preview-bubble" id="dreamPreviewBubble" contenteditable="true" oninput="syncOutputFromBubble()"></div>
+        <div class="dream-preview-label">🌟 あなたの夢の正体（いまの文）</div>
+        <div class="dream-preview-bubble" id="dreamPreviewBubble"></div>
+      </div>
+
+      <!-- 自由記述欄：ここで自由に書き直せる（stickyの外＝iPad Safariでも確実に入力できる） -->
+      <div class="dream-edit-block">
+        <div class="dream-edit-label">✏️ ここで自由に書き直せます（上の文と同じものが入っています）</div>
+        <textarea class="full-edit-area" id="dreamOutput" oninput="syncPreviewFromOutput()" placeholder="ここに自由に書いてね" autocapitalize="sentences" autocorrect="on" spellcheck="false" enterkeyhint="done"></textarea>
         <span class="dream-edit-reset" id="dreamEditReset" onclick="resetDreamManual()">🔄 ヒントからもう一度つくる</span>
-        <textarea id="dreamOutput" style="display:none" aria-hidden="true"></textarea>
       </div>
 
       <!-- 進捗バー -->
@@ -1338,7 +1344,7 @@ footer a:hover{text-decoration:underline;}
 // v24: GAS（Google Apps Script）／スプレッドシート連携は撤去。収集先は Supabase のみ。
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v25.6';
+const APP_VERSION='v25.7';
 // v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
@@ -1421,6 +1427,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 /* ── v18: 起動処理本体（成功でトップ表示・失敗で再読込UI）── */
 async function initApp(){
   const init=document.getElementById('scInit');
+  const _bg=document.getElementById('srcBadge'); if(_bg) _bg.textContent=APP_VERSION;  // 版数を即表示（読み込み前でも確認可）
   try{
     await loadMaster();
     buildGradeButtons();
@@ -2428,28 +2435,11 @@ function renderQuestionChips(elementId, cid, type, grp, targetInputId, chipClass
           chip.classList.add('used');
           const qNum=targetInputId==='blank1'?1:targetInputId==='blank2'?2:3;
           onDreamInput(qNum);
-          // Q3タップ後はプレビューへスクロール＋フォーカス
-          if(qNum===3){
-            const preview=document.getElementById('dreamPreviewBubble');
-            if(preview){
-              setTimeout(()=>{
-                preview.scrollIntoView({behavior:'smooth',block:'center'});
-                setTimeout(()=>{
-                  try{
-                    preview.focus();
-                    const sel=window.getSelection();const range=document.createRange();
-                    range.selectNodeContents(preview);range.collapse(false);
-                    sel.removeAllRanges();sel.addRange(range);
-                  }catch(_){}
-                  preview.style.transition='box-shadow .3s';
-                  preview.style.boxShadow='0 0 0 4px rgba(59,130,246,.35)';
-                  setTimeout(()=>{preview.style.boxShadow='';},1200);
-                },350);
-              },120);
-            }
-          } else {
-            inp.scrollIntoView({behavior:'smooth',block:'nearest'});
-          }
+          // 選択したら、その質問は閉じて次へ進む（＝スクロール量を減らす）
+          dreamActiveQ=(qNum<3)?qNum+1:0;
+          refreshDreamSteps();
+          const nextEl=(qNum<3)?document.getElementById('dreamStep'+(qNum+1)):document.getElementById('dreamOutput');
+          if(nextEl) setTimeout(()=>nextEl.scrollIntoView({behavior:'smooth',block:'center'}),140);
         }
       };
       el.appendChild(chip);
@@ -2777,6 +2767,6 @@ function fullReset(){
   show('scGrade');
 }
 </script>
-  <div id="srcBadge" style="position:fixed;right:6px;bottom:6px;font-size:.6rem;color:#94a3b8;background:rgba(255,255,255,.72);padding:2px 8px;border-radius:8px;z-index:40;pointer-events:none;letter-spacing:.02em"></div>
+  <div id="srcBadge" style="position:fixed;right:6px;bottom:6px;font-size:.7rem;font-weight:700;color:#475569;background:rgba(255,255,255,.9);padding:3px 9px;border-radius:8px;z-index:40;pointer-events:none;letter-spacing:.02em;box-shadow:0 1px 4px rgba(0,0,0,.12)"></div>
 </body>
 </html>
