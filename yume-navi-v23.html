@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25.4(2026-07-14): 記入欄を確実化＝テンプレ表示(吹き出し)を復活＋編集欄をsticky外に出しiPadで入力可＋dreamManualEdit毎回初期化。
+<!-- v25.5(2026-07-14): sticky撤去で表示を確実化＋版数を画面右下バッジに明示(v25.5)。記入欄ロジックはDOM模擬テストで結合文生成を確認済み。
+     v25.4(2026-07-14): 記入欄を確実化＝テンプレ表示(吹き出し)を復活＋編集欄をsticky外に出しiPadで入力可＋dreamManualEdit毎回初期化。
      v25.3(2026-07-14): 夢の正体欄を「編集できる1つのテキスト欄」に統合（吹き出しと下部編集欄の二重構造を解消＝必ず書き直せる）。
      v25.2(2026-07-14): 結合文テンプレ(小1-4)に{Q3}追加＋自由記述欄を常時表示（必ず書ける）。
      v25.1(2026-07-14): 「あなたへのメッセージ」撤去 / 文型テンプレのリテラル\n修正 / 仕切りバナーをボタン化＋タップ演出 / ルートC職業提案を1リスト単一選択に統合。
@@ -1190,7 +1191,7 @@ footer a:hover{text-decoration:underline;}
       </div>
 
       <!-- ★ 夢の正体プレビュー（テンプレ表示・ヒントで自動更新） -->
-      <div class="dream-preview-wrap sticky-live">
+      <div class="dream-preview-wrap">
         <div class="dream-preview-label">🌟 あなたの夢の正体
           <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選ぶと、ここに文ができます）</span>
         </div>
@@ -1341,7 +1342,7 @@ footer a:hover{text-decoration:underline;}
 // v24: GAS（Google Apps Script）／スプレッドシート連携は撤去。収集先は Supabase のみ。
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v25';
+const APP_VERSION='v25.5';
 // v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
