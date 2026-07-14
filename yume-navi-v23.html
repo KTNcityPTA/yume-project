@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- v25.3(2026-07-14): 夢の正体欄を「編集できる1つのテキスト欄」に統合（吹き出しと下部編集欄の二重構造を解消＝必ず書き直せる）。
+<!-- v25.4(2026-07-14): 記入欄を確実化＝テンプレ表示(吹き出し)を復活＋編集欄をsticky外に出しiPadで入力可＋dreamManualEdit毎回初期化。
+     v25.3(2026-07-14): 夢の正体欄を「編集できる1つのテキスト欄」に統合（吹き出しと下部編集欄の二重構造を解消＝必ず書き直せる）。
      v25.2(2026-07-14): 結合文テンプレ(小1-4)に{Q3}追加＋自由記述欄を常時表示（必ず書ける）。
      v25.1(2026-07-14): 「あなたへのメッセージ」撤去 / 文型テンプレのリテラル\n修正 / 仕切りバナーをボタン化＋タップ演出 / ルートC職業提案を1リスト単一選択に統合。
      v25(2026-07-14): 小学生向けルビ機能。静的枠組み全体へ<ruby>付与(rubifyStaticUI)。中学生以上・大人はbody.no-rubyでルビ非表示。マスタ由来テキストは誤読防止のため対象外。 -->
@@ -816,6 +817,7 @@ footer a:hover{text-decoration:underline;}
 .dream-step-ans{margin:.15rem 0 .05rem 2.35rem;font-size:.83rem;color:#065f46;font-weight:700;line-height:1.55;}
 .dream-step.collapsed .dream-step-head{margin-bottom:0;}
 .dream-edit-label{font-size:.78rem;font-weight:700;color:var(--pta);margin-bottom:.4rem;}
+.dream-edit-block{margin:.3rem 0 1rem;}
 .dream-edit-reset{display:none;margin-top:.45rem;font-size:.74rem;color:var(--ocean);cursor:pointer;text-decoration:underline;}
 .dream-edit-reset.show{display:inline-block;}
 .dream-preview-edit{width:100%;background:#fff;border:2px solid var(--ocean);border-radius:16px;padding:.85rem 1rem;font-family:inherit;font-size:.95rem;line-height:1.9;color:var(--ink);min-height:135px;resize:vertical;box-shadow:0 0 0 3px rgba(59,130,246,.06);}
@@ -1187,12 +1189,18 @@ footer a:hover{text-decoration:underline;}
         <div class="example-item" id="tplExample1"></div>
       </div>
 
-      <!-- ★ 夢の正体の本文欄（v25.3：吹き出しと編集欄を1つに統合。ここに文ができ、そのまま自由に書き直せる） -->
+      <!-- ★ 夢の正体プレビュー（テンプレ表示・ヒントで自動更新） -->
       <div class="dream-preview-wrap sticky-live">
         <div class="dream-preview-label">🌟 あなたの夢の正体
-          <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選ぶと文ができます。この文はそのまま書き直せます✏️）</span>
+          <span style="font-size:.65rem;color:var(--soft);font-weight:400">（下のヒントを選ぶと、ここに文ができます）</span>
         </div>
-        <textarea class="dream-preview-edit" id="dreamOutput" oninput="syncPreviewFromOutput()" placeholder="下のヒントを選ぶと、ここに文ができます。自分の言葉に書き直してもOK！"></textarea>
+        <div class="dream-preview-bubble" id="dreamPreviewBubble"></div>
+      </div>
+
+      <!-- 自由記述欄：常時表示・編集可能（v25.4：stickyの外に置いてiPadでも確実に入力・修正できるように） -->
+      <div class="dream-edit-block">
+        <div class="dream-edit-label">✏️ 自分の言葉で自由に書けます（上の文を書き直してもOK）</div>
+        <textarea class="full-edit-area" id="dreamOutput" oninput="syncPreviewFromOutput()" placeholder="ここに自由に書いてね"></textarea>
         <span class="dream-edit-reset" id="dreamEditReset" onclick="resetDreamManual()">🔄 ヒントからもう一度つくる</span>
       </div>
 
@@ -2153,6 +2161,10 @@ function showResult(){
   document.getElementById('blank3').value = '';
   document.getElementById('kansouInput').value = '';
 
+  // v25.4: 手動編集フラグを毎回リセット（前回の編集状態が残ってテンプレが出ない・ヒントが反映されない不具合を防ぐ）
+  dreamManualEdit=false;
+  const _rr=document.getElementById('dreamEditReset');if(_rr)_rr.classList.remove('show');
+
   populateTemplatesAndHints();
 
   // 職業名をデフォルトとしてテンプレート文章を初期生成
@@ -2306,15 +2318,23 @@ function onDreamInput(qNum){
   updateDreamPreview(b1,b2,b3);
 }
 function updateDreamPreview(b1,b2,b3){
+  const bub=document.getElementById('dreamPreviewBubble');
   const out=document.getElementById('dreamOutput');
-  if(!out) return;
-  if(dreamManualEdit) return;            // 手動編集を尊重（自動で上書きしない）
-  out.value=buildDreamText(b1,b2,b3);
+  if(dreamManualEdit){                    // 手動編集中はプレビューも編集内容を表示
+    if(bub&&out) bub.innerText=out.value;
+    return;
+  }
+  const text=buildDreamText(b1,b2,b3);
+  if(bub) bub.innerHTML=buildDreamHTML(b1,b2,b3,dreamActiveQ).replace(/\n/g,'<br>');
+  if(out) out.value=text;
 }
 function syncPreviewFromOutput(){
-  // v25.3: 本文欄を直接編集＝手動編集モード。以後は自動で上書きしない。
+  // 本文欄を直接編集＝手動編集モード。プレビューにも反映し、以後は自動で上書きしない。
   dreamManualEdit=true;
   const r=document.getElementById('dreamEditReset');if(r)r.classList.add('show');
+  const v=document.getElementById('dreamOutput').value;
+  const bub=document.getElementById('dreamPreviewBubble');
+  if(bub) bub.innerText=v;
 }
 function syncOutputFromBubble(){
   // bubble直接編集 → dreamOutput同期
