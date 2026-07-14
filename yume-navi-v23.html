@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v25(2026-07-14): 小学生向けルビ機能。静的枠組み全体へ<ruby>付与(rubifyStaticUI)。中学生以上・大人はbody.no-rubyでルビ非表示。マスタ由来テキストは誤読防止のため対象外。 -->
 <!-- ═══════════════════════════════════════════════════════
   夢ナビ v24（2026-07-08）交野市PTA協議会 夢プロジェクト
   【v24 変更点】Google（GAS）／スプレッドシート連携を全撤去。収集先は Supabase のみに一本化。
@@ -456,7 +457,9 @@ textarea.input-field{resize:vertical;min-height:90px;line-height:1.7;}
 .confirm-val{color:var(--ink);}
 
 /* ── ルビ ── */
-ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);}
+ruby{ruby-align:center;}rt{font-size:.55em;color:var(--soft);font-weight:400;letter-spacing:0;}
+body.no-ruby rt{display:none;}
+.rb{}
 
 /* ── フッター ── */
 footer{background:var(--pta);color:#fff;text-align:center;padding:1.1rem 1rem;font-size:.72rem;line-height:1.8;}
@@ -1327,7 +1330,7 @@ footer a:hover{text-decoration:underline;}
 // v24: GAS（Google Apps Script）／スプレッドシート連携は撤去。収集先は Supabase のみ。
 const STORAGE_KEY='yumeNavi_master_v2';
 // v19: 画面右下に表示する版数とデータ取得元（デバッグ・確認用）
-const APP_VERSION='v24';
+const APP_VERSION='v25';
 // v23: 人気度はスコア型（大きいほど人気）。マスタv2.5.0とセット運用。
 let DATA_SOURCE='';
 // ── v21: 収集先＝Supabase（GAS不要のDB／学校iPadから到達可能を確認済み）──────
@@ -1556,6 +1559,7 @@ function buildGradeButtons(){
       lead.innerHTML=`こんにちは！👋<br><span style="font-size:.95rem;font-weight:400;color:var(--soft)">夢の正体を一緒に探そう！<br>学年を教えてください。</span>`;
     }
   }
+  rubifyStaticUI();
 }
 
 function renderGradeGroup(parent,groupLabel,grades,type){
@@ -1591,11 +1595,12 @@ function previewGrade(gid){
   document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
   const btn=document.querySelector(`.gs-btn[data-id="${gid}"]`);btn.classList.add('active');btn.style.background=g.color;btn.style.borderColor=g.color;
   const p=document.getElementById('gradePreview');p.style.borderColor=g.color;p.style.display='block';
-  p.innerHTML=`<span class="gc-icon">${g.icon}</span><div class="gc-name">${g.label}</div><div class="gc-desc">${g.desc}</div>`;
+  p.innerHTML=`<span class="gc-icon">${g.icon}</span><div class="gc-name">${addFurigana(escHTML(g.label))}</div><div class="gc-desc">${addFurigana(escHTML(g.desc))}</div>`;
   const cb=document.getElementById('gradeConfirmBtn');cb.style.display='block';cb.style.background=g.grad;cb.dataset.gid=gid;
 }
 function goProfile(){
   grade=document.getElementById('gradeConfirmBtn').dataset.gid;
+  document.body.classList.toggle('no-ruby',!isElementaryGrade(grade));
   const sel=document.getElementById('pSchool');
   sel.innerHTML='<option value="">── 選んでください ──</option>';
 
@@ -1966,25 +1971,7 @@ function generateRouteC(){
    よく出る漢字へ ruby タグを付ける。
    完全な形態素解析は不可なので、頻出単語の辞書置換で対応。
    ─────────────────────────────── */
-const FURIGANA_MAP = [
-  // 動詞・形容詞
-  ['感じる','かんじる'],['助ける','たすける'],['守る','まもる'],['作る','つくる'],
-  ['伝える','つたえる'],['届ける','とどける'],['喜ぶ','よろこぶ'],['楽しむ','たのしむ'],
-  ['学ぶ','まなぶ'],['育てる','そだてる'],['考える','かんがえる'],['見つける','みつける'],
-  ['動く','うごく'],['生きる','いきる'],['変える','かえる'],['広げる','ひろげる'],
-  ['高める','たかめる'],['深める','ふかめる'],['関わる','かかわる'],['支える','ささえる'],
-  // 名詞
-  ['安心','あんしん'],['笑顔','えがお'],['喜び','よろこび'],['感謝','かんしゃ'],
-  ['健康','けんこう'],['幸せ','しあわせ'],['勇気','ゆうき'],['希望','きぼう'],
-  ['仲間','なかま'],['社会','しゃかい'],['未来','みらい'],['自然','しぜん'],
-  ['動物','どうぶつ'],['食べ物','たべもの'],['体験','たいけん'],['体','からだ'],
-  ['病気','びょうき'],['医者','いしゃ'],['先生','せんせい'],['子ども','こども'],
-  ['大人','おとな'],['世界','せかい'],['言葉','ことば'],['気持ち','きもち'],
-  ['生活','せいかつ'],['環境','かんきょう'],['地球','ちきゅう'],['音楽','おんがく'],
-  ['表現','ひょうげん'],['挑戦','ちょうせん'],['努力','どりょく'],['成長','せいちょう'],
-  ['家族','かぞく'],['友達','ともだち'],['地域','ちいき'],['人々','ひとびと'],
-  ['活動','かつどう'],['安全','あんぜん'],['楽しさ','たのしさ'],['面白さ','おもしろさ'],
-];
+const FURIGANA_MAP=[['夢','ゆめ'],['正体','しょうたい'],['交野市','かたのし'],['協議会','きょうぎかい'],['仕事','しごと'],['仕事名','しごとめい'],['職業','しょくぎょう'],['職業名','しょくぎょうめい'],['学年','がくねん'],['学年選択','がくねんせんたく'],['学校','がっこう'],['学校名','がっこうめい'],['学校展開','がっこうてんかい'],['小学','しょうがく'],['中学','ちゅうがく'],['大人','おとな'],['年生','ねんせい'],['生年月日','せいねんがっぴ'],['性別','せいべつ'],['夏休','なつやす'],['宿題','しゅくだい'],['偉人','いじん'],['偉人名','いじんめい'],['社会','しゃかい'],['世界','せかい'],['分野','ぶんや'],['分析','ぶんせき'],['診断','しんだん'],['結果','けっか'],['質問','しつもん'],['感想','かんそう'],['例文','れいぶん'],['名前','なまえ'],['内容','ないよう'],['種別','しゅべつ'],['返信','へんしん'],['返信希望','へんしんきぼう'],['希望','きぼう'],['確認','かくにん'],['確認画面','かくにんがめん'],['画面','がめん'],['送信','そうしん'],['送信内容','そうしんないよう'],['送信完了','そうしんかんりょう'],['提出','ていしゅつ'],['保存','ほぞん'],['印刷','いんさつ'],['画像','がぞう'],['参考','さんこう'],['個人情報','こじんじょうほう'],['運営','うんえい'],['改善','かいぜん'],['集計','しゅうけい'],['目的','もくてき'],['使用','しよう'],['項目','こうもく'],['入力','にゅうりょく'],['所属','しょぞく'],['必須','ひっす'],['複数','ふくすう'],['複数選択可','ふくすうせんたくか'],['選択','せんたく'],['本当','ほんとう'],['本番','ほんばん'],['大切','たいせつ'],['感動','かんどう'],['病気','びょうき'],['医者','いしゃ'],['元気','げんき'],['健康','けんこう'],['動物','どうぶつ'],['力','ちから'],['人','ひと'],['人気','にんき'],['人向','ひとむ'],['好','す'],['得意','とくい'],['趣味','しゅみ'],['興味','きょうみ'],['気持','きも'],['気','き'],['誰','だれ'],['何','なに'],['方法','ほうほう'],['方','ほう'],['活用','かつよう'],['活躍','かつやく'],['相談','そうだん'],['要望','ようぼう'],['意見','いけん'],['不具合','ふぐあい'],['不要','ふよう'],['報告','ほうこく'],['苦労','くろう'],['努力','どりょく'],['憧','あこが'],['叶','かな'],['道','みち'],['紹介','しょうかい'],['減','へ'],['苦','くる'],['影響','えいきょう'],['調','しら'],['言葉','ことば'],['田中','たなか'],['太郎','たろう'],['詳細','しょうさい'],['記入','きにゅう'],['読込中','よみこみちゅう'],['月','つき'],['日','ひ'],['年','ねん'],['一','いち'],['一番','いちばん'],['一緒','いっしょ'],['件','けん'],['他','ほか'],['下','した'],['前','まえ'],['後','あと'],['中','なか'],['順','じゅん'],['本','ほん'],['探す','さがす'],['探そう','さがそう'],['探','さが'],['選ぶ','えらぶ'],['選ぼう','えらぼう'],['選んで','えらんで'],['選んだ','えらんだ'],['選','えら'],['考える','かんがえる'],['考えて','かんがえて'],['考えよう','かんがえよう'],['考','かんが'],['教えて','おしえて'],['教','おし'],['届けたい','とどけたい'],['届','とど'],['助けたい','たすけたい'],['助','たす'],['見る','みる'],['見つけた','みつけた'],['見つけたい','みつけたい'],['見えて','みえて'],['見','み'],['書いて','かいて'],['書いていま','かいていま'],['書こう','かこう'],['書き','かき'],['書けます','かけます'],['書','か'],['進む','すすむ'],['戻る','もどる'],['戻','もど'],['直す','なおす'],['直','なお'],['減らし','へらし'],['向いて','むいて'],['向かう','むかう'],['向','む'],['浮かぶ','うかぶ'],['浮','う'],['叶える','かなえる'],['笑顔','えがお'],['答えると','こたえると'],['答','こた'],['知った','しった'],['知りたい','しりたい'],['知ると','しると'],['知','し'],['思い','おもい'],['思って','おもって'],['思われる','おもわれる'],['思','おも'],['合う','あう'],['合った','あった'],['合わせ','あわせ'],['合','あ'],['生まれた','うまれた'],['生','う'],['待ち','まち'],['待','ま'],['押して','おして'],['押','お'],['開いて','ひらいて'],['開','ひら'],['読んで','よんで'],['読','よ'],['調べよう','しらべよう'],['与えた','あたえた'],['与える','あたえる'],['与','あた'],['近い','ちかい'],['近','ちか'],['出て','でて'],['出','で'],['入れられる','いれられる'],['入','い'],['実際','じっさい'],['完成','かんせい'],['準備中','じゅんびちゅう'],['少し','すこし'],['少','すこ'],['今日','きょう'],['今','いま'],['明らか','あきらか'],['明','あき'],['換えて','かえて'],['換','か'],['気づき','きづき'],['気づいた','きづいた'],['作','つく'],['付きます','つきます'],['付','つ'],['倉治小学校','くらじしょうがっこう'],['郡津小学校','こうづしょうがっこう'],['旭小学校','あさひしょうがっこう'],['星田小学校','ほしだしょうがっこう'],['妙見坂小学校','みょうけんざかしょうがっこう'],['岩船小学校','いわふねしょうがっこう'],['私市小学校','きさいちしょうがっこう'],['藤','ふじ'],['尾小学校','おしょうがっこう'],['交野','かたの'],['学園','がくえん'],['第','だい'],['中学校','ちゅうがっこう'],['小学校','しょうがっこう'],['手段','しゅだん'],['価値','かち'],['変化','へんか'],['勇気','ゆうき'],['挑戦','ちょうせん'],['未来','みらい'],['安心','あんしん'],['仲間','なかま'],['家族','かぞく'],['友達','ともだち'],['地域','ちいき'],['自然','しぜん'],['体験','たいけん'],['成長','せいちょう'],['感謝','かんしゃ'],['表現','ひょうげん'],['環境','かんきょう'],['地球','ちきゅう'],['音楽','おんがく'],['看護','かんご'],['保育','ほいく'],['警察官','けいさつかん'],['消防士','しょうぼうし'],['宇宙飛行士','うちゅうひこうし'],['選手','せんしゅ'],['声優','せいゆう'],['動機','どうき'],['喜','よろこ'],['本質','ほんしつ'],['天体','てんたい'],['理由','りゆう'],['候補','こうほ'],['分','わ'],['目指','めざ'],['近づく','ちかづく'],['自分','じぶん'],['自身','じしん'],['自由','じゆう'],['軸','じく'],['将来','しょうらい'],['第一歩','だいいっぽ'],['踏','ふ'],['描','えが'],['現実','げんじつ'],['進路','しんろ'],['尊厳','そんげん'],['医療','いりょう'],['得','え'],['使い方','つかいかた'],['何だろう','なんだろう'],['私','わたし'],['深','ふか'],['身','み'],['中身','なかみ'],['立場','たちば'],['医師','いし'],['言語','げんご'],['生きられる','いきられる'],['生きる','いきる'],['生きよう','いきよう'],['生活','せいかつ'],['前を向','まえをむ'],['前向','まえむ'],['向ける','むける'],['一度','いちど'],['一つ','ひとつ'],['使い','つかい'],['使','つか'],['例','れい'],['修正','しゅうせい'],['最初','さいしょ'],['同','おな'],['問','と'],['送','おく'],['関','かん'],['上','うえ']];
 
 function addFurigana(text){
   // v17: 旧Safari（iOS16.3以前）はlookbehind正規表現で実行時エラーになるため、
@@ -1999,10 +1986,48 @@ function addFurigana(text){
   return result;
 }
 
+/* v25: 小学生向けルビ。静的枠組みテキストへ一括<ruby>付与（マスタ由来テキストは誤読防止のため対象外）。中学生以上・大人はbody.no-rubyでルビ非表示。 */
+const RUBY_SKIP_TAGS={SCRIPT:1,STYLE:1,RUBY:1,RT:1,TEXTAREA:1,INPUT:1,SELECT:1,OPTION:1};
+function rubifyStaticUI(){
+  const roots=[document.querySelector('header'),document.getElementById('docView'),
+               document.getElementById('finishOverlay'),document.querySelector('main'),
+               document.querySelector('footer')];
+  roots.forEach(r=>{ if(r) walkRuby(r); });
+}
+function walkRuby(root){
+  let walker;
+  try{
+    walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
+      acceptNode(n){
+        if(!n.nodeValue||!/[一-鿿々]/.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+        let p=n.parentNode;
+        while(p&&p.nodeType===1){
+          if(RUBY_SKIP_TAGS[p.tagName]) return NodeFilter.FILTER_REJECT;
+          if(p.hasAttribute&&p.hasAttribute('data-noruby')) return NodeFilter.FILTER_REJECT;
+          p=p.parentNode;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+  }catch(_){ return; }
+  const targets=[]; let node;
+  while(node=walker.nextNode()) targets.push(node);
+  targets.forEach(n=>{
+    const esc=escHTML(n.nodeValue);
+    const rb=addFurigana(esc);
+    if(rb!==esc){
+      const span=document.createElement('span');
+      span.className='rb'; span.innerHTML=rb;
+      if(n.parentNode) n.parentNode.replaceChild(span,n);
+    }
+  });
+}
+function isElementaryGrade(gid){return /^s\d/.test(gid||'');}
+
 function showResultC(){
   const g=GRADES.find(x=>x.id===grade);
   document.getElementById('resHeaderC').style.background=g.grad;
-  document.getElementById('resSubC').textContent=g.label;
+  document.getElementById('resSubC').innerHTML=addFurigana(escHTML(g.label));
 
   // 小1〜3はルビを付与する
   const useRuby=['s1','s2','s3'].includes(grade);
@@ -2017,18 +2042,18 @@ function showResultC(){
     const emoji=animalCharResult['絵文字']||(emojiHit?emojiHit[1]:'🌟');
     const group=animalCharResult['天体グループ']?`${animalCharResult['天体グループ']}グループ`:'';
     // キャラ名にもルビ
-    const nameDisplay=useRuby?addFurigana(name):name;
+    const nameDisplay=escHTML(name);
     document.getElementById('resAnimalNameC').innerHTML=`${emoji} ${nameDisplay}`;
-    const groupDisplay=useRuby?addFurigana(group):group;
+    const groupDisplay=escHTML(group);
     document.getElementById('resAnimalGroupC').innerHTML=group?`🪐 ${groupDisplay}`:'';
     document.getElementById('resAnimalGroupC').style.display=group?'table':'none';
     const engine=animalCharResult[`${ck}_心のエンジン`]||'';
     const exp=animalCharResult[`${ck}_得られる体験`]||'';
-    const engineLabel=useRuby?'💛 こころのエンジン（やる気のもと）':'💛 こころのエンジン（動機）';
-    const expLabel=useRuby?'✨ えられる体験（よろこび）':'✨ 得られる体験（喜び）';
+    const engineLabel=addFurigana('💛 こころのエンジン（動機）');
+    const expLabel=addFurigana('✨ 得られる体験（喜び）');
     let html='';
-    if(engine)html+=`<div class="animal-prop-box"><div class="animal-prop-title">${engineLabel}</div><div class="animal-prop-text">${useRuby?addFurigana(engine):engine}</div></div>`;
-    if(exp)html+=`<div class="animal-prop-box"><div class="animal-prop-title">${expLabel}</div><div class="animal-prop-text">${useRuby?addFurigana(exp):exp}</div></div>`;
+    if(engine)html+=`<div class="animal-prop-box"><div class="animal-prop-title">${engineLabel}</div><div class="animal-prop-text">${escHTML(engine)}</div></div>`;
+    if(exp)html+=`<div class="animal-prop-box"><div class="animal-prop-title">${expLabel}</div><div class="animal-prop-text">${escHTML(exp)}</div></div>`;
     document.getElementById('resAnimalDescC').innerHTML=html;
   }
 
@@ -2131,8 +2156,8 @@ function showResult(){
   const h1=document.getElementById('resHeader1');if(h1)h1.style.background=g.grad;
   const titleText=`「${selectedCareerName}」の夢の正体`;
   const subText=`${g.label} ／ ${route==='A'?'なりたい仕事から':route==='B'?'したいことから':'夢を一緒に考えるルート'}`;
-  document.getElementById('resTitle1').textContent=titleText;
-  document.getElementById('resSub1').textContent=subText;
+  document.getElementById('resTitle1').innerHTML='「'+escHTML(selectedCareerName||'')+'」'+addFurigana('の夢の正体');
+  document.getElementById('resSub1').innerHTML=addFurigana(escHTML(subText));
   document.getElementById('transformCareer').textContent=selectedCareerName||'—';
   
   const isSmall=['s1','s2'].includes(grade);
@@ -2142,7 +2167,7 @@ function showResult(){
     ?`では、実際にあなたの夢の正体を考えてみよう！`
     :`では、あなた自身の夢の正体を言語化してみよう。`;
   const bannerEl=document.getElementById('dividerBannerText');
-  if(bannerEl){bannerEl.textContent=bannerText;bannerEl.className='divider-banner-text'+(isSmall?' small':'');}
+  if(bannerEl){bannerEl.innerHTML=addFurigana(escHTML(bannerText));bannerEl.className='divider-banner-text'+(isSmall?' small':'');}
   renderKatarikake();
   const guide=MASTER.guides.find(x=>x['学年']===g.col);
   if(guide){document.getElementById('guideTitle').textContent=guide['ガイドタイトル']||'夢の正体って何だろう？';document.getElementById('guideBody').textContent=guide['ガイド本文']||'';}
@@ -2370,9 +2395,9 @@ function populateTemplatesAndHints(){
   const useRuby=['s1','s2','s3'].includes(grade);
 
   // 設問ラベルを学年に合わせて更新
-  document.getElementById('dreamQ1Label').textContent=`❶ ${dq.q1}`;
-  document.getElementById('dreamQ2Label').textContent=`❷ ${dq.q2}`;
-  document.getElementById('dreamQ3Label').textContent=`❸ ${dq.q3}`;
+  document.getElementById('dreamQ1Label').innerHTML=`❶ ${addFurigana(escHTML(dq.q1))}`;
+  document.getElementById('dreamQ2Label').innerHTML=`❷ ${addFurigana(escHTML(dq.q2))}`;
+  document.getElementById('dreamQ3Label').innerHTML=`❸ ${addFurigana(escHTML(dq.q3))}`;
   document.getElementById('blank1').placeholder=dq.p1;
   document.getElementById('blank2').placeholder=dq.p2;
   document.getElementById('blank3').placeholder=dq.p3;
@@ -2394,7 +2419,7 @@ function populateTemplatesAndHints(){
     }else{
       ex1.textContent='「私の夢は、病気で苦しむ人に、もう一度前を向く力を届け、誰もが尊厳を持って生きられる社会をつくることです。\nその夢に近づく手段として、今は医師を目指しています。」';
     }
-    if(useRuby) ex1.innerHTML=addFurigana(ex1.textContent);
+    ex1.innerHTML=addFurigana(escHTML(ex1.textContent)).replace(/\n/g,'<br>');
   }
 
   // writingSubも学年別に
@@ -2403,7 +2428,7 @@ function populateTemplatesAndHints(){
     sub.textContent=isSmall
       ?'ヒントをタップしながら、3つのしつもんにこたえてみてね！'
       :'ヒントを参考に3つの質問に答えると、あなただけの夢の正体が完成するよ！';
-    if(useRuby) sub.innerHTML=addFurigana(sub.textContent);
+    sub.innerHTML=addFurigana(escHTML(sub.textContent));
   }
 
   // 初期プレビュー
@@ -2767,6 +2792,7 @@ async function sendContact(){
 }
 function fullReset(){
   grade=null;route=null;selectedCareerId=null;selectedCareerName=null;customSchool='';
+  document.body.classList.remove('no-ruby');
   selectedValueIds=[];selectedLikeChips=[];selectedTokiChips=[];catSelected=[];animalCharResult=null;
   window._cAnimalList=[];window._cValueList=[];window._cAnimalShown=5;window._cValueShown=5;
   document.querySelectorAll('.gs-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.borderColor='';});
